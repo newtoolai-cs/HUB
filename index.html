@@ -18,8 +18,63 @@
   document.documentElement.setAttribute('data-theme',t);
 })();
 </script>
+<style>
+/* =====================================================================
+   ПРЕЛОУДЕР. Стили лежат в <head>, чтобы он появился до всего
+   остального и не мигнул. Тема берётся из data-theme на <html>.
+   ===================================================================== */
+body.booting{overflow:hidden}
+.boot{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:#E7EBEF;transition:opacity .4s ease;
+}
+:root[data-theme="dark"] .boot{background:#0A0B0E}
+.boot.gone{opacity:0;pointer-events:none}
+.boot-in{
+  display:flex;flex-direction:column;align-items:center;gap:15px;
+  animation:bootIn .45s ease both;
+}
+.boot-mark{font-size:19px;line-height:1;color:#2F6BFF}
+:root[data-theme="dark"] .boot-mark{color:#5C8DFF;text-shadow:0 0 18px rgba(92,141,255,.55)}
+.boot-name{
+  /* системный шрифт намеренно: свой ещё не загружен, и подмена была бы заметна */
+  font:600 14px/1 system-ui,-apple-system,'Segoe UI',sans-serif;
+  letter-spacing:.24em;text-transform:uppercase;color:#161B23;
+}
+:root[data-theme="dark"] .boot-name{color:#EEF0F4}
+.boot-track{
+  position:relative;width:128px;height:2px;border-radius:2px;overflow:hidden;
+  background:rgba(22,27,35,.13);
+}
+:root[data-theme="dark"] .boot-track{background:rgba(255,255,255,.1)}
+.boot-track i{
+  position:absolute;top:0;bottom:0;width:42%;border-radius:2px;background:#2F6BFF;
+  animation:bootSweep 1.15s cubic-bezier(.55,0,.45,1) infinite;
+}
+:root[data-theme="dark"] .boot-track i{background:#5C8DFF;box-shadow:0 0 12px rgba(92,141,255,.75)}
+.boot-note{
+  font:400 9.5px/1 ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  letter-spacing:.2em;text-transform:uppercase;color:#8A94A3;
+}
+:root[data-theme="dark"] .boot-note{color:#69737F}
+@keyframes bootSweep{from{left:-45%}to{left:100%}}
+@keyframes bootIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  .boot-in{animation:none}
+  .boot-track i{animation:none;left:0;width:100%}
+}
+</style>
 </head>
-<body>
+<body class="booting">
+
+<div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
+  <div class="boot-in">
+    <div class="boot-mark">◤</div>
+    <div class="boot-name">Deck Hub</div>
+    <div class="boot-track"><i></i></div>
+    <div class="boot-note">загрузка</div>
+  </div>
+</div>
 
 <!-- ============ стили Prompt Deck ============ -->
 <style>
@@ -2226,6 +2281,28 @@ const LINKS = [
   const boot=location.hash.replace('#/','');
   const bs=SERVICES.find(x=>x.id===boot);
   if(bs&&bs.screen) enter(boot);
+})();
+</script>
+
+<script>
+/* прелоудер скрывается по готовности шрифтов или по загрузке страницы,
+   но не раньше 420 мс — иначе на быстрой сети он просто мигнёт */
+(function(){
+  var el=document.getElementById('boot');
+  if(!el) return;
+  var t0=Date.now(), MIN=420, MAX=2600, done=false;
+  function hide(){
+    if(done) return; done=true;
+    setTimeout(function(){
+      el.classList.add('gone');
+      document.body.classList.remove('booting');
+      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el) },450);
+    }, Math.max(0, MIN-(Date.now()-t0)));
+  }
+  if(document.readyState==='complete') hide();
+  else window.addEventListener('load',hide);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(hide).catch(hide);
+  setTimeout(hide,MAX);   // страховка, если что-то не догрузилось
 })();
 </script>
 

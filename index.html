@@ -1731,14 +1731,15 @@ const ITEMS=[
 ];
 const IT=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
 
-/* Диапазоны из методики. Концы Low / Medium / High включительны,
-   между ними остаются разрывы (3.75–4 и 5.25–5.3) — их методика не покрывает. */
+/* Диапазоны из методики: Low [2.5–3.80], Medium [3.85–5.25], High [5.3–6.7].
+   Концы включительны, между диапазонами остаются разрывы (3.80–3.85 и
+   5.25–5.30) — их методика не покрывает, конструктор их подсвечивает. */
 const RANGES=[
   {from:0,   to:1.8,                     tier:'primitive',label:'по таблице поинтов',below:true},
   {from:1.8, to:2.5,                     tier:'lowest',   label:'по таблице поинтов',below:true},
-  {from:2.5, to:3.75,toInc:true,         tier:'low',      label:'Low'},
-  {from:3.75,to:4,   fromEx:true,        tier:'medium',   label:'разрыв Low / Medium',gap:true},
-  {from:4,   to:5.25,toInc:true,         tier:'medium',   label:'Medium'},
+  {from:2.5, to:3.8, toInc:true,         tier:'low',      label:'Low'},
+  {from:3.8, to:3.85,fromEx:true,        tier:'medium',   label:'разрыв Low / Medium',gap:true},
+  {from:3.85,to:5.25,toInc:true,         tier:'medium',   label:'Medium'},
   {from:5.25,to:5.3, fromEx:true,        tier:'high',     label:'разрыв Medium / High',gap:true},
   {from:5.3, to:6.7, toInc:true,         tier:'high',     label:'High'},
   {from:6.7, to:99,  fromEx:true,        tier:'highest',  label:'выше High-диапазона',above:true},

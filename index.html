@@ -638,6 +638,202 @@ body.booting{overflow:hidden}
 }
 </style>
 
+<!-- ============ стили музыки (скоуп #screenMusic) ============ -->
+<style>
+#screenMusic{
+  --r-sm:6px; --r:10px; --r-lg:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --t:140ms cubic-bezier(.4,0,.2,1);
+}
+:root[data-theme="dark"] #screenMusic{
+  --bg:#101218; --surface:#171A22; --surface-2:#1E222C; --surface-3:#262B37;
+  --border:#2A2F3C; --border-strong:#3A4051;
+  --text:#E8EAF0; --dim:#8A90A2; --faint:#5C6274;
+  --hot:#E8B33C; --warm:#7C8CF8; --cold:#6B7280;
+  --hot-soft:rgba(232,179,60,.13); --warm-soft:rgba(124,140,248,.13); --cold-soft:rgba(107,114,128,.13);
+  --danger:#E8635C;
+  --shadow:0 18px 50px rgba(0,0,0,.55);
+}
+:root[data-theme="light"] #screenMusic{
+  --bg:#F1F2F6; --surface:#FFFFFF; --surface-2:#F6F7FA; --surface-3:#EBEDF3;
+  --border:#DFE2EA; --border-strong:#C6CBD8;
+  --text:#161923; --dim:#666D80; --faint:#949AAB;
+  --hot:#B8801A; --warm:#4F5FD4; --cold:#727A8A;
+  --hot-soft:rgba(184,128,26,.10); --warm-soft:rgba(79,95,212,.10); --cold-soft:rgba(114,122,138,.10);
+  --danger:#C6423B;
+  --shadow:0 18px 50px rgba(20,25,40,.14);
+}
+#screenMusic [data-bucket="week"]{ --accent:var(--hot);  --accent-soft:var(--hot-soft);  }
+#screenMusic [data-bucket="month"]{ --accent:var(--warm); --accent-soft:var(--warm-soft); }
+#screenMusic [data-bucket="old"]{ --accent:var(--cold); --accent-soft:var(--cold-soft); }
+#screenMusic *{box-sizing:border-box}
+
+#screenMusic{background:var(--bg);color:var(--text);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;padding-bottom:96px}
+#screenMusic button, #screenMusic input, #screenMusic select{font:inherit;color:inherit}
+#screenMusic button{cursor:pointer;background:none;border:none}
+#screenMusic :focus-visible{outline:2px solid var(--warm);outline-offset:2px;border-radius:var(--r-sm)}
+#screenMusic mark{background:var(--hot-soft);color:var(--hot);border-radius:3px;padding:0 2px}
+#screenMusic ::-webkit-scrollbar{width:10px;height:10px}
+#screenMusic ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px;border:3px solid var(--bg)}
+#screenMusic .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+#screenMusic /* шапка */
+.top{border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:40}
+#screenMusic .top-in{display:flex;align-items:center;gap:14px;padding:16px 0}
+#screenMusic .brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;min-width:0}
+#screenMusic .brand h1{margin:0;font-size:19px;font-weight:750;letter-spacing:-.03em;white-space:nowrap}
+#screenMusic .brand .sub{font:11px/1 var(--mono);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+#screenMusic .mode-tag{font:10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:var(--r-sm);border:1px solid var(--border);color:var(--dim)}
+#screenMusic .mode-tag.local{color:var(--hot);border-color:var(--hot);background:var(--hot-soft)}
+#screenMusic .icon-btn{width:36px;height:36px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);display:grid;place-items:center;transition:var(--t);flex:none}
+#screenMusic .icon-btn:hover{border-color:var(--border-strong);background:var(--surface-2)}
+#screenMusic .icon-btn svg{width:17px;height:17px;stroke:var(--text);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#screenMusic .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);font-size:14px;font-weight:550;transition:var(--t);white-space:nowrap}
+#screenMusic .btn:hover{border-color:var(--border-strong);background:var(--surface-2)}
+#screenMusic .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+#screenMusic .btn.primary:hover{opacity:.87}
+#screenMusic .btn.ghost{border-color:transparent;color:var(--dim)}
+#screenMusic .btn.ghost:hover{color:var(--text);background:var(--surface-2)}
+#screenMusic .btn.danger{color:var(--danger);border-color:var(--border)}
+#screenMusic .btn.danger:hover{border-color:var(--danger);background:var(--surface-2)}
+#screenMusic .btn:disabled, #screenMusic .icon-btn:disabled{opacity:.5;pointer-events:none}
+#screenMusic /* секции */
+.sections{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+#screenMusic .sections::-webkit-scrollbar{display:none}
+#screenMusic .sec{display:flex;align-items:center;gap:9px;padding:14px 2px;margin-right:26px;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--dim);font-size:14px;font-weight:550;transition:var(--t);white-space:nowrap}
+#screenMusic .sec:hover{color:var(--text)}
+#screenMusic .sec .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+#screenMusic .sec .n{font:11px/1 var(--mono);color:var(--faint);padding:3px 6px;border-radius:5px;background:var(--surface-2)}
+#screenMusic .sec[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+#screenMusic .sec[aria-selected="true"] .n{background:var(--accent-soft);color:var(--accent)}
+#screenMusic .rollover{display:flex;align-items:center;gap:8px;padding:11px 0 0;font:11px/1.4 var(--mono);color:var(--faint)}
+#screenMusic .rollover b{color:var(--accent);font-weight:600}
+#screenMusic /* фильтры */
+.filters{display:flex;flex-wrap:wrap;gap:9px;padding:16px 0 0}
+#screenMusic .search{position:relative;flex:1 1 260px;min-width:200px}
+#screenMusic .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--faint);fill:none;stroke-width:1.8}
+#screenMusic .search input{width:100%;height:38px;padding:0 34px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);transition:var(--t)}
+#screenMusic .search input:focus{border-color:var(--border-strong);outline:none}
+#screenMusic .search input::placeholder{color:var(--faint)}
+#screenMusic .search .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:5px;color:var(--faint);display:none;place-items:center}
+#screenMusic .search.has .clear{display:grid}
+#screenMusic .search .clear:hover{color:var(--text);background:var(--surface-3)}
+#screenMusic select.pill{height:38px;padding:0 30px 0 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);appearance:none;transition:var(--t);font-size:14px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 15px) 17px,calc(100% - 11px) 17px;background-size:4px 4px;background-repeat:no-repeat}
+#screenMusic select.pill:hover{border-color:var(--border-strong)}
+#screenMusic .count-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0 10px;font:11px/1 var(--mono);color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+#screenMusic /* список */
+.list{display:flex;flex-direction:column;gap:8px;padding-bottom:40px}
+#screenMusic .card{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);padding:14px 16px 0;transition:border-color var(--t),background var(--t)}
+#screenMusic .card:hover{border-color:var(--border-strong)}
+#screenMusic .card.playing{border-color:var(--accent);background:var(--surface-2)}
+#screenMusic .card-main{display:flex;align-items:flex-start;gap:13px}
+#screenMusic .play{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface-2);display:grid;place-items:center;transition:var(--t);margin-top:1px}
+#screenMusic .play:hover{background:var(--surface-3);border-color:var(--accent)}
+#screenMusic .play svg{width:13px;height:13px;fill:var(--text);stroke:none;margin-left:1px}
+#screenMusic .card.playing .play{background:var(--accent);border-color:var(--accent)}
+#screenMusic .card.playing .play svg{fill:var(--bg);margin-left:0}
+#screenMusic .info{flex:1;min-width:0}
+#screenMusic .ttl{font-size:15px;font-weight:600;letter-spacing:-.01em;word-break:break-word}
+#screenMusic .meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 8px;padding-top:4px;font:11px/1.7 var(--mono);color:var(--dim)}
+#screenMusic .meta .sep{color:var(--faint)}
+#screenMusic .meta .mood{color:var(--accent)}
+#screenMusic .chips{display:flex;flex-wrap:wrap;gap:5px;padding-top:8px}
+#screenMusic .chip{font:10px/1 var(--mono);padding:5px 7px;border-radius:5px;background:var(--surface-2);color:var(--dim)}
+#screenMusic .chip.code{color:var(--accent);background:var(--accent-soft)}
+#screenMusic .chip.nofile{color:var(--danger);background:transparent;border:1px solid var(--border)}
+#screenMusic .actions{display:flex;align-items:center;gap:4px;flex:none}
+#screenMusic .act{height:32px;padding:0 10px;border-radius:var(--r-sm);color:var(--dim);display:inline-flex;align-items:center;gap:6px;font:11px/1 var(--mono);transition:var(--t)}
+#screenMusic .act:hover{color:var(--text);background:var(--surface-3)}
+#screenMusic .act svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#screenMusic /* полоса свежести */
+.decay{display:flex;align-items:center;gap:10px;padding:12px 0 13px;margin-top:12px;border-top:1px solid var(--border)}
+#screenMusic .decay-bar{flex:1;height:3px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+#screenMusic .decay-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s linear}
+#screenMusic .decay-txt{font:10px/1 var(--mono);color:var(--faint);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+#screenMusic .decay-txt b{color:var(--accent);font-weight:600}
+#screenMusic .decay.flat{padding:11px 0 12px}
+#screenMusic .empty{border:1px dashed var(--border);border-radius:var(--r-lg);padding:56px 24px;text-align:center}
+#screenMusic .empty h3{margin:0 0 6px;font-size:16px;font-weight:600}
+#screenMusic .empty p{margin:0 0 18px;color:var(--dim);font-size:14px}
+#screenMusic /* загрузка */
+.queue{display:flex;flex-direction:column;gap:6px;padding:0 0 14px}
+#screenMusic .qrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);padding:10px 13px}
+#screenMusic .qname{font:12px/1.4 var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenMusic .qstate{font:10px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+#screenMusic .qstate.ok{color:var(--warm)}
+#screenMusic .qstate.err{color:var(--danger)}
+#screenMusic .qbar{grid-column:1/-1;height:3px;background:var(--surface-3);border-radius:2px;overflow:hidden}
+#screenMusic .qbar i{display:block;height:100%;background:var(--warm);width:0;transition:width 160ms linear}
+#screenMusic .drop{position:fixed;inset:0;z-index:95;background:rgba(6,8,14,.72);backdrop-filter:blur(3px);display:none;place-items:center}
+#screenMusic .drop.on{display:grid}
+#screenMusic .drop-in{border:2px dashed var(--warm);border-radius:var(--r-lg);padding:48px 64px;text-align:center;color:var(--text);font-size:17px;font-weight:600;background:var(--surface)}
+#screenMusic /* плеер */
+.player{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--surface);border-top:1px solid var(--border);transform:translateY(105%);transition:transform 220ms cubic-bezier(.4,0,.2,1)}
+#screenMusic .player.on{transform:none}
+#screenMusic .player-in{display:flex;align-items:center;gap:14px;padding:12px 0}
+#screenMusic .player .play{margin:0}
+#screenMusic .p-info{flex:1;min-width:0}
+#screenMusic .p-ttl{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenMusic .p-sub{font:11px/1.6 var(--mono);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenMusic .p-time{font:11px/1 var(--mono);color:var(--faint);flex:none}
+#screenMusic .seek{flex:2 1 160px;height:4px;border-radius:2px;background:var(--surface-3);cursor:pointer;min-width:80px}
+#screenMusic .seek-fill{height:100%;background:var(--accent);border-radius:2px;width:0}
+#screenMusic .p-err{color:var(--danger)}
+#screenMusic /* модалки */
+.scrim{position:fixed;inset:0;z-index:80;background:rgba(6,8,14,.62);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+#screenMusic .scrim.on{display:flex}
+#screenMusic .modal{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+#screenMusic .modal.wide{max-width:720px}
+#screenMusic .m-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border)}
+#screenMusic .m-head h2{margin:0;font-size:16px;font-weight:650;letter-spacing:-.02em;flex:1}
+#screenMusic .m-body{padding:20px}
+#screenMusic .m-foot{display:flex;gap:9px;justify-content:flex-end;padding:16px 20px;border-top:1px solid var(--border)}
+#screenMusic .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#screenMusic .field{display:flex;flex-direction:column;gap:6px}
+#screenMusic .field.full{grid-column:1/-1}
+#screenMusic .field label{font:10px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+#screenMusic .field input{height:38px;padding:0 11px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface-2);transition:var(--t);width:100%}
+#screenMusic .field input:focus{border-color:var(--border-strong);outline:none}
+#screenMusic .field .hint{font:10px/1.4 var(--mono);color:var(--faint)}
+#screenMusic .check{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--dim);grid-column:1/-1}
+#screenMusic .check input{width:16px;height:16px;accent-color:var(--warm)}
+#screenMusic .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+#screenMusic .stat{border:1px solid var(--border);border-radius:var(--r);padding:14px;background:var(--surface-2)}
+#screenMusic .stat .v{font:26px/1 var(--mono);font-weight:600;letter-spacing:-.03em;color:var(--accent)}
+#screenMusic .stat .k{font:10px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding-top:7px}
+#screenMusic .s-title{font:10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:0 0 10px}
+#screenMusic .bars{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
+#screenMusic .bar-row{display:grid;grid-template-columns:minmax(0,1fr) 46px;align-items:center;gap:10px}
+#screenMusic .bar-lbl{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenMusic .bar-wrap{grid-column:1/-1;height:3px;background:var(--surface-3);border-radius:2px;overflow:hidden;margin-top:-4px}
+#screenMusic .bar-fill{height:100%;background:var(--warm);border-radius:2px}
+#screenMusic .bar-n{font:11px/1 var(--mono);color:var(--dim);text-align:right}
+#screenMusic .quota{border:1px solid var(--border);border-radius:var(--r);padding:14px;background:var(--surface-2);margin-bottom:22px}
+#screenMusic .quota-top{display:flex;justify-content:space-between;font:11px/1 var(--mono);color:var(--dim);padding-bottom:9px}
+#screenMusic .quota-bar{height:5px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+#screenMusic .quota-fill{height:100%;border-radius:3px;background:var(--warm)}
+#screenMusic .quota-fill.hot{background:var(--hot)}
+#screenMusic .quota-fill.over{background:var(--danger)}
+#screenMusic .quota-note{font:10px/1.5 var(--mono);color:var(--faint);padding-top:9px}
+#screenMusic .toast{position:fixed;left:50%;bottom:110px;transform:translate(-50%,14px);z-index:99;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-size:13px;font-weight:550;opacity:0;pointer-events:none;transition:var(--t);max-width:82vw;text-align:center}
+#screenMusic .toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:640px){
+#screenMusic .wrap{padding:0 14px}
+#screenMusic .brand .sub, #screenMusic .mode-tag{display:none}
+#screenMusic .card{padding:13px 13px 0}
+#screenMusic .actions{flex-direction:column;align-items:flex-end;gap:2px}
+#screenMusic .act{padding:0 8px}
+#screenMusic .grid, #screenMusic .stat-grid{grid-template-columns:1fr}
+#screenMusic .p-time, #screenMusic .seek{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+#screenMusic *{transition:none!important;animation:none!important}}
+
+#screenMusic{min-height:100vh}
+</style>
+
 <!-- ============ стили хаба ============ -->
 <style>
 /* =====================================================================
@@ -682,9 +878,10 @@ body.booting{overflow:hidden}
   display:grid;gap:var(--gut);
   grid-template-columns:repeat(4,minmax(0,1fr));
   grid-template-areas:
-    "head head hero hero"
-    "calc calc hero hero"
-    "ext  ext  ext  ext";
+    "head  head  hero hero"
+    "calc  calc  hero hero"
+    "music music music music"
+    "ext   ext   ext  ext";
 }
 @media(max-width:1080px){
   #screenHub .bento{
@@ -693,6 +890,7 @@ body.booting{overflow:hidden}
       "head head"
       "hero hero"
       "calc calc"
+      "music music"
       "ext  ext";
     padding:26px 18px 56px;
   }
@@ -700,7 +898,7 @@ body.booting{overflow:hidden}
 @media(max-width:620px){
   #screenHub .bento{
     grid-template-columns:minmax(0,1fr);
-    grid-template-areas:"head" "hero" "calc" "ext";
+    grid-template-areas:"head" "hero" "calc" "music" "ext";
     padding:20px 14px 44px;--r:16px;
   }
 }
@@ -768,6 +966,7 @@ body.booting{overflow:hidden}
 
 /* плитка калькулятора */
 #screenHub .t-calc{grid-area:calc;padding:0;flex-direction:row;align-items:stretch}
+#screenHub .t-calc.t-music{grid-area:music}
 #screenHub .calc-stage{
   position:relative;flex:0 0 132px;overflow:hidden;
   background:linear-gradient(160deg,var(--h-soft),var(--h-tile));border-right:1px solid var(--h-line-soft);
@@ -960,6 +1159,7 @@ body.booting{overflow:hidden}
 
       <article class="tile act t-hero" id="heroTile"></article>
       <article class="tile act t-calc" id="calcTile"></article>
+      <article class="tile act t-calc t-music" id="musicTile"></article>
 
       <div class="ext-block">
         <div class="lab">внешние сервисы</div>
@@ -1144,6 +1344,121 @@ body.booting{overflow:hidden}
 </div>
 
 <div class="ta-toast" id="calcToast"></div>
+</section>
+
+<!-- ============ экран 4: актуальная музыка ============ -->
+<section class="screen" id="screenMusic">
+<header class="top">
+  <div class="wrap">
+    <div class="top-in">
+      <button class="icon-btn" id="hubBackMusic" title="Все сервисы" aria-label="Все сервисы">
+        <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div class="brand"><h1>Актуальная музыка</h1><span class="sub">Music Deck</span></div>
+      <span class="mode-tag" id="modeTag">—</span>
+      <button class="icon-btn" id="mStatsBtn" title="Статистика" aria-label="Статистика">
+        <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="Тема" aria-label="Переключить тему">
+        <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+      </button>
+      <button class="btn primary" id="upBtn">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+        Загрузить треки
+      </button>
+    </div>
+    <nav class="sections" id="sections" role="tablist"></nav>
+    <div class="rollover" id="rollover"></div>
+    <div class="filters">
+      <div class="search" id="searchWrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="mQ" type="search" placeholder="Название или настроение…" autocomplete="off">
+        <button class="clear" id="qClear" aria-label="Очистить">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <select class="pill" id="fMood"><option value="">Все настроения</option></select>
+      <select class="pill" id="fAuthor"><option value="">Все авторы</option></select>
+      <select class="pill" id="fSort">
+        <option value="new">Сначала новые</option>
+        <option value="old">Сначала старые</option>
+        <option value="title">По названию</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="queue" id="queue"></div>
+  <div class="count-line">
+    <span id="countLine"></span>
+    <button class="btn ghost" id="resetBtn" style="height:26px;padding:0 8px;font:11px/1 var(--mono);display:none">Сбросить фильтры</button>
+  </div>
+  <div class="list" id="list"></div>
+</main>
+
+<div class="drop" id="drop"><div class="drop-in">Отпустите файлы — загружу в библиотеку</div></div>
+
+<div class="player" id="player">
+  <div class="wrap">
+    <div class="player-in">
+      <button class="play" id="pPlay" aria-label="Пауза"><svg viewBox="0 0 24 24"><path d="M5 3l16 9-16 9z"/></svg></button>
+      <div class="p-info"><div class="p-ttl" id="pTtl">—</div><div class="p-sub" id="pSub"></div></div>
+      <span class="p-time" id="pCur">0:00</span>
+      <div class="seek" id="seek"><div class="seek-fill" id="seekFill"></div></div>
+      <span class="p-time" id="pDur">0:00</span>
+      <button class="icon-btn" id="pClose" aria-label="Закрыть плеер">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+<audio id="audio" preload="none"></audio>
+<input type="file" id="upFile" accept="audio/*" multiple style="display:none">
+<input type="file" id="replaceFile" accept="audio/*" style="display:none">
+
+<div class="scrim" id="formScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="formTtl">
+    <div class="m-head">
+      <h2 id="formTtl">Трек</h2>
+      <button class="icon-btn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="grid">
+        <div class="field full"><label for="fTitle">Название</label><input id="fTitle" placeholder="Neon Drive"></div>
+        <div class="field full"><label for="fMoodIn">Настроение</label><input id="fMoodIn" list="moodList" placeholder="energetic"><datalist id="moodList"></datalist></div>
+        <div class="field"><label for="fCode">Код дизайнера</label><input id="fCode" placeholder="IL"></div>
+        <div class="field"><label for="fDate">Дата добавления</label><input id="fDate" type="datetime-local"></div>
+        <div class="field full">
+          <label>Файл</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="fFileInfo" style="font:11px/1.4 var(--mono);color:var(--dim);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+            <button class="btn" id="replaceBtn" style="height:32px;padding:0 11px;font-size:13px">Заменить</button>
+          </div>
+          <span class="hint">От даты добавления считается секция. Файл можно заменить, отсчёт не сбросится.</span>
+        </div>
+        <label class="check"><input type="checkbox" id="fForceOld"> Сразу в «Старую», не ждать переездов</label>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn danger" id="delBtn" style="margin-right:auto">Удалить</button>
+      <button class="btn" data-close>Отмена</button>
+      <button class="btn primary" id="saveBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="statScrim">
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="statTtl">
+    <div class="m-head">
+      <h2 id="statTtl">Статистика</h2>
+      <button class="icon-btn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="m-body" id="statBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="mToast"></div>
 </section>
 
 <div class="toast" id="toast"></div>
@@ -2103,6 +2418,738 @@ renderCatalog();renderResult();
 </script>
 
 <script>
+/* ══════════════════════════════  КОНФИГ  ══════════════════════════════ */
+const CFG = {
+  SUPABASE_URL : 'https://gbbpyrcyhpkngkngpvrd.supabase.co',
+  SUPABASE_KEY : 'sb_publishable_aQXEoDBO7PC8z1IG3_ytcg_00UuSJjC',
+  TABLE        : 'music',
+  BUCKET       : 'music',       // публичный бакет Storage с файлами
+  QUOTA_MB     : 1024,          // лимит хранилища вашего плана, для индикатора
+  ROLLOVER_DAY : 1,             // 0=вс, 1=пн — день недельного переезда
+  ROLLOVER_HOUR: 13,
+  MIN_WEEK_DAYS : 2,            // минимум в «за неделю»
+  MIN_MONTH_DAYS: 14,           // минимум в «за месяц»
+};
+const REMOTE = !!(CFG.SUPABASE_URL && CFG.SUPABASE_KEY);
+
+/* ═══════════════════════════  ВОЗРАСТ ТРЕКА  ══════════════════════════ */
+/* Секция не хранится в базе — она вычисляется из added_at.
+   Минимальный срок нужен, чтобы трек, добавленный в пятницу, не вылетал
+   из «недели» через двое суток только потому, что понедельник близко. */
+function weekExpiry(added){
+  const r = new Date(added);
+  r.setHours(CFG.ROLLOVER_HOUR, 0, 0, 0);
+  r.setDate(r.getDate() + ((CFG.ROLLOVER_DAY - r.getDay() + 7) % 7));
+  while (r - added < CFG.MIN_WEEK_DAYS * 864e5) r.setDate(r.getDate() + 7);
+  return r;
+}
+function monthExpiry(added){
+  const w = weekExpiry(added);
+  let m = new Date(w.getFullYear(), w.getMonth() + 1, 1, 0, 0, 0, 0);
+  while (m - w < CFG.MIN_MONTH_DAYS * 864e5) m = new Date(m.getFullYear(), m.getMonth() + 1, 1, 0, 0, 0, 0);
+  return m;
+}
+function bucketOf(t, now){
+  if (t.force_old) return 'old';
+  const a = new Date(t.added_at);
+  if (now < weekExpiry(a))  return 'week';
+  if (now < monthExpiry(a)) return 'month';
+  return 'old';
+}
+function lifeOf(t, now){
+  if (t.force_old) return null;
+  const a = new Date(t.added_at), w = weekExpiry(a), m = monthExpiry(a);
+  if (now < w) return { from:a, to:w, next:'«За месяц»' };
+  if (now < m) return { from:w, to:m, next:'«Старую»'   };
+  return null;
+}
+function nextRollover(now){
+  const r = new Date(now);
+  r.setHours(CFG.ROLLOVER_HOUR, 0, 0, 0);
+  r.setDate(r.getDate() + ((CFG.ROLLOVER_DAY - r.getDay() + 7) % 7));
+  if (r <= now) r.setDate(r.getDate() + 7);
+  return r;
+}
+
+/* ═══════════════════════════  УТИЛИТЫ  ══════════════════════════════ */
+/* Экран живёт внутри хаба, поэтому ищем элементы только у себя,
+   иначе можно наткнуться на одноимённые узлы соседних сервисов. */
+const ROOT = document.getElementById('screenMusic');
+const $  = s => ROOT.querySelector(s);
+const $$ = s => [...ROOT.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const AUDIO_RE  = /\.(mp3|wav|aif|aiff|m4a|aac|flac|ogg|opus|wma)$/i;
+const NOPLAY_RE = /\.(aif|aiff|wma|ape|alac|m4p)$/i;
+
+function plural(n, one, few, many){
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5)   return few;
+  if (b === 1)          return one;
+  return many;
+}
+function mmss(sec){
+  if (!sec && sec !== 0) return '';
+  return Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+}
+function mb(bytes){
+  if (!bytes) return '';
+  const m = bytes / 1048576;
+  return (m < 10 ? m.toFixed(1) : Math.round(m)) + ' МБ';
+}
+function left(ms){
+  if (ms <= 0) return 'вот-вот';
+  const min = Math.floor(ms / 60000), h = Math.floor(min / 60), d = Math.floor(h / 24);
+  if (d >= 1) return d + ' ' + plural(d, 'день', 'дня', 'дней') + (h % 24 ? ' ' + (h % 24) + ' ч' : '');
+  if (h >= 1) return h + ' ч' + (min % 60 ? ' ' + (min % 60) + ' мин' : '');
+  return Math.max(1, min) + ' мин';
+}
+const shortDate = d => new Date(d).toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+function toLocalInput(d){
+  const x = new Date(d), p = n => String(n).padStart(2, '0');
+  return x.getFullYear() + '-' + p(x.getMonth()+1) + '-' + p(x.getDate()) + 'T' + p(x.getHours()) + ':' + p(x.getMinutes());
+}
+let toastT;
+function toast(msg){
+  const el = $('#mToast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+/* Имя файла как источник метаданных: «Neon Drive [IL].mp3» → название и код. */
+function parseName(name){
+  let s = String(name).replace(AUDIO_RE, '').trim();
+  let code = '';
+  s = s.replace(/\[([^\]]+)\]/g, (_, x) => {
+    if (!code && /^[A-ZА-ЯЁ]{2,3}$/.test(x.trim())) code = x.trim();
+    return ' ';
+  });
+  s = s.replace(/[_]+/g, ' ').replace(/\s{2,}/g, ' ').trim().replace(/^[-–—\s]+|[-–—\s]+$/g, '');
+  return { title: s || String(name), author_code: code };
+}
+
+/* ═══════════════════════════  ХРАНИЛИЩЕ  ════════════════════════════ */
+const LS_KEY = 'music_deck_tracks';
+
+/* Ключи нового формата (sb_publishable_…) — не JWT, и в Authorization их
+   передавать нельзя: платформа попробует разобрать их как токен и ответит
+   Invalid JWT. Такой ключ уходит только в apikey.
+   Старые anon-ключи (eyJ…) — полноценные JWT, им нужны оба заголовка. */
+const LEGACY_JWT = /^eyJ/.test(CFG.SUPABASE_KEY);
+function sbHead(extra){
+  const h = { apikey: CFG.SUPABASE_KEY };
+  if (LEGACY_JWT) h.Authorization = 'Bearer ' + CFG.SUPABASE_KEY;
+  return Object.assign(h, extra || {});
+}
+
+const remote = {
+  base(){ return CFG.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/' + CFG.TABLE; },
+  async list(){
+    const r = await fetch(this.base() + '?select=*&order=added_at.desc', { headers: sbHead() });
+    if (!r.ok) throw new Error(r.status === 401
+      ? 'ключ не принят (401). Попробуйте legacy anon-ключ из Settings → API Keys → Legacy'
+      : 'Supabase ' + r.status);
+    return r.json();
+  },
+  async add(t){
+    const r = await fetch(this.base(), { method:'POST',
+      headers: sbHead({ 'Content-Type':'application/json', Prefer:'return=representation' }),
+      body: JSON.stringify(t) });
+    if (!r.ok) throw new Error('Supabase ' + r.status + ' ' + (await r.text().catch(()=>'')).slice(0,120));
+    return (await r.json())[0];
+  },
+  async update(id, patch){
+    const r = await fetch(this.base() + '?id=eq.' + id, { method:'PATCH',
+      headers: sbHead({ 'Content-Type':'application/json', Prefer:'return=representation' }),
+      body: JSON.stringify(patch) });
+    if (!r.ok) throw new Error('Supabase ' + r.status);
+    return (await r.json())[0];
+  },
+  async remove(id){
+    const r = await fetch(this.base() + '?id=eq.' + id, { method:'DELETE', headers: sbHead() });
+    if (!r.ok) throw new Error('Supabase ' + r.status);
+  }
+};
+
+const local = {
+  read(){ try { return JSON.parse(localStorage.getItem(LS_KEY)) || null; } catch { return null; } },
+  write(a){ localStorage.setItem(LS_KEY, JSON.stringify(a)); },
+  async list(){
+    let a = this.read();
+    if (!a) { a = seed(); this.write(a); }
+    return a.sort((x, y) => new Date(y.added_at) - new Date(x.added_at));
+  },
+  async add(t){
+    const a = this.read() || [];
+    const rec = Object.assign({ id: crypto.randomUUID() }, t);
+    a.push(rec); this.write(a); return rec;
+  },
+  async update(id, patch){
+    const a = this.read() || [], i = a.findIndex(x => x.id === id);
+    if (i > -1) { a[i] = Object.assign({}, a[i], patch); this.write(a); return a[i]; }
+  },
+  async remove(id){ this.write((this.read() || []).filter(x => x.id !== id)); }
+};
+
+const db = REMOTE ? remote : local;
+
+function seed(){
+  const day = 864e5, now = Date.now();
+  const mk = (t, mood, dur, code, ago, size) => ({
+    id: crypto.randomUUID(), title:t, mood, duration:dur, author_code:code,
+    file_name: t + '.mp3', size, storage_path: '', url: '',
+    added_at: new Date(now - ago * day).toISOString(), force_old:false
+  });
+  return [
+    mk('Neon Drive',   'energetic', 154, 'IL', 0.4, 4.2e6),
+    mk('Paper Cities', 'calm',      201, 'AN', 1.2, 5.1e6),
+    mk('Ground Zero',  'epic',      118, 'IL', 2.5, 3.0e6),
+    mk('Soft Launch',  'corporate', 167, 'DK', 3.8, 4.4e6),
+    mk('Half Light',   'calm',      223, 'AN', 9,   5.6e6),
+    mk('Rush Hour',    'energetic', 132, 'DK', 12,  3.4e6),
+    mk('Static Bloom', 'epic',      187, 'IL', 18,  4.8e6),
+    mk('Cold Open',    'corporate', 145, 'DK', 44,  3.7e6),
+    mk('Old Signal',   'calm',      209, 'AN', 71,  5.2e6),
+    mk('Blue Hour',    'calm',      244, 'IL', 96,  6.1e6),
+  ];
+}
+
+/* ═════════════════════════  АДРЕСА ФАЙЛОВ  ══════════════════════════ */
+/* Публичный бакет отдаёт файл обычным HTTP с поддержкой диапазонов,
+   поэтому плеер и перемотка работают всегда. */
+function fileUrl(t){
+  if (!t.storage_path) return String(t.url || '');
+  if (!REMOTE) return '';
+  return CFG.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/public/'
+       + CFG.BUCKET + '/' + t.storage_path.split('/').map(encodeURIComponent).join('/');
+}
+const playableUrl = t => fileUrl(t);
+/* ?download= отдаёт файл вложением с человеческим именем. */
+function downloadUrl(t){
+  const u = fileUrl(t);
+  return (u && t.storage_path) ? u + '?download=' + encodeURIComponent(t.file_name || t.title + '.mp3') : u;
+}
+
+/* ═══════════════════════  ЗАГРУЗКА В STORAGE  ═══════════════════════ */
+function storagePath(id, fileName){
+  const ext = (String(fileName).split('.').pop() || 'mp3').toLowerCase().replace(/[^a-z0-9]/g, '');
+  return id + '.' + (ext || 'mp3');
+}
+
+function putObject(path, file, onProgress){
+  return new Promise((res, rej) => {
+    const x = new XMLHttpRequest();
+    x.open('POST', CFG.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/' + CFG.BUCKET + '/' + path);
+    x.setRequestHeader('apikey', CFG.SUPABASE_KEY);
+    if (LEGACY_JWT) x.setRequestHeader('Authorization', 'Bearer ' + CFG.SUPABASE_KEY);
+    x.setRequestHeader('x-upsert', 'true');
+    x.setRequestHeader('Content-Type', file.type || 'audio/mpeg');
+    x.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+    x.onload = () => {
+      if (x.status >= 200 && x.status < 300) return res();
+      rej(new Error(x.status === 404
+        ? 'бакет «' + CFG.BUCKET + '» не создан — прогоните схему в SQL Editor'
+        : x.status === 413 ? 'файл больше лимита загрузки, поднимите его в настройках Storage'
+        : 'Storage ' + x.status));
+    };
+    x.onerror = () => rej(new Error('сеть недоступна'));
+    x.send(file);
+  });
+}
+
+async function deleteObject(path){
+  if (!path || !REMOTE) return;
+  await fetch(CFG.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/' + CFG.BUCKET + '/' + path,
+    { method:'DELETE', headers: sbHead() }).catch(() => {});
+}
+
+/* Очередь загрузки: последовательно, чтобы прогресс был честным. */
+const queue = [];
+let uploading = false;
+
+function renderQueue(){
+  const box = $('#queue');
+  if (!queue.length) { box.innerHTML = ''; return; }
+  box.innerHTML = queue.map((q, i) => `
+    <div class="qrow">
+      <span class="qname">${esc(q.name)}</span>
+      <span class="qstate ${q.state}">${q.state === 'ok' ? 'готово' : q.state === 'err' ? esc(q.err || 'ошибка') : q.state === 'run' ? Math.round(q.pct * 100) + '%' : 'в очереди'}</span>
+      <span class="qbar"><i style="width:${q.state === 'ok' ? 100 : Math.round(q.pct * 100)}%"></i></span>
+    </div>`).join('');
+}
+
+function enqueue(files){
+  if (!REMOTE) { toast('Загрузка работает только при подключённом Supabase'); return; }
+  const ok = [...files].filter(f => f.type.startsWith('audio/') || AUDIO_RE.test(f.name));
+  if (!ok.length) { toast('Это не аудиофайлы'); return; }
+  ok.forEach(f => queue.push({ file:f, name:f.name, state:'wait', pct:0 }));
+  renderQueue();
+  runQueue();
+}
+
+async function runQueue(){
+  if (uploading) return;
+  uploading = true;
+  $('#upBtn').disabled = true;
+  try {
+    for (const q of queue) {
+      if (q.state !== 'wait') continue;
+      q.state = 'run'; renderQueue();
+      try {
+        const meta = parseName(q.name);
+        const rec = await db.add({
+          title: meta.title, mood: '', author_code: meta.author_code,
+          file_name: q.name, size: q.file.size, storage_path: '',
+          added_at: new Date().toISOString(), force_old: false
+        });
+        const path = storagePath(rec.id, q.name);
+        await putObject(path, q.file, p => { q.pct = p; renderQueue(); });
+        await db.update(rec.id, { storage_path: path });
+        rec.storage_path = path;
+        tracks.unshift(rec);
+        q.state = 'ok';
+        render();
+      } catch(e) {
+        q.state = 'err'; q.err = e.message;
+      }
+      renderQueue();
+    }
+  } finally {
+    uploading = false;
+    $('#upBtn').disabled = false;
+    const bad = queue.filter(q => q.state === 'err').length;
+    const good = queue.filter(q => q.state === 'ok').length;
+    if (good) toast('Загружено: ' + good + (bad ? ', с ошибкой: ' + bad : ''));
+    else if (bad) toast('Не загрузилось: ' + bad);
+    setTimeout(() => {
+      for (let i = queue.length - 1; i >= 0; i--) if (queue[i].state === 'ok') queue.splice(i, 1);
+      renderQueue();
+      probeDurations();
+    }, 1800);
+  }
+}
+
+/* ════════════════════════════  СОСТОЯНИЕ  ═══════════════════════════ */
+const SECTIONS = [
+  { id:'week',  label:'Актуальная за неделю' },
+  { id:'month', label:'Актуальная за месяц'  },
+  { id:'old',   label:'Старая'               },
+];
+let tracks = [], section = 'week', query = '', fMood = '', fAuthor = '', sort = 'new';
+let editingId = null, playingId = null;
+
+/* ═════════════════════════════  ТЕМА  ═══════════════════════════════ */
+const THEME_KEY = 'deckhub.theme';    // общий ключ с Deck Hub
+function paintThemeIcon(t){
+  $('#themeIcon').innerHTML = t === 'dark'
+    ? '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'
+    : '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/>';
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(THEME_KEY, t);
+  paintThemeIcon(t);
+}
+/* тему могли переключить на другом экране хаба — иконку держим в курсе.
+   Здесь только перерисовка, без setAttribute, иначе получится петля. */
+new MutationObserver(() => paintThemeIcon(document.documentElement.getAttribute('data-theme')))
+  .observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+applyTheme(document.documentElement.getAttribute('data-theme') || localStorage.getItem(THEME_KEY) || 'dark');
+$('#themeBtn').onclick = () =>
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+
+/* ════════════════════════════  ВЫБОРКА  ═════════════════════════════ */
+const inBucket = id => { const now = new Date(); return tracks.filter(t => bucketOf(t, now) === id); };
+
+function visible(){
+  let a = inBucket(section);
+  const q = query.trim().toLowerCase();
+  if (q) a = a.filter(t => (t.title || '').toLowerCase().includes(q) || (t.mood || '').toLowerCase().includes(q));
+  if (fMood)   a = a.filter(t => t.mood === fMood);
+  if (fAuthor) a = a.filter(t => t.author_code === fAuthor);
+  const by = {
+    new:   (x, y) => new Date(y.added_at) - new Date(x.added_at),
+    old:   (x, y) => new Date(x.added_at) - new Date(y.added_at),
+    title: (x, y) => (x.title || '').localeCompare(y.title || '', 'ru'),
+  };
+  return a.sort(by[sort]);
+}
+function hl(text, q){
+  const s = esc(text);
+  if (!q) return s;
+  return s.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<mark>$1</mark>');
+}
+
+/* ════════════════════════════  РЕНДЕР  ══════════════════════════════ */
+function renderSections(){
+  const now = new Date();
+  $('#sections').innerHTML = SECTIONS.map(s => {
+    const n = tracks.filter(t => bucketOf(t, now) === s.id).length;
+    return `<button class="sec" data-bucket="${s.id}" data-sec="${s.id}" role="tab" aria-selected="${s.id === section}">
+      <span class="dot"></span>${s.label}<span class="n">${n}</span></button>`;
+  }).join('');
+  $$('.sec').forEach(b => b.onclick = () => { section = b.dataset.sec; render(); });
+
+  const box = $('#rollover');
+  box.setAttribute('data-bucket', section);
+  if (section === 'week') {
+    const d = nextRollover(new Date());
+    box.innerHTML = `↳ Ближайший переезд в «За месяц»: ${d.toLocaleString('ru-RU',{weekday:'short',day:'numeric',month:'short'})}, ${String(CFG.ROLLOVER_HOUR).padStart(2,'0')}:00 · через <b>${left(d - Date.now())}</b>`;
+  } else if (section === 'month') {
+    const d = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+    box.innerHTML = `↳ Ближайший переезд в «Старую»: ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})} · через <b>${left(d - Date.now())}</b>`;
+  } else {
+    box.innerHTML = '↳ Архив. Дальше треки никуда не переезжают.';
+  }
+}
+
+function renderFilters(){
+  const moods = [...new Set(tracks.map(t => t.mood).filter(Boolean))].sort();
+  const auth  = [...new Set(tracks.map(t => t.author_code).filter(Boolean))].sort();
+  const fill = (sel, list, cur, all) => {
+    sel.innerHTML = `<option value="">${all}</option>` +
+      list.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(v)}</option>`).join('');
+  };
+  fill($('#fMood'), moods, fMood, 'Все настроения');
+  fill($('#fAuthor'), auth, fAuthor, 'Все авторы');
+  $('#moodList').innerHTML = moods.map(m => `<option value="${esc(m)}">`).join('');
+}
+
+function renderList(){
+  const now = new Date(), a = visible(), q = query.trim();
+  const dirty = !!(q || fMood || fAuthor);
+  $('#resetBtn').style.display = dirty ? 'inline-flex' : 'none';
+  $('#countLine').textContent = a.length
+    ? `${a.length} ${plural(a.length,'трек','трека','треков')}${dirty ? ' из ' + inBucket(section).length : ''}` : '';
+
+  const list = $('#list');
+  if (!a.length) {
+    list.innerHTML = `<div class="empty">
+      <h3>${dirty ? 'Ничего не нашлось' : 'Здесь пока пусто'}</h3>
+      <p>${dirty ? 'Другой запрос или снимите часть фильтров.' : 'Перетащите файлы на страницу или нажмите «Загрузить треки».'}</p>
+      <button class="btn primary" id="emptyAct">${dirty ? 'Сбросить фильтры' : 'Загрузить треки'}</button></div>`;
+    $('#emptyAct').onclick = dirty ? resetFilters : () => $('#upFile').click();
+    return;
+  }
+
+  list.innerHTML = a.map(t => {
+    const b = bucketOf(t, now), life = lifeOf(t, now);
+    let decay;
+    if (life) {
+      const pct = Math.max(0, Math.min(100, 100 - (now - life.from) / (life.to - life.from) * 100));
+      decay = `<div class="decay">
+        <div class="decay-bar"><div class="decay-fill" style="width:${pct.toFixed(1)}%"></div></div>
+        <span class="decay-txt">в ${life.next} через <b>${left(life.to - now)}</b></span></div>`;
+    } else {
+      decay = `<div class="decay flat"><span class="decay-txt">в архиве${t.force_old ? ' · вручную' : ''} · добавлен ${shortDate(t.added_at)}</span></div>`;
+    }
+    const meta = [
+      t.mood && `<span class="mood">${hl(t.mood, q)}</span>`,
+      t.duration && mmss(t.duration),
+      t.size && mb(t.size),
+      shortDate(t.added_at),
+    ].filter(Boolean).join(' <span class="sep">·</span> ');
+    const noFile = REMOTE && !t.storage_path && !t.url;
+
+    return `<article class="card${playingId === t.id ? ' playing' : ''}" data-bucket="${b}" data-id="${t.id}">
+      <div class="card-main">
+        <button class="play" data-act="play" aria-label="Слушать"><svg viewBox="0 0 24 24"><path d="${playingId === t.id ? 'M6 4h4v16H6zM14 4h4v16h-4z' : 'M5 3l16 9-16 9z'}"/></svg></button>
+        <div class="info">
+          <div class="ttl">${hl(t.title, q)}</div>
+          <div class="meta">${meta}</div>
+          ${t.author_code || noFile ? `<div class="chips">
+            ${t.author_code ? `<span class="chip code">${esc(t.author_code)}</span>` : ''}
+            ${noFile ? '<span class="chip nofile">нет файла</span>' : ''}
+          </div>` : ''}
+        </div>
+        <div class="actions">
+          <button class="act" data-act="down" title="Скачать файл">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12M7 11l5 5 5-5M4 20h16"/></svg>
+          </button>
+          <button class="act" data-act="edit" title="Изменить">
+            <svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17z"/></svg>
+          </button>
+        </div>
+      </div>
+      ${decay}
+    </article>`;
+  }).join('');
+
+  list.querySelectorAll('.card').forEach(card => {
+    const t = tracks.find(x => x.id === card.dataset.id);
+    card.querySelectorAll('[data-act]').forEach(btn => btn.onclick = e => {
+      e.stopPropagation();
+      const act = btn.dataset.act;
+      if (act === 'play') togglePlay(t);
+      if (act === 'down') download(t);
+      if (act === 'edit') openForm(t);
+    });
+  });
+}
+
+function render(){ renderSections(); renderFilters(); renderList(); }
+function resetFilters(){
+  query = ''; $('#mQ').value = ''; $('#searchWrap').classList.remove('has');
+  fMood = ''; fAuthor = ''; render();
+}
+
+/* ═════════════════════════════  ПЛЕЕР  ══════════════════════════════ */
+const audio = $('#audio');
+function togglePlay(t){
+  if (playingId === t.id) {
+    audio.paused ? audio.play().catch(playErr) : audio.pause();
+    return;
+  }
+  const src = playableUrl(t);
+  if (!src) { toast('У этого трека нет файла'); return; }
+  playingId = t.id;
+  audio.src = src;
+  audio.play().catch(playErr);
+  $('#player').classList.add('on');
+  $('#player').setAttribute('data-bucket', bucketOf(t, new Date()));
+  $('#pTtl').textContent = t.title;
+  $('#pSub').textContent = [t.mood, t.author_code].filter(Boolean).join(' · ');
+  renderList();
+}
+function playErr(){
+  const t = tracks.find(x => x.id === playingId);
+  if (!t) return;
+  $('#pSub').innerHTML = '<span class="p-err">' + esc(
+    NOPLAY_RE.test(t.file_name || '') ? 'Браузер не умеет этот формат — нужен mp3'
+    : t.storage_path ? 'Файл не отдаётся — проверьте, что бакет «' + CFG.BUCKET + '» публичный'
+    : 'У трека нет файла') + '</span>';
+}
+function syncPlayer(){
+  $('#pPlay').innerHTML = `<svg viewBox="0 0 24 24"><path d="${audio.paused ? 'M5 3l16 9-16 9z' : 'M6 4h4v16H6zM14 4h4v16h-4z'}"/></svg>`;
+  renderList();
+}
+audio.onplay = audio.onpause = syncPlayer;
+audio.onloadedmetadata = async () => {
+  const t = tracks.find(x => x.id === playingId);
+  if (!t || t.duration || !isFinite(audio.duration)) return;
+  t.duration = Math.round(audio.duration);
+  renderList();
+  try { await db.update(t.id, { duration: t.duration }); } catch(e) { console.warn(e); }
+};
+audio.ontimeupdate = () => {
+  if (!audio.duration) return;
+  $('#seekFill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+  $('#pCur').textContent = mmss(audio.currentTime);
+  $('#pDur').textContent = mmss(audio.duration);
+};
+audio.onended = () => { playingId = null; $('#player').classList.remove('on'); renderList(); };
+$('#pPlay').onclick = () => audio.paused ? audio.play().catch(playErr) : audio.pause();
+$('#pClose').onclick = () => { audio.pause(); playingId = null; $('#player').classList.remove('on'); renderList(); };
+$('#seek').onclick = e => {
+  if (!audio.duration) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  audio.currentTime = (e.clientX - r.left) / r.width * audio.duration;
+};
+
+/* ══════════════════  ДЛИТЕЛЬНОСТЬ СЧИТАЕТСЯ САМА  ═══════════════════ */
+/* Браузер читает метаданные, не скачивая файл целиком.
+   По одному треку за раз, чтобы не грузить сеть параллельными запросами. */
+const noDur = new Set();
+let probing = false;
+
+function probeOne(t){
+  return new Promise((res, rej) => {
+    const src = playableUrl(t);
+    if (!src) return rej(new Error('нет файла'));
+    const a = new Audio();
+    a.preload = 'metadata';
+    let closed = false;
+    const finish = v => {
+      if (closed) return;
+      closed = true; clearTimeout(to); a.src = '';
+      v ? res(v) : rej(new Error('нет метаданных'));
+    };
+    const to = setTimeout(() => finish(null), 15000);
+    a.onloadedmetadata = () => finish(isFinite(a.duration) && a.duration > 0 ? Math.round(a.duration) : null);
+    a.onerror = () => finish(null);
+    a.src = src;
+  });
+}
+
+async function probeDurations(){
+  if (probing) return;
+  probing = true;
+  try {
+    while (true) {
+      const t = tracks.find(x => !x.duration && !noDur.has(x.id) && (x.storage_path || x.url));
+      if (!t) break;
+      let sec = null;
+      try { sec = await probeOne(t); } catch { /* пропускаем */ }
+      if (sec) {
+        t.duration = sec; renderList();
+        try { await db.update(t.id, { duration: sec }); } catch(e) { console.warn(e); }
+      } else noDur.add(t.id);
+    }
+  } finally { probing = false; }
+}
+
+/* ════════════════════════════  ДЕЙСТВИЯ  ════════════════════════════ */
+function download(t){
+  const u = downloadUrl(t);
+  if (!u) { toast('У этого трека нет файла'); return; }
+  const a = document.createElement('a');
+  a.href = u; a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function openForm(t){
+  editingId = t.id;
+  $('#fTitle').value  = t.title || '';
+  $('#fMoodIn').value = t.mood || '';
+  $('#fCode').value   = t.author_code || '';
+  $('#fDate').value   = toLocalInput(t.added_at || new Date());
+  $('#fForceOld').checked = !!t.force_old;
+  $('#fFileInfo').textContent = t.file_name
+    ? t.file_name + (t.size ? ' · ' + mb(t.size) : '')
+    : (t.url ? 'внешняя ссылка' : 'файла нет');
+  $('#formScrim').classList.add('on');
+  setTimeout(() => $('#fTitle').focus(), 30);
+}
+const closeAll = () => $$('.scrim').forEach(s => s.classList.remove('on'));
+
+$('#saveBtn').onclick = async () => {
+  const title = $('#fTitle').value.trim();
+  if (!title) { toast('Впишите название'); $('#fTitle').focus(); return; }
+  const patch = {
+    title,
+    mood: $('#fMoodIn').value.trim(),
+    author_code: $('#fCode').value.trim(),
+    added_at: new Date($('#fDate').value || Date.now()).toISOString(),
+    force_old: $('#fForceOld').checked,
+  };
+  try {
+    const upd = await db.update(editingId, patch);
+    const i = tracks.findIndex(x => x.id === editingId);
+    tracks[i] = upd || Object.assign({}, tracks[i], patch);
+    closeAll(); render(); toast('Сохранено');
+  } catch(e) { toast('Не сохранилось: ' + e.message); }
+};
+
+$('#delBtn').onclick = async () => {
+  const t = tracks.find(x => x.id === editingId);
+  if (!t) return;
+  if (!confirm('Удалить «' + t.title + '» вместе с файлом? Это навсегда.')) return;
+  try {
+    await deleteObject(t.storage_path);
+    await db.remove(t.id);
+    tracks = tracks.filter(x => x.id !== t.id);
+    if (playingId === t.id) $('#pClose').click();
+    closeAll(); render(); toast('Удалено');
+  } catch(e) { toast('Не удалилось: ' + e.message); }
+};
+
+/* замена файла у существующего трека — отсчёт секции не сбрасывается */
+$('#replaceBtn').onclick = () => { $('#replaceFile').value = ''; $('#replaceFile').click(); };
+$('#replaceFile').onchange = async e => {
+  const f = e.target.files && e.target.files[0];
+  const t = tracks.find(x => x.id === editingId);
+  if (!f || !t) return;
+  try {
+    toast('Загружаю файл…');
+    const path = storagePath(t.id, f.name);
+    await putObject(path, f);
+    if (t.storage_path && t.storage_path !== path) await deleteObject(t.storage_path);
+    Object.assign(t, { storage_path: path, file_name: f.name, size: f.size, duration: null });
+    noDur.delete(t.id);
+    await db.update(t.id, { storage_path: path, file_name: f.name, size: f.size, duration: null });
+    $('#fFileInfo').textContent = f.name + ' · ' + mb(f.size);
+    render(); probeDurations(); toast('Файл заменён');
+  } catch(err) { toast('Не заменилось: ' + err.message); }
+};
+
+/* ═══════════════════════════  СТАТИСТИКА  ═══════════════════════════ */
+function openStats(){
+  const now = new Date();
+  const byB = id => tracks.filter(t => bucketOf(t, now) === id).length;
+  const bytes = tracks.reduce((s, t) => s + (t.size || 0), 0);
+  const usedMb = bytes / 1048576, pct = Math.min(100, usedMb / CFG.QUOTA_MB * 100);
+  const cls = pct > 90 ? 'over' : pct > 70 ? 'hot' : '';
+  const group = key => {
+    const m = {};
+    tracks.forEach(t => { const v = t[key]; if (v) m[v] = (m[v] || 0) + 1; });
+    return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  };
+  const bars = (rows, max) => rows.map(([k, v]) =>
+    `<div class="bar-row"><span class="bar-lbl">${esc(k)}</span><span class="bar-n">${v}</span>
+     <div class="bar-wrap"><div class="bar-fill" style="width:${v / max * 100}%"></div></div></div>`).join('');
+  const moods = group('mood'), auth = group('author_code');
+  const noFile = tracks.filter(t => !t.storage_path && !t.url).length;
+
+  $('#statBody').innerHTML = `
+    <div class="quota">
+      <div class="quota-top"><span>Занято в хранилище</span><span>${usedMb < 1024 ? usedMb.toFixed(0) + ' МБ' : (usedMb/1024).toFixed(2) + ' ГБ'} из ${CFG.QUOTA_MB} МБ</span></div>
+      <div class="quota-bar"><div class="quota-fill ${cls}" style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="quota-note">${pct > 70
+        ? 'Место кончается. Дальше — либо план Pro, либо переезд на Cloudflare R2.'
+        : 'Средний трек весит ' + (tracks.length ? mb(bytes / tracks.length) : '—') + ', запас ещё есть.'}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat" data-bucket="week"><div class="v">${byB('week')}</div><div class="k">За неделю</div></div>
+      <div class="stat" data-bucket="month"><div class="v">${byB('month')}</div><div class="k">За месяц</div></div>
+      <div class="stat" data-bucket="old"><div class="v">${byB('old')}</div><div class="k">Старая</div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat" data-bucket="month"><div class="v">${tracks.length}</div><div class="k">Всего треков</div></div>
+      <div class="stat" data-bucket="month"><div class="v">${mmss(tracks.reduce((s,t)=>s+(t.duration||0),0)) || '0:00'}</div><div class="k">Общий хронометраж</div></div>
+      <div class="stat" data-bucket="${noFile ? 'week' : 'month'}"><div class="v">${noFile}</div><div class="k">Без файла</div></div>
+    </div>
+    ${moods.length ? `<div class="s-title">Настроения</div><div class="bars">${bars(moods, moods[0][1])}</div>` : ''}
+    ${auth.length ? `<div class="s-title">Кто добавляет</div><div class="bars">${bars(auth, auth[0][1])}</div>` : ''}`;
+  $('#statScrim').classList.add('on');
+}
+
+/* ══════════════════════════════  СВЯЗКА  ════════════════════════════ */
+$('#upBtn').onclick    = () => { $('#upFile').value = ''; $('#upFile').click(); };
+$('#upFile').onchange  = e => enqueue(e.target.files);
+$('#mStatsBtn').onclick = openStats;
+$('#resetBtn').onclick = resetFilters;
+$('#qClear').onclick   = () => { query = ''; $('#mQ').value = ''; $('#searchWrap').classList.remove('has'); render(); };
+$('#mQ').oninput = e => { query = e.target.value; $('#searchWrap').classList.toggle('has', !!query); renderList(); };
+$('#fMood').onchange   = e => { fMood = e.target.value; renderList(); };
+$('#fAuthor').onchange = e => { fAuthor = e.target.value; renderList(); };
+$('#fSort').onchange   = e => { sort = e.target.value; renderList(); };
+$$('[data-close]').forEach(b => b.onclick = closeAll);
+$$('.scrim').forEach(s => s.onclick = e => { if (e.target === s) closeAll(); });
+document.addEventListener('keydown', e => {
+  if (!ROOT.classList.contains('on')) return;          // не на нашем экране — не мешаем
+  if (e.key === 'Escape') closeAll();
+  if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); $('#mQ').focus(); }
+});
+
+/* перетаскивание файлов на страницу */
+let dragDepth = 0;
+window.addEventListener('dragenter', e => {
+  if (!ROOT.classList.contains('on')) return;
+  if (![...e.dataTransfer.types].includes('Files')) return;
+  dragDepth++; $('#drop').classList.add('on');
+});
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('#drop').classList.remove('on'); } });
+window.addEventListener('drop', e => {
+  if (!ROOT.classList.contains('on')) return;
+  e.preventDefault(); dragDepth = 0; $('#drop').classList.remove('on');
+  if (e.dataTransfer.files.length) enqueue(e.dataTransfer.files);
+});
+
+/* живой обратный отсчёт */
+setInterval(() => { if (!$$('.scrim.on').length) { renderSections(); renderList(); } }, 60000);
+
+(async function init(){
+  $('#modeTag').textContent = REMOTE ? 'Supabase' : 'Локально';
+  $('#modeTag').classList.toggle('local', !REMOTE);
+  try { tracks = await db.list(); }
+  catch(e) { toast('База недоступна: ' + e.message); tracks = []; }
+  render();
+  probeDurations();
+})();
+</script>
+
+<script>
 /* =====================================================================
    СЕРВИСЫ ХАБА — правится только этот массив.
    screen : 'deck' | 'calc' — открывается внутренним экраном хаба
@@ -2117,9 +3164,14 @@ const SERVICES = [
   },
   {
     id:'points', name:'Расчёт поинтов', kicker:'Оценка задач', status:'beta', screen:'calc',
-    color:'#2F6BFF', preview:'tiers',
+    color:'#2F6BFF', preview:'tiers', cta:'Открыть калькулятор',
     desc:'Определяет сложность задачи и считает поинты. Звёздочки поднимают тир выше.'
   },
+  {
+    id:'music', name:'Актуальная музыка', kicker:'Музыка', status:'ready', screen:'music',
+    color:'#E8A33C', preview:'wave', cta:'Открыть библиотеку',
+    desc:'Библиотека треков команды: свежие сверху, старые уезжают в архив сами. Прослушивание и скачивание в один клик.'
+  }
 ];
 
 
@@ -2154,12 +3206,13 @@ const LINKS = [
 (function(){
   const q=s=>document.querySelector(s);
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const prev=s=>(PREVIEWS[s.preview]||(()=>''))();
   const ST={
     ready:{l:'работает',c:'#2FA37A'},
     beta :{l:'бета',    c:'#2F6BFF'},
     soon :{l:'скоро',c:'#8A94A3'}
   };
-  const SCREENS={deck:'#screenDeck',calc:'#screenCalc'};
+  const SCREENS={deck:'#screenDeck',calc:'#screenCalc',music:'#screenMusic'};
   const box=(vb,inner)=>'<svg class="prev" viewBox="'+vb+'" aria-hidden="true">'+inner+'</svg>';
 
   /* ---- миниатюры: рисуем сам инструмент ---- */
@@ -2175,6 +3228,14 @@ const LINKS = [
         s+='<rect class="chip" x="'+x+'" y="152" width="'+w+'" height="16" rx="5"/>';
       });
       return box('0 0 640 186',s);
+    },
+    wave(){
+      let s='';
+      for(let i=0;i<20;i++){
+        const t=i/19, h=10+Math.abs(Math.sin(t*Math.PI*2.1))*46*(0.45+0.55*Math.sin(t*Math.PI));
+        s+='<rect class="bar-a" x="'+(24+i*5.6)+'" y="'+(44-h/2)+'" width="3" height="'+h.toFixed(1)+'" rx="1.5"/>';
+      }
+      return box('0 0 132 88',s);
     },
     tiers(){
       const cols=['#7C8AA0','#4E86C6','#2FA37A','#E0A93B','#E5713B','#D63C4E'];
@@ -2211,7 +3272,7 @@ const LINKS = [
     const st=ST[s.status], tile=q('#heroTile');
     tile.style.setProperty('--c',s.color);
     tile.innerHTML=
-      '<div class="hero-stage">'+PREVIEWS[s.preview]()+'</div>'+
+      '<div class="hero-stage">'+prev(s)+'</div>'+
       '<div class="hero-body">'+
         '<div class="hero-top"><span class="kicker">'+esc(s.kicker)+'</span>'+
           '<h2>'+esc(s.name)+'</h2>'+
@@ -2228,11 +3289,12 @@ const LINKS = [
   }
 
   /* ---- плитка калькулятора ---- */
-  function buildCalc(s){
-    const st=ST[s.status], tile=q('#calcTile');
+  function buildCalc(s, sel){
+    const st=ST[s.status], tile=q(sel);
+    if(!tile) return;
     tile.style.setProperty('--c',s.color);
     tile.innerHTML=
-      '<div class="calc-stage">'+PREVIEWS[s.preview]()+'</div>'+
+      '<div class="calc-stage">'+prev(s)+'</div>'+
       '<div class="calc-body">'+
         '<div class="hero-top"><span class="kicker">'+esc(s.kicker)+'</span>'+
           '<span class="badge" style="--s:'+st.c+';margin-left:auto"><i></i>'+st.l+'</span></div>'+
@@ -2240,7 +3302,7 @@ const LINKS = [
         '<p>'+esc(s.desc)+'</p>'+
       '</div>';
     actions(tile.querySelector('.calc-body'),[
-      ['Открыть калькулятор','go',()=>enter(s.id),arrow]
+      [s.cta || 'Открыть','go',()=>enter(s.id),arrow]
     ]);
     clickable(tile,s.id);
   }
@@ -2287,6 +3349,8 @@ const LINKS = [
 
   /* ---- переходы ---- */
   function hideAll(){
+    const a=document.getElementById('audio');   // плеер музыки не должен играть поверх других сервисов
+    if(a && !a.paused) a.pause();
     Object.values(SCREENS).forEach(sel=>{const el=q(sel); if(el) el.classList.remove('on')});
     q('#screenHub').classList.remove('on');
   }
@@ -2356,8 +3420,10 @@ const LINKS = [
   /* ---- старт ---- */
   const deck=SERVICES.find(s=>s.screen==='deck');
   const calc=SERVICES.find(s=>s.screen==='calc');
+  const music=SERVICES.find(s=>s.screen==='music');
   if(deck) buildHero(deck);
-  if(calc) buildCalc(calc);
+  if(calc) buildCalc(calc,'#calcTile');
+  if(music) buildCalc(music,'#musicTile');
   buildSoon();
   buildLinks();
   const live=SERVICES.filter(s=>s.screen).length;
@@ -2365,7 +3431,7 @@ const LINKS = [
   q('#headNote').textContent = live===SERVICES.length
     ? word(SERVICES.length)+' · всё доступно'
     : word(SERVICES.length)+' · '+live+' доступно';
-  ['#hubBack','#hubBackCalc'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
+  ['#hubBack','#hubBackCalc','#hubBackMusic'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
   const boot=location.hash.replace('#/','');
   const bs=SERVICES.find(x=>x.id===boot);
   if(bs&&bs.screen) enter(boot);
@@ -2396,4 +3462,3 @@ const LINKS = [
 
 </body>
 </html>
-

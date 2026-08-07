@@ -1035,6 +1035,9 @@ body.booting{overflow:hidden}
 }
 
 /* ---------------- миниатюры ---------------- */
+#screenHub .prev .eq{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.32,0,.24,1)}
+#screenHub .t-music:hover .prev .eq:nth-child(odd){transform:scaleY(1.22)}
+#screenHub .t-music:hover .prev .eq:nth-child(even){transform:scaleY(.76)}
 #screenHub .prev .ln{fill:var(--h-prev);transition:transform .5s cubic-bezier(.32,0,.24,1)}
 #screenHub .prev .ln.hot{fill:var(--c)}
 #screenHub .prev .caret{fill:var(--c);opacity:0;transition:opacity .2s}
@@ -3266,11 +3269,16 @@ const LINKS = [
       return box('0 0 640 186',s);
     },
     wave(){
-      let s='';
-      for(let i=0;i<20;i++){
-        const t=i/19, h=10+Math.abs(Math.sin(t*Math.PI*2.1))*46*(0.45+0.55*Math.sin(t*Math.PI));
-        s+='<rect class="bar-a" x="'+(24+i*5.6)+'" y="'+(44-h/2)+'" width="3" height="'+h.toFixed(1)+'" rx="1.5"/>';
-      }
+      /* эквалайзер: девять столбиков по плавной кривой, заливка градиентом
+         от цвета сервиса к прозрачному — читается как звук, а не как забор */
+      const hs=[22,40,60,76,54,68,36,50,26];
+      let s='<defs><linearGradient id="mwg" x1="0" y1="0" x2="0" y2="1">'
+          + '<stop offset="0" style="stop-color:var(--c);stop-opacity:.95"/>'
+          + '<stop offset="1" style="stop-color:var(--c);stop-opacity:.3"/></linearGradient></defs>';
+      hs.forEach((h,i)=>{
+        s+='<rect class="eq" x="'+(20+i*11)+'" y="'+(44-h/2).toFixed(1)+'" width="5" height="'+h+'" rx="2.5"'
+         + ' fill="url(#mwg)" style="transition-delay:'+(i*40)+'ms"/>';
+      });
       return box('0 0 132 88',s);
     },
     tiers(){

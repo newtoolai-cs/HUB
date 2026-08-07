@@ -832,6 +832,7 @@ body.booting{overflow:hidden}
 #screenMusic *{transition:none!important;animation:none!important}}
 
 #screenMusic{min-height:100vh}
+#screenMusic .meta .dl{color:var(--warm)}
 </style>
 
 <!-- ============ стили хаба ============ -->
@@ -1383,6 +1384,7 @@ body.booting{overflow:hidden}
         <option value="new">Сначала новые</option>
         <option value="old">Сначала старые</option>
         <option value="title">По названию</option>
+        <option value="dl">Часто скачивают</option>
       </select>
     </div>
   </div>
@@ -2562,7 +2564,7 @@ const remote = {
     const r = await fetch(this.base() + '?id=eq.' + id, { method:'PATCH',
       headers: sbHead({ 'Content-Type':'application/json', Prefer:'return=representation' }),
       body: JSON.stringify(patch) });
-    if (!r.ok) throw new Error('Supabase ' + r.status);
+    if (!r.ok) throw new Error('Supabase ' + r.status + ' ' + (await r.text().catch(()=>'')).slice(0,160));
     return (await r.json())[0];
   },
   async remove(id){
@@ -2700,7 +2702,7 @@ async function runQueue(){
         const rec = await db.add({
           title: meta.title, mood: '', author_code: meta.author_code,
           file_name: q.name, size: q.file.size, storage_path: '',
-          added_at: new Date().toISOString(), force_old: false
+          added_at: new Date().toISOString(), force_old: false, downloads: 0
         });
         const path = storagePath(rec.id, q.name);
         await putObject(path, q.file, p => { q.pct = p; renderQueue(); });
@@ -2771,6 +2773,7 @@ function visible(){
     new:   (x, y) => new Date(y.added_at) - new Date(x.added_at),
     old:   (x, y) => new Date(x.added_at) - new Date(y.added_at),
     title: (x, y) => (x.title || '').localeCompare(y.title || '', 'ru'),
+    dl:    (x, y) => (y.downloads || 0) - (x.downloads || 0),
   };
   return a.sort(by[sort]);
 }
@@ -2843,11 +2846,13 @@ function renderList(){
     } else {
       decay = `<div class="decay flat"><span class="decay-txt">в архиве${t.force_old ? ' · вручную' : ''} · добавлен ${shortDate(t.added_at)}</span></div>`;
     }
+    const dl = Number(t.downloads) || 0;
     const meta = [
       t.mood && `<span class="mood">${hl(t.mood, q)}</span>`,
       t.duration && mmss(t.duration),
       t.size && mb(t.size),
       shortDate(t.added_at),
+      dl && `<span class="dl" title="${dl} ${plural(dl,'скачивание','скачивания','скачиваний')}">↓ ${dl}</span>`,
     ].filter(Boolean).join(' <span class="sep">·</span> ');
     const noFile = REMOTE && !t.storage_path && !t.url;
 
@@ -2989,12 +2994,35 @@ async function probeDurations(){
 }
 
 /* ════════════════════════════  ДЕЙСТВИЯ  ════════════════════════════ */
+/* Счётчик скачиваний. Колонки downloads может не быть в таблице —
+   тогда база ответит ошибкой один раз, и дальше мы просто не считаем,
+   а сам файл всё равно скачивается. */
+let noDownloadCol = false;
+
+async function bumpDownloads(t){
+  if (noDownloadCol) return;
+  const n = (t.downloads || 0) + 1;
+  t.downloads = n;
+  renderList();
+  try {
+    await db.update(t.id, { downloads: n });
+  } catch(e) {
+    if (/downloads/i.test(e.message)) {
+      noDownloadCol = true;
+      tracks.forEach(x => delete x.downloads);
+      renderList();
+      toast('Счётчик скачиваний выключен: в таблице нет колонки downloads');
+    } else console.warn(e);
+  }
+}
+
 function download(t){
   const u = downloadUrl(t);
   if (!u) { toast('У этого трека нет файла'); return; }
   const a = document.createElement('a');
   a.href = u; a.target = '_blank'; a.rel = 'noopener';
   document.body.appendChild(a); a.click(); a.remove();
+  bumpDownloads(t);
 }
 
 function openForm(t){
@@ -3078,6 +3106,10 @@ function openStats(){
     `<div class="bar-row"><span class="bar-lbl">${esc(k)}</span><span class="bar-n">${v}</span>
      <div class="bar-wrap"><div class="bar-fill" style="width:${v / max * 100}%"></div></div></div>`).join('');
   const moods = group('mood'), auth = group('author_code');
+  const dlTotal = tracks.reduce((s, t) => s + (Number(t.downloads) || 0), 0);
+  const topDl = tracks.filter(t => Number(t.downloads) > 0)
+                      .sort((a, b) => b.downloads - a.downloads)
+                      .slice(0, 8).map(t => [t.title, t.downloads]);
   const noFile = tracks.filter(t => !t.storage_path && !t.url).length;
 
   $('#statBody').innerHTML = `
@@ -3098,8 +3130,12 @@ function openStats(){
       <div class="stat" data-bucket="month"><div class="v">${mmss(tracks.reduce((s,t)=>s+(t.duration||0),0)) || '0:00'}</div><div class="k">Общий хронометраж</div></div>
       <div class="stat" data-bucket="${noFile ? 'week' : 'month'}"><div class="v">${noFile}</div><div class="k">Без файла</div></div>
     </div>
+    <div class="stat-grid">
+      <div class="stat" data-bucket="week"><div class="v">${dlTotal}</div><div class="k">Скачиваний</div></div>
+    </div>
     ${moods.length ? `<div class="s-title">Настроения</div><div class="bars">${bars(moods, moods[0][1])}</div>` : ''}
-    ${auth.length ? `<div class="s-title">Кто добавляет</div><div class="bars">${bars(auth, auth[0][1])}</div>` : ''}`;
+    ${auth.length ? `<div class="s-title">Кто добавляет</div><div class="bars">${bars(auth, auth[0][1])}</div>` : ''}
+    ${topDl.length ? `<div class="s-title">Что скачивают чаще</div><div class="bars">${bars(topDl, topDl[0][1])}</div>` : ''}`;
   $('#statScrim').classList.add('on');
 }
 

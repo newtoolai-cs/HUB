@@ -2356,10 +2356,13 @@ function renderResult(){
   creoIn.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); setCreo(+e.target.value); }});
   const st=document.getElementById('shootTog');
   if(!r.shootItem)st.addEventListener('change',e=>{state.shoot=e.target.checked;renderResult();});
-  document.getElementById('copy').addEventListener('click',()=>copySummary(r,tierPts,total,shoot,isAvatar8));
+  document.getElementById('copy').addEventListener('click',()=>copySummary(r,tierPts,total,shoot,isAvatar8,{derived,tBase,work6}));
 }
 
-function copySummary(r,tierPts,total,shoot,isAvatar8){
+function copySummary(r,tierPts,total,shoot,isAvatar8,calc){
+  /* derived / tBase / work6 считаются при отрисовке результата,
+     поэтому приходят сюда параметром, а не берутся из внешней области */
+  const {derived,tBase,work6} = calc || {};
   const L=[];
   L.push(`Task Assessment — Creation Video`);
   L.push(`Креативов: ${state.creo}`);
@@ -3202,7 +3205,7 @@ const SERVICES = [
     desc:'Общая база промтов команды: видео и фото, категории, теги, авторы, копирование в один клик.'
   },
   {
-    id:'points', name:'Расчёт поинтов', kicker:'Оценка задач', status:'beta', screen:'calc',
+    id:'points', name:'Расчёт поинтов', kicker:'Оценка задач', status:'ready', screen:'calc',
     color:'#2F6BFF', preview:'tiers', cta:'Открыть калькулятор',
     desc:'Определяет сложность задачи и считает поинты. Звёздочки поднимают тир выше.'
   },

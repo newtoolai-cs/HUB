@@ -3642,7 +3642,7 @@ render();
             null            — плитка «в работе», не кликается
    status : 'ready' | 'beta' | 'soon'
    ===================================================================== */
-const SERVICES = [
+let SERVICES = [
   {
     id:'prompt-deck', name:'Prompt Deck', kicker:'Промты', status:'ready', screen:'deck',
     color:'#2FA37A', preview:'prompts',
@@ -3664,7 +3664,7 @@ const SERVICES = [
 /* =====================================================================
    ВНЕШНИЕ СЕРВИСЫ — открываются в новой вкладке.
    ===================================================================== */
-const LINKS = [
+let LINKS = [
   {name:'Kling',   kicker:'Видео',        color:'#2F6BFF',
    desc:'Генерация видео из текста и картинок. Открывается в командном воркспейсе.',
    url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
@@ -3694,6 +3694,7 @@ const LINKS = [
   const raf=f=>(window.requestAnimationFrame||(g=>setTimeout(g,0)))(f);
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const prev=s=>(PREVIEWS[s.preview]||(()=>''))();
+  const word=n=>{const a=n%10,b=n%100;return n+' сервис'+(a===1&&b!==11?'':(a>1&&a<5&&(b<10||b>20)?'а':'ов'))};
   const ST={
     ready:{l:'работает',c:'#2FA37A'},
     beta :{l:'бета',    c:'#2F6BFF'},
@@ -3855,6 +3856,7 @@ const LINKS = [
     hideAll(); target.classList.add('on');
     document.title=s.name+' — Deck Hub';
     window.scrollTo({top:0});
+    track('open', s.id);
     if(clickSelector) raf(()=>{const el=document.querySelector(clickSelector); if(el) el.click()});
     else if(s.tab) raf(()=>{const el=document.querySelector(s.tab); if(el) el.click()});
   }
@@ -3863,6 +3865,7 @@ const LINKS = [
     document.title='Deck Hub — инструменты команды дизайна';
     if(location.hash) history.replaceState(null,'',location.pathname+location.search);
     window.scrollTo({top:0});
+    track('open','hub');
   }
   window.addEventListener('hashchange',()=>{
     const id=location.hash.replace('#/','');
@@ -3910,6 +3913,106 @@ const LINKS = [
   })
     .observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
+  /* =====================================================================
+     СТАТИСТИКА И КОНФИГ ИЗ БАЗЫ
+     Плитки рисуются сразу из массивов выше, а база лишь уточняет их —
+     если она недоступна, хаб остаётся рабочим.
+     ===================================================================== */
+  const DB = {
+    url:'https://vkjhmnwcffrwktkekklc.supabase.co',
+    key:'sb_publishable_NOmZ1a99hmVtNjUJXPltkw_8oU8GMDu'
+  };
+  const HEAD = { apikey:DB.key, 'Content-Type':'application/json' };
+  const CACHE = 'deckhub.config';
+
+  const store = {
+    get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } },
+    set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
+  };
+
+  /* случайный id браузера — не человека: другой браузер или чистка = новый id */
+  function visitorId(){
+    let v = store.get('deckhub.visitor');
+    if(!v){
+      v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2));
+      store.set('deckhub.visitor', v);
+    }
+    return v;
+  }
+  const device = () => (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) ? 'mobile' : 'desktop';
+
+  let lastEvent = '';
+  function track(kind, service, detail){
+    const stamp = kind+':'+service+':'+(detail||'');
+    if(stamp === lastEvent) return;              // не пишем один и тот же переход дважды
+    lastEvent = stamp;
+    setTimeout(()=>{ lastEvent='' }, 1500);
+    try{
+      fetch(DB.url+'/rest/v1/hub_events', {
+        method:'POST', keepalive:true,
+        headers:Object.assign({Prefer:'return=minimal'}, HEAD),
+        body:JSON.stringify({ kind, service, detail:detail||null, visitor:visitorId(), device:device() })
+      }).catch(()=>{});
+    }catch(e){}
+  }
+
+  /* нажатия ключевых кнопок — одним делегированным слушателем,
+     чтобы не трогать код самих сервисов */
+  const ACTIONS = [
+    ['#screenDeck [data-copy]',      'prompt-deck', 'copy'],
+    ['#screenDeck #openAdd',         'prompt-deck', 'add'],
+    ['#screenCalc #copy',            'points',      'copy'],
+    ['#screenCalc #tCopy',           'talk',        'copy'],
+    ['#screenCalc #tabTalkBtn',      'talk',        'open'],
+    ['#screenMusic [data-act="down"]','music',      'download'],
+    ['#screenMusic #upBtn',          'music',       'upload'],
+  ];
+  document.addEventListener('click', e=>{
+    const a = e.target.closest('#extGrid a');
+    if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+(l?l.id:'other'),'open'); return; }
+    for(const [sel, service, detail] of ACTIONS){
+      if(e.target.closest(sel)){ track('action', service, detail); return; }
+    }
+  }, true);
+
+  /* конфиг из базы: сначала кэш прошлого удачного ответа, потом сеть */
+  function applyConfig(cfg){
+    if(cfg.services && cfg.services.length) SERVICES = cfg.services;
+    if(cfg.links && cfg.links.length) LINKS = cfg.links;
+    const deck=SERVICES.find(s=>s.screen==='deck'), calc=SERVICES.find(s=>s.screen==='calc'),
+          music=SERVICES.find(s=>s.screen==='music');
+    if(deck) buildHero(deck);
+    if(calc) buildCalc(calc,'#calcTile');
+    if(music) buildCalc(music,'#musicTile');
+    buildLinks();
+    const live=SERVICES.filter(s=>s.screen).length;
+    q('#headNote').textContent = live===SERVICES.length
+      ? word(SERVICES.length)+' · всё доступно'
+      : word(SERVICES.length)+' · '+live+' доступно';
+  }
+  function fromRows(rows, isLink){
+    return rows.filter(r=>!r.hidden).map(r=> isLink
+      ? { id:r.id, name:r.name, kicker:r.kicker||'', desc:r.descr||'', url:r.url, color:r.color||'#2F6BFF' }
+      : { id:r.id, name:r.name, kicker:r.kicker||'', desc:r.descr||'', status:r.status||'ready',
+          screen:r.screen||null, tab:r.tab||null, color:r.color||'#2F6BFF',
+          preview:r.preview||'prompts', cta:r.cta||null });
+  }
+  async function loadConfig(){
+    const cached = store.get(CACHE);
+    if(cached){ try{ applyConfig(JSON.parse(cached)) }catch(e){} }
+    try{
+      const get = p => fetch(DB.url+'/rest/v1/'+p, {headers:HEAD}).then(r=>{ if(!r.ok) throw 0; return r.json() });
+      const [svc, lnk] = await Promise.all([
+        get('hub_services?select=*&order=sort.asc'),
+        get('hub_links?select=*&order=sort.asc')
+      ]);
+      if(!svc.length && !lnk.length) return;            // таблицы пустые — остаёмся на коде
+      const cfg = { services:fromRows(svc,false), links:fromRows(lnk,true) };
+      applyConfig(cfg);
+      store.set(CACHE, JSON.stringify(cfg));
+    }catch(e){ /* база недоступна — работаем на встроенных массивах */ }
+  }
+
   /* ---- старт ---- */
   const deck=SERVICES.find(s=>s.screen==='deck');
   const calc=SERVICES.find(s=>s.screen==='calc');
@@ -3920,14 +4023,14 @@ const LINKS = [
   buildSoon();
   buildLinks();
   const live=SERVICES.filter(s=>s.screen).length;
-  const word=n=>{const a=n%10,b=n%100;return n+' сервис'+(a===1&&b!==11?'':(a>1&&a<5&&(b<10||b>20)?'а':'ов'))};
   q('#headNote').textContent = live===SERVICES.length
     ? word(SERVICES.length)+' · всё доступно'
     : word(SERVICES.length)+' · '+live+' доступно';
   ['#hubBack','#hubBackCalc','#hubBackMusic'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
   const boot=location.hash.replace('#/','');
   const bs=SERVICES.find(x=>x.id===boot);
-  if(bs&&bs.screen) enter(boot);
+  if(bs&&bs.screen) enter(boot); else track('open','hub');
+  loadConfig();
 })();
 </script>
 

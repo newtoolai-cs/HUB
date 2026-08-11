@@ -835,6 +835,142 @@ body.booting{overflow:hidden}
 #screenMusic .meta .dl{color:var(--warm)}
 </style>
 
+<!-- ============ стили опросника — вкладка калькулятора ============ -->
+<style>
+/* вводная строка панели и сброс — в духе base-strip калькулятора */
+#tab-talk .tg-intro{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:11px;
+  padding:12px 15px;font-size:13px;line-height:1.5;color:var(--ink);margin-bottom:16px;
+}
+#tab-talk .tg-intro > button{margin-left:auto}
+#tab-talk .tg-reset{
+  flex:none;background:var(--panel);border:1px solid var(--line);color:var(--muted);cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;padding:7px 12px;border-radius:9px;
+  transition:all .14s;
+}
+#tab-talk .tg-reset:hover{color:var(--ink);border-color:var(--faint)}
+
+#tab-talk .tg-wrap{max-width:1060px;margin:0 auto}
+#tab-talk /* шапка */
+  .tg-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+#tab-talk .tg-head .tg-t{flex:1;min-width:240px}
+#tab-talk .tg-eyebrow{
+    font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:7px;
+  }
+#tab-talk h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.025em;margin:0 0 8px}
+#tab-talk .tg-lede{color:var(--muted);font-size:14px;max-width:62ch;margin:0}
+#tab-talk .tg-headside{display:flex;gap:8px;align-items:center}
+#tab-talk .tg-ghost{
+    display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
+    color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;
+    padding:8px 13px;border-radius:10px;box-shadow:var(--shadow);transition:all .14s;
+  }
+#tab-talk .tg-ghost:hover{color:var(--ink);border-color:var(--faint)}
+#tab-talk .tg-ghost svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#tab-talk html[data-theme="dark"] .tg-sun{display:none}
+#tab-talk html[data-theme="light"] .tg-moon{display:none}
+#tab-talk .tg-grid{display:grid;grid-template-columns:1fr 384px;gap:18px;align-items:start}
+@media(max-width:900px){
+#tab-talk .tg-grid{grid-template-columns:1fr}}
+#tab-talk .tg-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+#tab-talk .tg-card+.tg-card{margin-top:14px}
+#tab-talk /* вопросы */
+  .tg-qn{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+#tab-talk .tg-qn .tg-n{
+    flex:none;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--panel);
+    display:grid;place-items:center;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;
+  }
+#tab-talk .tg-qn h2{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;letter-spacing:-.01em;margin:0;flex:1}
+#tab-talk .tg-qn .tg-hint{font-size:12.5px;color:var(--faint);flex-basis:100%;padding-left:30px;margin-top:-8px}
+#tab-talk .tg-opts{display:flex;flex-direction:column;gap:8px}
+#tab-talk .tg-opt{
+    display:flex;align-items:flex-start;gap:11px;text-align:left;width:100%;cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;
+    font:inherit;color:inherit;transition:all .14s;
+  }
+#tab-talk .tg-opt:hover{border-color:var(--faint)}
+#tab-talk .tg-opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+#tab-talk .tg-opt .tg-radio{
+    flex:none;width:17px;height:17px;border-radius:50%;border:1.6px solid var(--line);margin-top:1px;
+    display:grid;place-items:center;transition:all .14s;
+  }
+#tab-talk .tg-opt[aria-pressed="true"] .tg-radio{border-color:var(--accent)}
+#tab-talk .tg-opt[aria-pressed="true"] .tg-radio::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent)}
+#tab-talk .tg-opt .tg-txt{flex:1;min-width:0}
+#tab-talk .tg-opt .tg-lbl{font-size:14px;font-weight:500}
+#tab-talk .tg-opt .tg-sub{font-size:12.5px;color:var(--faint);margin-top:3px}
+#tab-talk .tg-opt .tg-flag{
+    display:inline-block;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:600;
+    letter-spacing:.05em;padding:2px 7px;border-radius:6px;margin-top:6px;
+  }
+#tab-talk .tg-flag.tg-med{background:var(--warn-soft);color:var(--warn)}
+#tab-talk .tg-flag.tg-high{background:var(--reject-soft);color:var(--reject)}
+#tab-talk .tg-flag.tg-low{background:var(--ok-soft);color:var(--ok)}
+#tab-talk /* количество */
+  .tg-creo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#tab-talk .tg-creo-lab{font-size:13px;color:var(--muted);margin-right:auto}
+#tab-talk .tg-creo-in{display:inline-flex;align-items:center;height:34px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+#tab-talk .tg-creo-in button{width:32px;height:100%;background:none;border:0;color:var(--muted);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;display:grid;place-items:center;transition:all .12s}
+#tab-talk .tg-creo-in button:hover{background:var(--panel);color:var(--ink)}
+#tab-talk .tg-creo-in input{
+    width:46px;height:100%;background:none;border:0;outline:none;text-align:center;
+    font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--ink);
+    border-left:1px solid var(--line);border-right:1px solid var(--line);
+    -moz-appearance:textfield;appearance:textfield;
+  }
+#tab-talk .tg-creo-in input::-webkit-outer-spin-button, #tab-talk .tg-creo-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#tab-talk .tg-creo-pre{display:inline-flex;height:34px;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+#tab-talk .tg-creo-pre button{min-width:34px;padding:0 9px;background:none;border:0;color:var(--faint);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12.5px;transition:all .12s}
+#tab-talk .tg-creo-pre button+button{border-left:1px solid var(--line)}
+#tab-talk .tg-creo-pre button:hover{color:var(--ink);background:var(--panel-2)}
+#tab-talk .tg-creo-pre button.tg-on{background:var(--accent-soft);color:var(--accent)}
+#tab-talk /* результат */
+  .tg-res{position:sticky;top:20px}
+#tab-talk .tg-verdict{padding:20px;border-radius:var(--radius);border:1px solid var(--vl);background:var(--vs);margin:-20px -20px 18px;border-bottom-left-radius:0;border-bottom-right-radius:0}
+#tab-talk .tg-verdict .tg-k{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--vc);margin-bottom:8px}
+#tab-talk .tg-verdict .tg-v{font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700;letter-spacing:-.03em;color:var(--vc);line-height:1.05}
+#tab-talk .tg-verdict .tg-sub{font-size:13px;color:var(--muted);margin-top:7px}
+#tab-talk .tg-pts{display:flex;align-items:baseline;gap:9px;margin-bottom:4px}
+#tab-talk .tg-pts .tg-big{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#tab-talk .tg-pts .tg-unit{font-size:13px;color:var(--muted)}
+#tab-talk .tg-pts-note{font-size:12.5px;color:var(--faint);margin-bottom:16px}
+#tab-talk .tg-why{border-top:1px solid var(--line-soft);padding-top:14px}
+#tab-talk .tg-why .tg-t{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+#tab-talk .tg-why ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#tab-talk .tg-why li{display:flex;gap:9px;font-size:13px;line-height:1.5}
+#tab-talk .tg-why li .tg-m{flex:none;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;width:16px;text-align:center;margin-top:1px}
+#tab-talk .tg-why li.tg-up .tg-m{color:var(--reject)}
+#tab-talk .tg-why li.tg-down .tg-m{color:var(--ok)}
+#tab-talk .tg-why li.tg-neutral .tg-m{color:var(--faint)}
+#tab-talk .tg-why li b{font-weight:600}
+#tab-talk .tg-item{
+    margin-top:16px;padding:13px 14px;border-radius:11px;background:var(--panel-2);
+    border:1px solid var(--line-soft);font-size:13px;line-height:1.55;
+  }
+#tab-talk .tg-item .tg-t{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+#tab-talk .tg-item .tg-stars{color:var(--accent);font-weight:600}
+#tab-talk .tg-note{margin-top:12px;padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.55;display:flex;gap:9px}
+#tab-talk .tg-note.tg-warn{background:var(--warn-soft);border:1px solid var(--warn-line);color:var(--ink)}
+#tab-talk .tg-note.tg-info{background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--ink)}
+#tab-talk .tg-note .tg-i{flex:none;font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--warn)}
+#tab-talk .tg-note.tg-info .tg-i{color:var(--accent)}
+#tab-talk .tg-actions{display:flex;gap:9px;margin-top:16px}
+#tab-talk .tg-primary{
+    flex:1;background:var(--accent);color:#fff;border:0;border-radius:10px;cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:11px 14px;
+    transition:filter .14s;
+  }
+#tab-talk .tg-primary:hover{filter:brightness(1.07)}
+#tab-talk .tg-toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:60;
+    background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;
+    opacity:0;pointer-events:none;transition:all .2s;
+  }
+#tab-talk .tg-toast.tg-on{opacity:1;transform:translate(-50%,0)}
+</style>
+
 <!-- ============ стили хаба ============ -->
 <style>
 /* =====================================================================
@@ -1273,6 +1409,7 @@ body.booting{overflow:hidden}
   <div class="tabs" role="tablist">
     <button role="tab" data-tab="calc" aria-selected="true">Конструктор</button>
     <button role="tab" data-tab="ref" aria-selected="false">Справочник</button>
+    <button role="tab" data-tab="talk" aria-selected="false" id="tabTalkBtn">Разговорные генерации</button>
   </div>
 
   <div id="tab-calc">
@@ -1345,6 +1482,35 @@ body.booting{overflow:hidden}
       </div></details>
     </div>
   </div>
+
+<div id="tab-talk" style="display:none">
+  <div class="tg-intro">
+    Пять вопросов из методики вместо чтения таблицы. Отвечай по ТЗ — на выходе сложность генераций,
+    поинты и готовый пункт, который остаётся отметить в конструкторе.
+    <button class="tg-reset" id="tReset">Сбросить</button>
+  </div>
+<div class="tg-grid">
+    <div>
+      <div class="tg-card" id="tQuestions"></div>
+      <div class="tg-card">
+        <div class="tg-qn"><span class="tg-n">5</span><h2>Сколько генераций в задаче</h2></div>
+        <div class="tg-creo">
+          <span class="tg-creo-lab">Обычно столько же, сколько креативов</span>
+          <span class="tg-creo-in">
+            <button type="button" data-step="-1" aria-label="Меньше">−</button>
+            <input id="tCreoN" type="number" inputmode="numeric" min="1" max="99" step="1" value="6" aria-label="Количество генераций">
+            <button type="button" data-step="1" aria-label="Больше">+</button>
+          </span>
+          <span class="tg-creo-pre" id="tCreoPre"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tg-card tg-res" id="tRes"></div>
+  </div>
+
+  <div class="tg-toast" id="tToast"></div>
+</div>
 </div>
 
 <div class="ta-toast" id="calcToast"></div>
@@ -2146,8 +2312,10 @@ themeBtn.addEventListener('click',()=>{const n=document.documentElement.dataset.
 /* ============ табы ============ */
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
-  document.getElementById('tab-calc').style.display=b.dataset.tab==='calc'?'':'none';
-  document.getElementById('tab-ref').style.display=b.dataset.tab==='ref'?'':'none';
+  ['calc','ref','talk'].forEach(k=>{
+    const el=document.getElementById('tab-'+k);
+    if(el) el.style.display = b.dataset.tab===k ? '' : 'none';
+  });
 }));
 
 /* ============ каталог ============ */
@@ -3192,6 +3360,282 @@ setInterval(() => { if (!$$('.scrim.on').length) { renderSections(); renderList(
 </script>
 
 <script>
+/* Панель живёт в общей области видимости с калькулятором, а имена вроде
+   TIERS, state, render, fmt, toast есть у обоих. Оборачиваем в функцию,
+   чтобы ничего не пересекалось. */
+(function(){
+/* ═════════════════════════════════════════════════════════════════════
+   Классификация разговорных генераций по методике Task Assessment.
+
+   Простые  → Low    (0.5 / 3 / 3.5 · при 8 аватарах 4)
+   Обычные  → Medium (0.75 / 4.5 / 6)
+   Сложные  → High   (1 / 6 / 8)
+
+   Признаки взяты дословно из раздела «Разговорные генерации делятся на»,
+   поправки — из пунктов Low №5-6, Medium №3 и High №4.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const TIERS = {
+  low:    { name:'Простые',  tier:'Low',    pts:[0.5, 3, 3.5], stars:2,
+            item:'Разговорные генерации 6 разных простых аватаров через Kling / HeyGen / TikTok / Vozo' },
+  medium: { name:'Обычные',  tier:'Medium', pts:[0.75, 4.5, 6], stars:3,
+            item:'Разговорные обычные генерации 6-8 видео через Kling / HeyGen / TikTok / Vozo' },
+  high:   { name:'Сложные',  tier:'High',   pts:[1, 6, 8], stars:2,
+            item:'Сложные разговорные генерации 6 видео через Kling / Vozo (футаж требует подготовки), от ~15 секунд' },
+};
+const COLOR = { low:'--ok', medium:'--warn', high:'--reject' };
+
+const QUESTIONS = [
+  {
+    id:'people', title:'Сколько говорящих в кадре',
+    hint:'Считается не число людей в сцене, а сколько из них говорят.',
+    opts:[
+      { v:'one',      lbl:'Один человек',                     sub:'Живой фон допускается', tier:null },
+      { v:'two-one',  lbl:'Двое, но одной генерацией',        sub:'Оба в кадре, генерация одна', tier:'medium' },
+      { v:'two-two',  lbl:'Двое, двумя генерациями',          sub:'Диалог, склеенный из двух генераций', tier:'high' },
+    ]
+  },
+  {
+    id:'action', title:'Дополнительное действие по промту',
+    hint:'Нарезать овощи, упаковать чемодан, ехать на велосипеде, поднять руки.',
+    opts:[
+      { v:'none',    lbl:'Нет, только говорит',              sub:'', tier:null },
+      { v:'simple',  lbl:'Одно простое действие',            sub:'Задано промтом', tier:'medium' },
+      { v:'complex', lbl:'Несколько разных действий',        sub:'Комплексная генерация: банкомат → улица → касса', tier:'high' },
+    ]
+  },
+  {
+    id:'motion', title:'Моушн внутри генерации',
+    hint:'Например: рассказчик говорит текст, затем камера уводит на другой объект.',
+    opts:[
+      { v:'no',  lbl:'Нет, статичный кадр', sub:'', tier:null },
+      { v:'yes', lbl:'Есть моушн',          sub:'Камера или монтаж внутри одной генерации', tier:'medium' },
+    ]
+  },
+  {
+    id:'source', title:'Чем делаем',
+    hint:'Для Vozo важно, откуда взялся футаж под липсинк.',
+    opts:[
+      { v:'gen',       lbl:'Генерация целиком',                    sub:'Kling, HeyGen, TikTok', tier:null },
+      { v:'vozo-old',  lbl:'Vozo на старом или прикреплённом футаже', sub:'Липсинк на готовом материале', tier:null },
+      { v:'vozo-new',  lbl:'Vozo, футаж требует подготовки',       sub:'Локации, действия, одежда найдены самостоятельно', tier:'high' },
+    ]
+  },
+  {
+    id:'prompt', title:'Промт',
+    hint:'Готовый отработанный промт понижает оценку до простых, даже если признаки обычных есть.',
+    opts:[
+      { v:'new',   lbl:'Новый промт',                sub:'Придумываем и отлаживаем', tier:null },
+      { v:'ready', lbl:'Готовый отработанный промт', sub:'Достаточно адаптировать существующую идею', tier:null, down:true },
+    ]
+  },
+];
+
+const state = { people:'one', action:'none', motion:'no', source:'gen', prompt:'new', creo:6 };
+const PRESETS = [3, 6, 8];
+const ROOT = document.getElementById('tab-talk');
+const visible = () => ROOT.style.display !== 'none';
+const $ = s => ROOT.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => { const r = Math.round(n * 100) / 100; return (Math.abs(r - Math.round(r)) < 1e-9 ? Math.round(r) : r).toString(); };
+const round2 = n => Math.round(n * 100) / 100;
+const stars = n => '★'.repeat(n);
+const plural = (n, a, b, c) => { const x = Math.abs(n) % 100, y = x % 10;
+  return x > 10 && x < 20 ? c : y > 1 && y < 5 ? b : y === 1 ? a : c; };
+
+/* ── решение ─────────────────────────────────────────────────────── */
+function decide(){
+  const reasons = [], notes = [];
+  let level = 'low';
+
+  QUESTIONS.forEach(q => {
+    const opt = q.opts.find(o => o.v === state[q.id]);
+    if (!opt || !opt.tier) return;
+    if (opt.tier === 'high') level = 'high';
+    else if (opt.tier === 'medium' && level !== 'high') level = 'medium';
+    reasons.push({ k:'up', tier:opt.tier, text:`${q.title.toLowerCase()}: <b>${opt.lbl.toLowerCase()}</b>` });
+  });
+
+  if (!reasons.length) reasons.push({ k:'neutral', text:'Ни одного признака обычных или сложных — один говорящий, без действий и моушна.' });
+
+  /* готовый промт: методика опускает до простых всё, что попало в обычные */
+  if (state.prompt === 'ready') {
+    if (level === 'medium') {
+      level = 'low';
+      reasons.push({ k:'down', text:'Есть готовый отработанный промт — методика понижает такую задачу до <b>простых</b>.' });
+    } else if (level === 'high') {
+      notes.push({ k:'warn', t:'Готовый промт понижает до простых только признаки <b>обычных</b>. Признаки сложных остаются, поэтому оценка не снижена.' });
+    }
+  }
+
+  /* меньше шести генераций у обычных — тоже понижение */
+  if (level === 'medium' && state.creo < 6) {
+    level = 'low';
+    reasons.push({ k:'down', text:`Генераций меньше шести (${state.creo}) — методика понижает обычные до <b>простых</b>.` });
+  }
+
+  if (state.source === 'vozo-new' && state.creo < 6) {
+    notes.push({ k:'warn', t:'Сложные разговорные генерации в методике описаны для шести видео. При меньшем количестве уточните оценку у TL.' });
+  }
+  if (state.source === 'vozo-old' && level === 'high') {
+    notes.push({ k:'info', t:'Для Vozo на готовом футаже сложность High обычно не ставится: там футаж не требует подготовки. Проверьте, точно ли материал новый.' });
+  }
+  if (level === 'low' && state.people === 'one' && state.action === 'none' && state.creo > 6) {
+    notes.push({ k:'info', t:'Если к простым аватарам идут дополнительные материалы, в методике это отдельный пункт: 2 шт = 6 крео, 3 шт = 8 крео.' });
+  }
+  return { level, reasons, notes };
+}
+
+function points(level, n){
+  const T = TIERS[level];
+  const base = level === 'low' ? 0.75 : level === 'medium' ? 1 : 1;   /* база сложности */
+  if (n === 6) return { v:T.pts[1], exact:true };
+  if (n === 8) return { v:(level === 'low' ? 4 : T.pts[2]), exact:true, avatars:level === 'low' };
+  const work6 = round2(T.pts[1] - base);
+  return { v:round2(base + round2(work6 * n / 6)), exact:false, base, work6 };
+}
+
+/* ── отрисовка ───────────────────────────────────────────────────── */
+function renderQuestions(){
+  $('#tQuestions').innerHTML = QUESTIONS.map((q, i) => `
+    <div class="tg-qn"><span class="tg-n">${i + 1}</span><h2>${esc(q.title)}</h2>
+      ${q.hint ? `<div class="tg-hint">${esc(q.hint)}</div>` : ''}</div>
+    <div class="tg-opts" data-q="${q.id}">
+      ${q.opts.map(o => `
+        <button class="tg-opt" type="button" data-v="${o.v}" aria-pressed="${state[q.id] === o.v}">
+          <span class="tg-radio"></span>
+          <span class="tg-txt">
+            <span class="tg-lbl">${esc(o.lbl)}</span>
+            ${o.sub ? `<span class="tg-sub">${esc(o.sub)}</span>` : ''}
+            ${o.tier ? `<span class="tg-flag tg-${o.tier === 'high' ? 'high' : 'med'}">${o.tier === 'high' ? 'признак сложных' : 'признак обычных'}</span>` : ''}
+            ${o.down ? '<span class="tg-flag tg-low">понижает до простых</span>' : ''}
+          </span>
+        </button>`).join('')}
+    </div>
+    ${i < QUESTIONS.length - 1 ? '<div style="height:22px"></div>' : ''}`).join('');
+
+  $('#tQuestions').querySelectorAll('.tg-opts').forEach(box => {
+    box.addEventListener('click', e => {
+      const b = e.target.closest('.tg-opt');
+      if (!b) return;
+      state[box.dataset.q] = b.dataset.v;
+      render();
+    });
+  });
+}
+
+function renderCreo(){
+  $('#tCreoN').value = state.creo;
+  $('#tCreoPre').innerHTML = PRESETS.map(p =>
+    `<button type="button" data-creo="${p}" class="${p === state.creo ? 'tg-on' : ''}">${p}</button>`).join('');
+}
+
+function render(){
+  renderQuestions();
+  renderCreo();
+
+  const { level, reasons, notes } = decide();
+  const T = TIERS[level], p = points(level, state.creo);
+  const c = COLOR[level];
+
+  $('#tRes').innerHTML = `
+    <div class="tg-verdict" style="--vc:var(${c});--vs:color-mix(in srgb,var(${c}) 9%,transparent);--vl:color-mix(in srgb,var(${c}) 28%,transparent)">
+      <div class="tg-k">сложность генераций</div>
+      <div class="tg-v">${T.name}</div>
+      <div class="tg-sub">В таблице поинтов это сложность <b>${T.tier}</b></div>
+    </div>
+
+    <div class="tg-pts">
+      <span class="tg-big">${fmt(p.v)}</span>
+      <span class="tg-unit">${plural(p.v, 'поинт', 'поинта', 'поинтов')} за ${state.creo} ${plural(state.creo, 'генерацию', 'генерации', 'генераций')}</span>
+    </div>
+    <div class="tg-pts-note">${p.exact
+      ? (p.avatars ? 'Значение из методики: Low на 8 аватаров считается как 4 поинта.' : 'Значение прямо из таблицы методики.')
+      : `В методике есть цифры только для 6 и 8. Посчитано по правилу: база ${fmt(p.base)} не делится на количество, работа ${fmt(p.work6)} × ${state.creo}/6.`}</div>
+
+    <div class="tg-why">
+      <div class="tg-t">почему так</div>
+      <ul>${reasons.map(r => `<li class="tg-${r.k}"><span class="tg-m">${r.k === 'up' ? '↑' : r.k === 'down' ? '↓' : '·'}</span><span>${r.text}</span></li>`).join('')}</ul>
+    </div>
+
+    <div class="tg-item">
+      <div class="tg-t">пункт для калькулятора</div>
+      <span class="tg-stars">${stars(T.stars)}</span> ${esc(T.item)}
+    </div>
+
+    ${notes.map(n => `<div class="tg-note tg-${n.k}"><span class="tg-i">${n.k === 'warn' ? '!' : 'i'}</span><span>${n.t}</span></div>`).join('')}
+
+    <div class="tg-actions"><button class="tg-primary" id="tCopy">Скопировать вывод</button></div>`;
+
+  $('#tCopy').onclick = () => copyOut(level, p, reasons);
+}
+
+/* ── копирование ─────────────────────────────────────────────────── */
+function copyOut(level, p, reasons){
+  const T = TIERS[level];
+  const strip = s => s.replace(/<[^>]+>/g, '');
+  const L = [
+    'Разговорные генерации — определение сложности',
+    `Сложность: ${T.name} (${T.tier})`,
+    `Генераций: ${state.creo}`,
+    `Поинты: ${fmt(p.v)}${p.exact ? '' : ' (посчитано, в методике нет цифры для такого количества)'}`,
+    '',
+    'Ответы:',
+    ...QUESTIONS.map(q => {
+      const o = q.opts.find(x => x.v === state[q.id]);
+      return `  • ${q.title}: ${o ? o.lbl : '—'}`;
+    }),
+    '',
+    'Почему:',
+    ...reasons.map(r => '  • ' + strip(r.text)),
+    '',
+    `Пункт: ${stars(T.stars)} ${T.item}`,
+  ];
+  const txt = L.join('\n');
+  const done = () => toast('Скопировано');
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(done).catch(() => fallback(txt, done));
+  else fallback(txt, done);
+}
+function fallback(txt, cb){
+  const ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) { toast('Не получилось скопировать'); }
+  document.body.removeChild(ta);
+}
+let tt;
+function toast(m){
+  const el = $('#tToast'); el.textContent = m; el.classList.add('tg-on');
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove('tg-on'), 2400);
+}
+
+/* ── связка ──────────────────────────────────────────────────────── */
+const setCreo = n => { state.creo = Math.min(99, Math.max(1, Math.round(n) || 1)); render(); };
+document.addEventListener('click', e => {
+  if (!visible()) return;
+  const pre = e.target.closest('[data-creo]');
+  if (pre) return setCreo(+pre.dataset.creo);
+  const step = e.target.closest('[data-step]');
+  if (step) return setCreo(state.creo + (+step.dataset.step));
+});
+document.addEventListener('change', e => {
+  if (!visible()) return; if (e.target.id === 'tCreoN') setCreo(+e.target.value); });
+document.addEventListener('keydown', e => {
+  if (!visible()) return;
+  if (e.key === 'Enter' && e.target.id === 'tCreoN') { e.preventDefault(); setCreo(+e.target.value); }
+});
+
+$('#tReset').onclick = () => {
+  Object.assign(state, { people:'one', action:'none', motion:'no', source:'gen', prompt:'new', creo:6 });
+  render(); toast('Сброшено');
+};
+
+render();
+})();
+</script>
+
+<script>
 /* =====================================================================
    СЕРВИСЫ ХАБА — правится только этот массив.
    screen : 'deck' | 'calc' — открывается внутренним экраном хаба
@@ -3247,6 +3691,7 @@ const LINKS = [
 /* ------------------------- дальше править не нужно ------------------------- */
 (function(){
   const q=s=>document.querySelector(s);
+  const raf=f=>(window.requestAnimationFrame||(g=>setTimeout(g,0)))(f);
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const prev=s=>(PREVIEWS[s.preview]||(()=>''))();
   const ST={
@@ -3308,10 +3753,10 @@ const LINKS = [
     });
     host.appendChild(wrap);
   }
-  function clickable(tile,id){
-    tile.onclick=()=>enter(id);
+  function clickable(tile,id,tab){
+    tile.onclick=()=>enter(id,tab);
     tile.tabIndex=0;
-    tile.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();enter(id)}};
+    tile.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();enter(id,tab)}};
   }
 
   /* ---- плитка Prompt Deck ---- */
@@ -3349,9 +3794,9 @@ const LINKS = [
         '<p>'+esc(s.desc)+'</p>'+
       '</div>';
     actions(tile.querySelector('.calc-body'),[
-      [s.cta || 'Открыть','go',()=>enter(s.id),arrow]
+      [s.cta || 'Открыть','go',()=>enter(s.id, s.tab),arrow]
     ]);
-    clickable(tile,s.id);
+    clickable(tile,s.id,s.tab);
   }
 
   /* ---- плитки «в работе»: без превью, только заголовок и «скоро» ---- */
@@ -3410,7 +3855,8 @@ const LINKS = [
     hideAll(); target.classList.add('on');
     document.title=s.name+' — Deck Hub';
     window.scrollTo({top:0});
-    if(clickSelector) requestAnimationFrame(()=>{const el=document.querySelector(clickSelector); if(el) el.click()});
+    if(clickSelector) raf(()=>{const el=document.querySelector(clickSelector); if(el) el.click()});
+    else if(s.tab) raf(()=>{const el=document.querySelector(s.tab); if(el) el.click()});
   }
   function showHub(){
     hideAll(); q('#screenHub').classList.add('on');

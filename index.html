@@ -3699,25 +3699,25 @@ let SERVICES = [
    ВНЕШНИЕ СЕРВИСЫ — открываются в новой вкладке.
    ===================================================================== */
 let LINKS = [
-  {name:'Kling',   kicker:'Видео',        color:'#2F6BFF',
+  {id:'kling', name:'Kling',   kicker:'Видео',        color:'#2F6BFF',
    desc:'Генерация видео из текста и картинок. Открывается в командном воркспейсе.',
    url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
-  {name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8',
+  {id:'openart', name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8',
    desc:'Картинки, стили и апскейл — для кадров и превью.',
    url:'https://openart.ai/home'},
-  {name:'Vozo',    kicker:'Липсинк',       color:'#E0870B',
+  {id:'vozo', name:'Vozo',    kicker:'Липсинк',       color:'#E0870B',
    desc:'Сервис для липсинка: подгоняет движение губ под новую озвучку.',
    url:'https://app.vozo.ai/'},
-  {name:'Vmake',   kicker:'Очистка',       color:'#E8596A',
+  {id:'vmake', name:'Vmake',   kicker:'Очистка',       color:'#E8596A',
    desc:'Удаление субтитров и водяных знаков с видео.',
    url:'https://vmake.ai/workspace'},
-  {name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6',
+  {id:'transcribe', name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6',
    desc:'Достаёт текст из озвучки — готовый скрипт из готового ролика.',
    url:'https://login.go-transcribe.com/'},
-  {name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4',
+  {id:'heygen', name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4',
    desc:'Говорящие аватары для креативов — из текста или своей озвучки.',
    url:'https://app.heygen.com/projects/avatar-videos'},
-  {name:'TopView', kicker:'Аватары',      color:'#2FA37A',
+  {id:'topview', name:'TopView', kicker:'Аватары',      color:'#2FA37A',
    desc:'UGC-аватары для перформанс-креативов. Открывается на нашей доске.',
    url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'}
 ];
@@ -3725,6 +3725,7 @@ let LINKS = [
 /* ------------------------- дальше править не нужно ------------------------- */
 (function(){
   const q=s=>document.querySelector(s);
+  const hostOf=u=>{ try{ return new URL(u).hostname.replace(/^www\./,'') }catch(e){ return 'other' } };
   const raf=f=>(window.requestAnimationFrame||(g=>setTimeout(g,0)))(f);
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const prev=s=>(PREVIEWS[s.preview]||(()=>''))();
@@ -4063,7 +4064,7 @@ let LINKS = [
   ];
   document.addEventListener('click', e=>{
     const a = e.target.closest('#extGrid a');
-    if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+(l?l.id:'other'),'open'); return; }
+    if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+((l&&l.id)||hostOf(a.href)),'open'); return; }
     for(const [sel, service, detail] of ACTIONS){
       if(e.target.closest(sel)){ track('action', service, detail); return; }
     }

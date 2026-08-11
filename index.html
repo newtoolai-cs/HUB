@@ -1071,6 +1071,25 @@ body.booting{overflow:hidden}
 #screenHub .t-head p{color:var(--h-mid);font-size:13.5px;line-height:1.55;margin:0;max-width:42ch}
 @media(max-width:620px){#screenHub .t-head h1{font-size:25px}}
 
+/* «это я» */
+#screenHub .who{
+  display:flex;flex-wrap:wrap;align-items:center;gap:7px;
+  margin:16px 0 14px;padding-top:14px;border-top:1px solid var(--h-line-soft);
+}
+#screenHub .who-ask{flex:1 1 100%;font-size:12.5px;line-height:1.5;color:var(--h-mid)}
+#screenHub .who-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#screenHub .who-pick{
+  background:var(--h-soft);border:1px solid var(--h-line);color:var(--h-ink);
+  font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:8px;transition:all .14s;
+}
+#screenHub .who-pick:hover{border-color:var(--h-accent);color:var(--h-accent)}
+#screenHub .who-input{
+  background:var(--h-soft);border:1px solid var(--h-line);color:var(--h-ink);
+  font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:8px;width:150px;outline:none;
+}
+#screenHub .who-input:focus{border-color:var(--h-accent)}
+#screenHub .who-me{font-family:var(--mono);font-size:11px;color:var(--h-mid)}
+#screenHub .who-me b{color:var(--h-ink);font-weight:600}
 /* статус */
 #screenHub .badge{
   display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;
@@ -1294,6 +1313,7 @@ body.booting{overflow:hidden}
           <h1>Инструменты команды <em>дизайна</em></h1>
           <p>Всё, чем мы работаем с ИИ-видео и моушном. Сервисы открываются здесь же, внутри хаба.</p>
         </div>
+        <div class="who" id="whoBox"></div>
         <div class="lab" id="headNote"></div>
       </section>
 
@@ -1598,7 +1618,7 @@ body.booting{overflow:hidden}
       <div class="grid">
         <div class="field full"><label for="fTitle">Название</label><input id="fTitle" placeholder="Neon Drive"></div>
         <div class="field full"><label for="fMoodIn">Настроение</label><input id="fMoodIn" list="moodList" placeholder="energetic"><datalist id="moodList"></datalist></div>
-        <div class="field"><label for="fCode">Код дизайнера</label><input id="fCode" placeholder="IL"></div>
+        <div class="field"><label for="fCode">Дизайнер</label><input id="fCode" placeholder="имя или код"></div>
         <div class="field"><label for="fDate">Дата добавления</label><input id="fDate" type="datetime-local"></div>
         <div class="field full">
           <label>Файл</label>
@@ -2189,6 +2209,9 @@ if(!configured){
 </script>
 
 <script>
+/* Скрипты сервисов живут в одной области видимости, поэтому каждый
+   закрываем в свою функцию: имена вроде toast, state, fmt есть у всех. */
+(function(){
 /* ============ модель ============ */
 const TIERS=[
   {key:'primitive',name:'Primitive',c:'var(--t0)',pts:[0.25,1.5,2],  base:0.75,star:0.375},
@@ -2527,6 +2550,7 @@ function renderResult(){
   document.getElementById('copy').addEventListener('click',()=>copySummary(r,tierPts,total,shoot,isAvatar8,{derived,tBase,work6}));
 }
 
+const calcAuthor = () => { try { return (localStorage.getItem('pd-author')||'').trim() } catch(e){ return '' } };
 function copySummary(r,tierPts,total,shoot,isAvatar8,calc){
   /* derived / tBase / work6 считаются при отрисовке результата,
      поэтому приходят сюда параметром, а не берутся из внешней области */
@@ -2547,6 +2571,7 @@ function copySummary(r,tierPts,total,shoot,isAvatar8,calc){
     ? `${T(r.tier).name} · ${state.creo} крео: база ${fmt(tBase)} (не делится) + работа ${fmt(work6)}×${state.creo}/6 = ${fmt(tierPts)}${shoot?` + 1 (#shooting)`:''}`
     : `${T(r.tier).name} · ${state.creo} крео${isAvatar8?' (8 аватаров)':''} = ${fmt(tierPts)}${shoot?` + 1 (#shooting)`:''}`);
   L.push(`ИТОГО: ${fmt(total)} points${shoot?' · #shooting':''}`);
+  if(calcAuthor()) L.push(`Оценил: ${calcAuthor()}`);
   const txt=L.join('\n');
   const done=()=>toast('Расчёт скопирован');
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done).catch(()=>fallback(txt,done));
@@ -2591,9 +2616,13 @@ document.getElementById('comboTable').innerHTML=Object.keys(COMBO).flatMap(pk=>C
 })).join('');
 
 renderCatalog();renderResult();
+})();
 </script>
 
 <script>
+/* Скрипты сервисов живут в одной области видимости, поэтому каждый
+   закрываем в свою функцию: имена вроде toast, state, fmt есть у всех. */
+(function(){
 /* ══════════════════════════════  КОНФИГ  ══════════════════════════════ */
 const CFG = {
   SUPABASE_URL : 'https://gbbpyrcyhpkngkngpvrd.supabase.co',
@@ -2706,6 +2735,8 @@ function parseName(name){
 
 /* ═══════════════════════════  ХРАНИЛИЩЕ  ════════════════════════════ */
 const LS_KEY = 'music_deck_tracks';
+/* ник, выбранный в хабе. Ключ общий с декой, поэтому имя одно на все сервисы. */
+const musicAuthor = () => { try { return (localStorage.getItem('pd-author')||'').trim() } catch(e){ return '' } };
 
 /* Ключи нового формата (sb_publishable_…) — не JWT, и в Authorization их
    передавать нельзя: платформа попробует разобрать их как токен и ответит
@@ -2874,7 +2905,7 @@ async function runQueue(){
       try {
         const meta = parseName(q.name);
         const rec = await db.add({
-          title: meta.title, mood: '', author_code: meta.author_code,
+          title: meta.title, mood: '', author_code: meta.author_code || musicAuthor(),
           file_name: q.name, size: q.file.size, storage_path: '',
           added_at: new Date().toISOString(), force_old: false, downloads: 0
         });
@@ -3203,7 +3234,7 @@ function openForm(t){
   editingId = t.id;
   $('#fTitle').value  = t.title || '';
   $('#fMoodIn').value = t.mood || '';
-  $('#fCode').value   = t.author_code || '';
+  $('#fCode').value   = t.author_code || musicAuthor();
   $('#fDate').value   = toLocalInput(t.added_at || new Date());
   $('#fForceOld').checked = !!t.force_old;
   $('#fFileInfo').textContent = t.file_name
@@ -3356,6 +3387,7 @@ setInterval(() => { if (!$$('.scrim.on').length) { renderSections(); renderList(
   catch(e) { toast('База недоступна: ' + e.message); tracks = []; }
   render();
   probeDurations();
+})();
 })();
 </script>
 
@@ -3591,6 +3623,8 @@ function copyOut(level, p, reasons){
     '',
     `Пункт: ${stars(T.stars)} ${T.item}`,
   ];
+  let me=''; try{ me=(localStorage.getItem('pd-author')||'').trim() }catch(e){}
+  if(me) L.push('', 'Определил: '+me);
   const txt = L.join('\n');
   const done = () => toast('Скопировано');
   if (navigator.clipboard && navigator.clipboard.writeText)
@@ -3960,7 +3994,45 @@ let LINKS = [
   /* Имя берём из деки: там его выбирают при добавлении промта.
      Кто ничего не добавлял — останется без имени, это честнее,
      чем спрашивать имя ещё раз на входе. */
+  /* Ключ тот же, что у деки: представился в хабе — дека тоже знает имя,
+     и наоборот. Одно имя на все сервисы. */
   const personName = () => (store.get('pd-author') || '').trim() || null;
+
+  /* ---- «это я»: спрашиваем один раз ---- */
+  async function designers(){
+    try{
+      const rows = await fetch(DB.url+'/rest/v1/prompts?select=author', {headers:HEAD}).then(r=>r.json());
+      return [...new Set(rows.map(r=>(r.author||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+    }catch(e){ return [] }
+  }
+  function setName(n){
+    store.set('pd-author', String(n||'').trim());
+    renderWho(); ping();
+  }
+  async function renderWho(){
+    const box = q('#whoBox'); if(!box) return;
+    const me = personName();
+    if(me){
+      box.innerHTML = '<span class="who-me">Вы — <b></b></span>';
+      box.querySelector('b').textContent = me;
+      return;
+    }
+    box.innerHTML = '<span class="who-ask">Представьтесь: имя подставится в ваши промты и будет видно в статистике хаба.</span>'
+      + '<span class="who-list">загружаю список…</span>';
+    const list = await designers();
+    const wrap = box.querySelector('.who-list');
+    wrap.innerHTML = '';
+    list.forEach(n=>{
+      const b=document.createElement('button');
+      b.type='button'; b.className='who-pick'; b.textContent=n;
+      b.onclick=()=>setName(n);
+      wrap.appendChild(b);
+    });
+    const inp=document.createElement('input');
+    inp.className='who-input'; inp.placeholder=list.length?'или впишите себя':'впишите имя';
+    inp.onkeydown=e=>{ if(e.key==='Enter' && inp.value.trim()) setName(inp.value) };
+    wrap.appendChild(inp);
+  }
   let curScreen = 'hub';
 
   function ping(){
@@ -4044,6 +4116,7 @@ let LINKS = [
   if(music) buildCalc(music,'#musicTile');
   buildSoon();
   buildLinks();
+  renderWho();
   const live=SERVICES.filter(s=>s.screen).length;
   q('#headNote').textContent = live===SERVICES.length
     ? word(SERVICES.length)+' · всё доступно'

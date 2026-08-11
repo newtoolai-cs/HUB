@@ -3856,7 +3856,7 @@ let LINKS = [
     hideAll(); target.classList.add('on');
     document.title=s.name+' — Deck Hub';
     window.scrollTo({top:0});
-    track('open', s.id);
+    curScreen = s.id; track('open', s.id); ping();
     if(clickSelector) raf(()=>{const el=document.querySelector(clickSelector); if(el) el.click()});
     else if(s.tab) raf(()=>{const el=document.querySelector(s.tab); if(el) el.click()});
   }
@@ -3865,7 +3865,7 @@ let LINKS = [
     document.title='Deck Hub — инструменты команды дизайна';
     if(location.hash) history.replaceState(null,'',location.pathname+location.search);
     window.scrollTo({top:0});
-    track('open','hub');
+    curScreen = 'hub'; track('open','hub'); ping();
   }
   window.addEventListener('hashchange',()=>{
     const id=location.hash.replace('#/','');
@@ -3956,6 +3956,28 @@ let LINKS = [
     }catch(e){}
   }
 
+  /* ---- присутствие: кто держит хаб открытым ---- */
+  /* Имя берём из деки: там его выбирают при добавлении промта.
+     Кто ничего не добавлял — останется без имени, это честнее,
+     чем спрашивать имя ещё раз на входе. */
+  const personName = () => (store.get('pd-author') || '').trim() || null;
+  let curScreen = 'hub';
+
+  function ping(){
+    try{
+      fetch(DB.url+'/rest/v1/hub_presence', {
+        method:'POST', keepalive:true,
+        headers:Object.assign({Prefer:'resolution=merge-duplicates,return=minimal'}, HEAD),
+        body:JSON.stringify({
+          visitor:visitorId(), name:personName(), device:device(),
+          screen:curScreen, last_seen:new Date().toISOString()
+        })
+      }).catch(()=>{});
+    }catch(e){}
+  }
+  setInterval(ping, 45000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) ping(); });
+
   /* нажатия ключевых кнопок — одним делегированным слушателем,
      чтобы не трогать код самих сервисов */
   const ACTIONS = [
@@ -4029,7 +4051,7 @@ let LINKS = [
   ['#hubBack','#hubBackCalc','#hubBackMusic'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
   const boot=location.hash.replace('#/','');
   const bs=SERVICES.find(x=>x.id===boot);
-  if(bs&&bs.screen) enter(boot); else track('open','hub');
+  if(bs&&bs.screen) enter(boot); else { track('open','hub'); ping(); }
   loadConfig();
 })();
 </script>

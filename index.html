@@ -70,6 +70,50 @@ body.booting{overflow:hidden}
 </style>
 </head>
 <body class="booting">
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   Диагностика. Если скрипт где-то падает, страница обычно остаётся
+   пустой: экраны скрыты и открывает их только код. Здесь мы ловим
+   любую ошибку и показываем её прямо на странице, чтобы не искать
+   в консоли.
+   ═══════════════════════════════════════════════════════════════════ */
+(function(){
+  var box = null;
+  function show(kind, text){
+    if(!box){
+      box = document.createElement('div');
+      box.setAttribute('style',
+        'position:fixed;left:0;right:0;bottom:0;z-index:99999;max-height:52vh;overflow:auto;'+
+        'background:#2B1114;color:#FFD9DC;border-top:2px solid #E8596A;'+
+        'font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;padding:12px 14px 40px;');
+      var close = document.createElement('button');
+      close.textContent = 'скрыть';
+      close.setAttribute('style','position:absolute;right:10px;top:8px;background:none;border:1px solid #E8596A;'+
+        'color:#FFD9DC;border-radius:6px;padding:3px 9px;font:inherit;cursor:pointer');
+      close.onclick = function(){ box.remove(); box = null; };
+      box.appendChild(close);
+      var head = document.createElement('div');
+      head.textContent = 'Ошибка на странице — покажите этот текст';
+      head.setAttribute('style','font-weight:700;margin-bottom:8px');
+      box.appendChild(head);
+      (document.body || document.documentElement).appendChild(box);
+    }
+    var row = document.createElement('div');
+    row.setAttribute('style','margin-bottom:7px;white-space:pre-wrap;word-break:break-word');
+    row.textContent = kind + ': ' + text;
+    box.appendChild(row);
+  }
+  window.addEventListener('error', function(e){
+    show('Ошибка', (e.message || 'без описания') + '  →  ' +
+      String(e.filename || '').split('/').pop() + ':' + (e.lineno || '?'));
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    var r = e.reason;
+    show('Обещание', (r && (r.message || r)) || 'без описания');
+  });
+})();
+</script>
+<div class="build-badge">сборка 12.08 · 11:20</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1110,6 +1154,16 @@ body.booting{overflow:hidden}
    ===================================================================== */
 .screen{display:none}
 .screen.on{display:block}
+/* если скрипт не успел открыть ни один экран, пусть будет видна главная,
+   а не пустая страница */
+html:not(:has(.screen.on)) #screenHub{display:block}
+
+/* метка сборки в углу: по ней сразу видно, какая версия задеплоена */
+.build-badge{
+  position:fixed;right:8px;bottom:6px;z-index:200;pointer-events:none;
+  font:9.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;
+  color:#8A94A3;opacity:.55;
+}
 
 #screenHub{
   --h-bg:#E7EBEF;
@@ -1797,13 +1851,14 @@ body.booting{overflow:hidden}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 10:35</div>
+      <div class="ad-build">сборка 12.08 · 11:20</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel" hidden>
     <div class="ad-panel-top">
       <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
       <button class="ad-btn" id="adLock">Выйти</button>
+      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 11:20</span>
     </div>
 <div class="ad-wrap">
 
@@ -4641,6 +4696,7 @@ let LINKS = [
     const gate=q('#adGate'), panel=q('#adPanel');
     if(gate) gate.hidden=true;
     if(panel) panel.hidden=false;
+    window.scrollTo({top:0});          /* иначе после входа можно остаться ниже экрана */
     window.dispatchEvent(new CustomEvent('admin:open'));
   }
   function initAdmin(){

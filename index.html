@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 14:10</div>
+<div class="build-badge">сборка 12.08 · 15:00</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -4015,8 +4015,8 @@ let LINKS = [
   const device = () => (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) ? 'mobile' : 'desktop';
 
   let lastEvent = '';
-  function track(kind, service, detail){
-    const stamp = kind+':'+service+':'+(detail||'');
+  function track(kind, service, detail, note){
+    const stamp = kind+':'+service+':'+(detail||'')+':'+(note||'');
     if(stamp === lastEvent) return;              // не пишем один и тот же переход дважды
     lastEvent = stamp;
     setTimeout(()=>{ lastEvent='' }, 1500);
@@ -4024,7 +4024,8 @@ let LINKS = [
       fetch(DB.url+'/rest/v1/hub_events', {
         method:'POST', keepalive:true,
         headers:Object.assign({Prefer:'return=minimal'}, HEAD),
-        body:JSON.stringify({ kind, service, detail:detail||null, visitor:visitorId(), device:device() })
+        body:JSON.stringify({ kind, service, detail:detail||null, note:note||null,
+                              visitor:visitorId(), device:device() })
       }).catch(()=>{});
     }catch(e){}
   }
@@ -4100,6 +4101,63 @@ let LINKS = [
     ['#screenMusic [data-act="down"]','music',      'download'],
     ['#screenMusic #upBtn',          'music',       'upload'],
   ];
+  /* =====================================================================
+     УДАЛЕНИЯ И ПРАВКИ
+     Ловим не клик по кнопке, а сам запрос к базе: тогда в статистику
+     попадает только то, что действительно произошло — если человек
+     отменил подтверждение, записи не будет. Работает для любого сервиса,
+     код самих сервисов при этом не тронут.
+     ===================================================================== */
+  const SERVICE_BY_TABLE = { prompts:'prompt-deck', music:'music' };
+  const COUNTERS = ['copies','downloads','duration'];   // такие правки — не правки, а счётчики
+  let pendingName = null;
+
+  /* запоминаем название до запроса: после удаления его уже негде взять */
+  document.addEventListener('click', e=>{
+    const delCard = e.target.closest('#screenDeck [data-del]');
+    if(delCard){
+      const card = delCard.closest('.card');
+      const h = card && card.querySelector('h3');
+      pendingName = h ? h.textContent.trim() : null;
+      return;
+    }
+    const btn = e.target.closest('button');
+    if(btn && /удалить|сохранить/i.test(btn.textContent || '')){
+      const f = document.getElementById('fTitle') || document.getElementById('f_title');
+      pendingName = f && f.value ? f.value.trim() : null;
+    }
+  }, true);
+
+  const nativeFetch = window.fetch ? window.fetch.bind(window) : null;
+  if(nativeFetch){
+    window.fetch = function(input, init){
+      let url = '', method = 'GET';
+      try{
+        url = typeof input === 'string' ? input : (input && input.url) || '';
+        method = ((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+      }catch(e){}
+      const res = nativeFetch(input, init);
+      try{
+        if(/\/rest\/v1\//.test(url) && (method === 'DELETE' || method === 'PATCH')){
+          const table = (url.split('/rest/v1/')[1] || '').split('?')[0];
+          if(!/^hub_/.test(table)){
+            let keys = [];
+            try{ keys = Object.keys(JSON.parse((init && init.body) || '{}')) }catch(e){}
+            const onlyCounter = keys.length && keys.every(k => COUNTERS.indexOf(k) >= 0);
+            if(!(method === 'PATCH' && onlyCounter)){
+              const name = pendingName; pendingName = null;
+              res.then(r => {
+                if(r && r.ok) track('action', SERVICE_BY_TABLE[table] || table,
+                                    method === 'DELETE' ? 'delete' : 'edit', name);
+              }).catch(()=>{});
+            }
+          }
+        }
+      }catch(e){}
+      return res;
+    };
+  }
+
   document.addEventListener('click', e=>{
     const a = e.target.closest('#extGrid a');
     if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+((l&&l.id)||hostOf(a.href)),'open'); return; }

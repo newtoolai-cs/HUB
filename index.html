@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 12:45</div>
+<div class="build-badge">сборка 12.08 · 13:10</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1856,14 +1856,14 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 12:45</div>
+      <div class="ad-build">сборка 12.08 · 13:10</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel">
     <div class="ad-panel-top">
       <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
       <button class="ad-btn" id="adLock">Выйти</button>
-      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:45</span>
+      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 13:10</span>
     </div>
 <div class="ad-wrap">
 
@@ -4709,6 +4709,31 @@ let LINKS = [
     if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
     window.scrollTo({top:0});
     window.dispatchEvent(new CustomEvent('admin:open'));
+    guardPanel();
+  }
+
+  /* Страж. Панель показывается, а через мгновение исчезает — значит её
+     кто-то прячет уже после нас. Кто именно, снаружи не видно, поэтому
+     просто возвращаем видимость и запоминаем, сколько раз пришлось. */
+  let guardFixes = 0, guardStop = null;
+  function guardPanel(){
+    const panel=byId('adPanel'), gate=byId('adGate');
+    if(!panel) return;
+    clearInterval(guardStop);
+    const check = ()=>{
+      if(!authed()) return;
+      if(getComputedStyle(panel).display === 'none'){
+        guardFixes++;
+        panel.style.setProperty('display','block','important');
+        panel.hidden = false;
+        if(gate){ gate.style.setProperty('display','none','important'); gate.hidden = true; }
+        const badge = document.querySelector('.build-badge');
+        if(badge) badge.textContent = badge.textContent.replace(/ · вернул.*/,'') + ' · вернул панель ' + guardFixes + ' р.';
+      }
+    };
+    let ticks = 0;
+    guardStop = setInterval(()=>{ check(); if(++ticks > 40) clearInterval(guardStop); }, 150);
+    check();
   }
   function closePanel(){
     const screen=byId('screenAdmin'), gate=byId('adGate'), panel=byId('adPanel');
@@ -5068,8 +5093,9 @@ let LINKS = [
     var box = document.createElement('div');
     box.id = 'selfCheckBox';
     box.setAttribute('style',
-      'position:fixed;inset:0;z-index:2147483647;overflow:auto;background:#12161D;color:#E8ECF2;'+
-      'padding:24px 20px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace');
+      'position:fixed;left:0;right:0;bottom:0;z-index:2147483647;max-height:46vh;overflow:auto;'+
+      'background:#12161D;color:#E8ECF2;border-top:2px solid #5C8CFF;'+
+      'padding:16px 18px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace');
     box.innerHTML =
       '<div style="font:700 15px/1.4 system-ui,sans-serif;margin-bottom:14px">Страница пустая — вот её состояние</div>'+
       '<div style="background:#0F1319;border:1px solid #2A323E;border-radius:10px;padding:14px;white-space:pre-wrap">'+

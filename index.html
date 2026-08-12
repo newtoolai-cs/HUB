@@ -578,10 +578,6 @@ body.booting{overflow:hidden}
 #screenCalc .crow.sum .cv{font-size:17px}
 #screenCalc .cform{font-family:'Space Grotesk',sans-serif;font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5;word-break:break-word}
 #screenCalc .points{margin-top:16px;border-top:1px solid var(--line-soft);padding:14px 22px 8px}
-#screenCalc .vol{display:flex;gap:6px;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:10px;padding:4px;margin-bottom:12px}
-#screenCalc .vol button{flex:1;border:0;background:transparent;padding:7px 4px;border-radius:7px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;color:var(--muted)}
-#screenCalc .vol button .c{display:block;font-family:'Inter',sans-serif;font-weight:450;font-size:9.5px;color:var(--faint)}
-#screenCalc .vol button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(20,27,35,.12)}
 #screenCalc .ln{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;padding:4px 0;gap:10px}
 #screenCalc .ln .k{color:var(--muted)}
 #screenCalc .ln .v{font-family:'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums;font-weight:600}
@@ -895,26 +891,8 @@ body.booting{overflow:hidden}
 }
 #tab-talk .tg-reset:hover{color:var(--ink);border-color:var(--faint)}
 
-#tab-talk .tg-wrap{max-width:1060px;margin:0 auto}
 #tab-talk /* шапка */
-  .tg-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:26px}
-#tab-talk .tg-head .tg-t{flex:1;min-width:240px}
-#tab-talk .tg-eyebrow{
-    font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--accent);margin-bottom:7px;
-  }
 #tab-talk h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.025em;margin:0 0 8px}
-#tab-talk .tg-lede{color:var(--muted);font-size:14px;max-width:62ch;margin:0}
-#tab-talk .tg-headside{display:flex;gap:8px;align-items:center}
-#tab-talk .tg-ghost{
-    display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
-    color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;
-    padding:8px 13px;border-radius:10px;box-shadow:var(--shadow);transition:all .14s;
-  }
-#tab-talk .tg-ghost:hover{color:var(--ink);border-color:var(--faint)}
-#tab-talk .tg-ghost svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#tab-talk html[data-theme="dark"] .tg-sun{display:none}
-#tab-talk html[data-theme="light"] .tg-moon{display:none}
 #tab-talk .tg-grid{display:grid;grid-template-columns:1fr 384px;gap:18px;align-items:start}
 @media(max-width:900px){
 #tab-talk .tg-grid{grid-template-columns:1fr}}

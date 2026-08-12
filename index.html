@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 12:00</div>
+<div class="build-badge">сборка 12.08 · 12:20</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1143,7 +1143,12 @@ body.booting{overflow:hidden}
 
 /* display:grid у карточки входа сильнее браузерного правила для [hidden],
    поэтому прячем явно — иначе форма остаётся на экране после входа */
-#screenAdmin .ad-gate[hidden], #screenAdmin .ad-panel[hidden]{display:none !important}
+/* Видимостью управляет один класс на самом экране. Раньше здесь были
+   атрибуты hidden у двух узлов, и если один из них не находился,
+   страница оставалась пустой без всяких ошибок. */
+#screenAdmin .ad-panel{display:none}
+#screenAdmin.authed .ad-panel{display:block}
+#screenAdmin.authed .ad-gate{display:none}
 </style>
 
 <!-- ============ стили хаба ============ -->
@@ -1851,14 +1856,14 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 12:00</div>
+      <div class="ad-build">сборка 12.08 · 12:20</div>
     </form>
   </div>
-  <div class="ad-panel" id="adPanel" hidden>
+  <div class="ad-panel" id="adPanel">
     <div class="ad-panel-top">
       <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
       <button class="ad-btn" id="adLock">Выйти</button>
-      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:00</span>
+      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:20</span>
     </div>
 <div class="ad-wrap">
 
@@ -4693,11 +4698,16 @@ let LINKS = [
   }
   const authed = () => { try{ return sessionStorage.getItem(SESSION)==='1' }catch(e){ return false } };
   function openPanel(){
-    const gate=q('#adGate'), panel=q('#adPanel');
-    if(gate) gate.hidden=true;
-    if(panel) panel.hidden=false;
-    window.scrollTo({top:0});          /* иначе после входа можно остаться ниже экрана */
+    /* один класс на экране: либо форма, либо панель — половинчатого
+       состояния, когда скрыто и то и другое, быть уже не может */
+    const screen=q('#screenAdmin');
+    if(screen) screen.classList.add('authed');
+    window.scrollTo({top:0});
     window.dispatchEvent(new CustomEvent('admin:open'));
+  }
+  function closePanel(){
+    const screen=q('#screenAdmin');
+    if(screen) screen.classList.remove('authed');
   }
   function initAdmin(){
     const form=q('#adGateForm'), inp=q('#adPass'), err=q('#adErr');
@@ -4731,7 +4741,7 @@ let LINKS = [
     const lock=q('#adLock');
     if(lock) lock.onclick=()=>{
       try{ sessionStorage.removeItem(SESSION) }catch(e){}
-      q('#adPanel').hidden=true; q('#adGate').hidden=false; inp.value=''; err.textContent='';
+      closePanel(); inp.value=''; err.textContent='';
     };
     ['#hubBackAdmin','#hubBackAdmin2'].forEach(sel=>{ const b=q(sel); if(b) b.onclick=showHub; });
   }
@@ -5023,9 +5033,13 @@ let LINKS = [
     }
     var W = innerWidth, H = innerHeight;
     var rows = [];
-    rows.push('в центре экрана: ' + describe(document.elementFromPoint(W/2, H/2)));
-    rows.push('сверху:          ' + describe(document.elementFromPoint(W/2, 80)));
-    rows.push('снизу:           ' + describe(document.elementFromPoint(W/2, H-80)));
+    var at = function(x, y){                      /* сама проверка падать не должна */
+      try{ return describe(document.elementFromPoint(x, y)) }
+      catch(e){ return 'не удалось определить (' + e.message + ')' }
+    };
+    rows.push('в центре экрана: ' + at(W/2, H/2));
+    rows.push('сверху:          ' + at(W/2, 80));
+    rows.push('снизу:           ' + at(W/2, H-80));
     rows.push('');
     [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){
       var st = getComputedStyle(s);

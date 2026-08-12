@@ -1085,6 +1085,17 @@ body.booting{overflow:hidden}
 #screenAdmin .ad-gate-back:hover{color:var(--ink)}
 #screenAdmin .ad-panel-top{display:flex;gap:9px;margin-bottom:16px}
 #screenAdmin .ad-panel-top .ad-btn{padding:7px 12px}
+
+#screenAdmin .ad-pass-wrap{position:relative}
+#screenAdmin .ad-pass-eye{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:none;border:0;color:var(--faint);cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;
+}
+#screenAdmin .ad-pass-eye:hover{color:var(--accent)}
+#screenAdmin .ad-build{
+  margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--faint);opacity:.7;
+}
 </style>
 
 <!-- ============ стили хаба ============ -->
@@ -1775,10 +1786,14 @@ body.booting{overflow:hidden}
       <div class="ad-gate-mark">◤</div>
       <h2>Админ-панель</h2>
       <p>Статистика и управление сервисами. Доступ по паролю.</p>
-      <input type="password" id="adPass" placeholder="Пароль" autocomplete="current-password" autofocus>
+      <div class="ad-pass-wrap">
+      <input type="password" id="adPass" placeholder="Пароль" autocomplete="new-password" autofocus>
+      <button type="button" class="ad-pass-eye" id="adEye" title="Показать пароль" aria-label="Показать пароль">показать</button>
+    </div>
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
+      <div class="ad-build">сборка 12.08 · 10:20</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel" hidden>
@@ -4552,14 +4567,14 @@ let LINKS = [
      а не настоящая: кто откроет исходник, обойдёт её. Настоящая — это
      Supabase Auth плюс политики базы.
 
-     Пароль по умолчанию: deck-admin-2026
+     Текущий пароль: sixseven
      Чтобы сменить, посчитайте хеш своего пароля в консоли браузера:
        crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
          .then(b => console.log([...new Uint8Array(b)]
            .map(x => x.toString(16).padStart(2,'0')).join('')))
      и подставьте результат в ADMIN_HASH.
      ===================================================================== */
-  const ADMIN_HASH = '34800cc8e536d40afd6ca728af5f30b542bb11c98ac2ceec4751f519d813d56f';
+  const ADMIN_HASH = 'ed227bb0d191d168545bec592e8b9c1199ef4ffa122a7395ededa0cf888dc09f';
   const SESSION = 'deckhub.admin';
 
   /* SHA-256 на чистом JS. Нужен потому, что crypto.subtle доступен только
@@ -4643,6 +4658,15 @@ let LINKS = [
     const go=q('#adGo');
     if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
     inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
+    /* браузер часто подставляет сюда сохранённый пароль от домена —
+       кнопка «показать» позволяет увидеть, что в поле на самом деле */
+    const eye=q('#adEye');
+    if(eye) eye.onclick=()=>{
+      const hidden = inp.type==='password';
+      inp.type = hidden ? 'text' : 'password';
+      eye.textContent = hidden ? 'скрыть' : 'показать';
+      inp.focus();
+    };
 
     const lock=q('#adLock');
     if(lock) lock.onclick=()=>{

@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 12:20</div>
+<div class="build-badge">сборка 12.08 · 12:45</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1856,14 +1856,14 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 12:20</div>
+      <div class="ad-build">сборка 12.08 · 12:45</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel">
     <div class="ad-panel-top">
       <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
       <button class="ad-btn" id="adLock">Выйти</button>
-      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:20</span>
+      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:45</span>
     </div>
 <div class="ad-wrap">
 
@@ -4697,21 +4697,28 @@ let LINKS = [
     return sha256js(text);           // https недоступен — считаем сами
   }
   const authed = () => { try{ return sessionStorage.getItem(SESSION)==='1' }catch(e){ return false } };
+  /* Узлы берём через getElementById: в одном из браузеров querySelector
+     по этим же селекторам возвращал null. И видимость ставим прямым
+     стилем — он сильнее любого правила из таблицы стилей, поэтому
+     панель не может остаться скрытой из-за неожиданного CSS. */
+  const byId = id => document.getElementById(id);
   function openPanel(){
-    /* один класс на экране: либо форма, либо панель — половинчатого
-       состояния, когда скрыто и то и другое, быть уже не может */
-    const screen=q('#screenAdmin');
+    const screen=byId('screenAdmin'), gate=byId('adGate'), panel=byId('adPanel');
     if(screen) screen.classList.add('authed');
+    if(gate){ gate.style.setProperty('display','none','important'); gate.hidden=true; }
+    if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
     window.scrollTo({top:0});
     window.dispatchEvent(new CustomEvent('admin:open'));
   }
   function closePanel(){
-    const screen=q('#screenAdmin');
+    const screen=byId('screenAdmin'), gate=byId('adGate'), panel=byId('adPanel');
     if(screen) screen.classList.remove('authed');
+    if(gate){ gate.style.removeProperty('display'); gate.hidden=false; }
+    if(panel){ panel.style.setProperty('display','none','important'); panel.hidden=true; }
   }
   function initAdmin(){
-    const form=q('#adGateForm'), inp=q('#adPass'), err=q('#adErr');
-    if(!form) return;
+    const form=byId('adGateForm'), inp=byId('adPass'), err=byId('adErr');
+    if(!form || !inp || !err) return;
     async function tryLogin(){
       const pass=(inp.value||'').trim();          // пробел из автозаполнения — частая причина отказа
       if(!pass){ err.textContent='Введите пароль'; return; }
@@ -4725,34 +4732,33 @@ let LINKS = [
       openPanel();
     }
     form.addEventListener('submit', e=>{ e.preventDefault(); tryLogin(); });
-    const go=q('#adGo');
+    const go=byId('adGo');
     if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
     inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
     /* браузер часто подставляет сюда сохранённый пароль от домена —
        кнопка «показать» позволяет увидеть, что в поле на самом деле */
-    const eye=q('#adEye');
+    const eye=byId('adEye');
     if(eye) eye.onclick=()=>{
       const hidden = inp.type==='password';
       inp.type = hidden ? 'text' : 'password';
       eye.textContent = hidden ? 'скрыть' : 'показать';
       inp.focus();
     };
-
-    const lock=q('#adLock');
+    const lock=byId('adLock');
     if(lock) lock.onclick=()=>{
       try{ sessionStorage.removeItem(SESSION) }catch(e){}
       closePanel(); inp.value=''; err.textContent='';
     };
-    ['#hubBackAdmin','#hubBackAdmin2'].forEach(sel=>{ const b=q(sel); if(b) b.onclick=showHub; });
+    ['hubBackAdmin','hubBackAdmin2'].forEach(id=>{ const b=byId(id); if(b) b.onclick=showHub; });
   }
 
   function enterAdmin(){
-    const target=q('#screenAdmin'); if(!target) return;
+    const target=byId('screenAdmin'); if(!target) return;
     location.hash='#/admin';
     hideAll(); target.classList.add('on');
     document.title='Админ-панель — Deck Hub';
     window.scrollTo({top:0});
-    if(authed()) openPanel(); else { const p=q('#adPass'); if(p) setTimeout(()=>p.focus(),50); }
+    if(authed()) openPanel(); else { const p=byId('adPass'); if(p) setTimeout(()=>p.focus(),50); }
   }
 
   window.addEventListener('hashchange',()=>{
@@ -5055,6 +5061,8 @@ let LINKS = [
     rows.push('вход в сессии: ' + au + ' · адрес: ' + location.pathname + location.hash);
     rows.push('прелоудер: ' + (document.getElementById('boot') ? 'ещё на странице' : 'убран') +
               ' · класс booting: ' + document.body.classList.contains('booting'));
+    var badge=document.querySelector('.build-badge');
+    rows.push('версия файла: ' + (badge ? badge.textContent : 'метки нет'));
     rows.push('прокрутка: ' + Math.round(scrollY) + ' из ' + document.documentElement.scrollHeight);
 
     var box = document.createElement('div');

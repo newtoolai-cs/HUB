@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 11:40</div>
+<div class="build-badge">сборка 12.08 · 12:00</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1851,14 +1851,14 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 11:40</div>
+      <div class="ad-build">сборка 12.08 · 12:00</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel" hidden>
     <div class="ad-panel-top">
       <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
       <button class="ad-btn" id="adLock">Выйти</button>
-      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 11:40</span>
+      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 12:00</span>
     </div>
 <div class="ad-wrap">
 
@@ -5001,51 +5001,72 @@ let LINKS = [
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   Самопроверка. Если через 1.5 с на странице ничего не видно, показываем,
-   что именно произошло, и даём выход. Заодно это спасательный люк:
-   можно сбросить вход или уйти на главную, не заходя в консоль.
+   Самопроверка. Признак беды — на странице не видно текста. Тогда
+   показываем состояние и, главное, что за элемент занимает центр
+   экрана: обычно именно он всё и закрывает.
    ═══════════════════════════════════════════════════════════════════ */
-setTimeout(function(){
-  var screens = [].slice.call(document.querySelectorAll('.screen'));
-  var visible = screens.filter(function(s){ return s.offsetHeight > 50; });
-  if(visible.length) return;                       // всё в порядке
+(function(){
+  function look(){
+    var text = (document.body.innerText || '').replace(/\s+/g, '');
+    if(text.length > 60) return;                       // что-то видно, всё хорошо
+    if(document.getElementById('selfCheckBox')) return;
 
-  var rows = screens.map(function(s){
-    return s.id + ': display=' + getComputedStyle(s).display +
-           ', высота=' + s.offsetHeight + ', класс on=' + s.classList.contains('on');
-  });
-  var gate = document.getElementById('adGate'), panel = document.getElementById('adPanel');
-  if(gate)  rows.push('форма входа: display=' + getComputedStyle(gate).display + ', высота=' + gate.offsetHeight);
-  if(panel) rows.push('панель: display=' + getComputedStyle(panel).display + ', высота=' + panel.offsetHeight +
-                      ', внутри символов=' + (panel.textContent || '').trim().length);
-  var au = '?'; try{ au = sessionStorage.getItem('deckhub.admin') } catch(e){ au = 'нет доступа' }
-  rows.push('адрес: ' + location.pathname + location.hash);
-  rows.push('вход в сессии: ' + au);
-  rows.push('прелоудер: ' + (document.getElementById('boot') ? 'ещё на странице' : 'убран'));
+    function describe(el){
+      if(!el) return 'ничего';
+      var s = el.tagName.toLowerCase();
+      if(el.id) s += '#' + el.id;
+      if(el.className && typeof el.className === 'string') s += '.' + el.className.split(' ').join('.');
+      var st = getComputedStyle(el);
+      return s + '  [display=' + st.display + ' opacity=' + st.opacity +
+             ' visibility=' + st.visibility + ' bg=' + st.backgroundColor +
+             ' цвет текста=' + st.color + ']';
+    }
+    var W = innerWidth, H = innerHeight;
+    var rows = [];
+    rows.push('в центре экрана: ' + describe(document.elementFromPoint(W/2, H/2)));
+    rows.push('сверху:          ' + describe(document.elementFromPoint(W/2, 80)));
+    rows.push('снизу:           ' + describe(document.elementFromPoint(W/2, H-80)));
+    rows.push('');
+    [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){
+      var st = getComputedStyle(s);
+      rows.push(s.id + ': display=' + st.display + ' высота=' + s.offsetHeight +
+                ' класс on=' + s.classList.contains('on') + ' текста=' + (s.innerText || '').trim().length);
+    });
+    var g = document.getElementById('adGate'), p = document.getElementById('adPanel');
+    if(g) rows.push('форма входа: display=' + getComputedStyle(g).display + ' высота=' + g.offsetHeight);
+    if(p) rows.push('панель: display=' + getComputedStyle(p).display + ' высота=' + p.offsetHeight +
+                    ' символов внутри=' + (p.textContent || '').trim().length +
+                    ' видимого текста=' + (p.innerText || '').trim().length);
+    var au = '?'; try{ au = String(sessionStorage.getItem('deckhub.admin')) }catch(e){ au = 'нет доступа' }
+    rows.push('вход в сессии: ' + au + ' · адрес: ' + location.pathname + location.hash);
+    rows.push('прелоудер: ' + (document.getElementById('boot') ? 'ещё на странице' : 'убран') +
+              ' · класс booting: ' + document.body.classList.contains('booting'));
+    rows.push('прокрутка: ' + Math.round(scrollY) + ' из ' + document.documentElement.scrollHeight);
 
-  var box = document.createElement('div');
-  box.setAttribute('style',
-    'position:fixed;inset:0;z-index:99998;overflow:auto;background:#12161D;color:#E8ECF2;padding:26px 22px;'+
-    'font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace');
-  box.innerHTML =
-    '<div style="font:700 15px/1.4 system-ui,sans-serif;margin-bottom:6px">На странице ничего не отобразилось</div>'+
-    '<div style="color:#98A3B2;font:13px/1.5 system-ui,sans-serif;margin-bottom:16px">'+
-    'Ошибок в коде нет, поэтому ниже — состояние страницы. Покажите этот список.</div>'+
-    '<div style="background:#0F1319;border:1px solid #2A323E;border-radius:10px;padding:14px;white-space:pre-wrap">'+
-    rows.join('\n') + '</div>'+
-    '<div style="margin-top:18px;display:flex;gap:9px;flex-wrap:wrap">'+
-    '<button id="scReset" style="background:#5C8CFF;border:0;color:#fff;padding:10px 15px;border-radius:9px;'+
-    'font:600 13px system-ui,sans-serif;cursor:pointer">Сбросить вход и перезагрузить</button>'+
-    '<button id="scHome" style="background:none;border:1px solid #2A323E;color:#98A3B2;padding:10px 15px;'+
-    'border-radius:9px;font:13px system-ui,sans-serif;cursor:pointer">На главную</button></div>';
-  document.body.appendChild(box);
-  document.getElementById('scReset').onclick = function(){
-    try{ sessionStorage.removeItem('deckhub.admin') }catch(e){}
-    location.hash = '';
-    location.reload();
-  };
-  document.getElementById('scHome').onclick = function(){ location.hash=''; location.reload(); };
-}, 1500);
+    var box = document.createElement('div');
+    box.id = 'selfCheckBox';
+    box.setAttribute('style',
+      'position:fixed;inset:0;z-index:2147483647;overflow:auto;background:#12161D;color:#E8ECF2;'+
+      'padding:24px 20px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace');
+    box.innerHTML =
+      '<div style="font:700 15px/1.4 system-ui,sans-serif;margin-bottom:14px">Страница пустая — вот её состояние</div>'+
+      '<div style="background:#0F1319;border:1px solid #2A323E;border-radius:10px;padding:14px;white-space:pre-wrap">'+
+      rows.join('\n') + '</div>'+
+      '<div style="margin-top:16px;display:flex;gap:9px;flex-wrap:wrap">'+
+      '<button id="scReset" style="background:#5C8CFF;border:0;color:#fff;padding:10px 15px;border-radius:9px;'+
+      'font:600 13px system-ui,sans-serif;cursor:pointer">Сбросить вход и перезагрузить</button>'+
+      '<button id="scHome" style="background:none;border:1px solid #2A323E;color:#98A3B2;padding:10px 15px;'+
+      'border-radius:9px;font:13px system-ui,sans-serif;cursor:pointer">На главную</button></div>';
+    document.body.appendChild(box);
+    document.getElementById('scReset').onclick = function(){
+      try{ sessionStorage.removeItem('deckhub.admin') }catch(e){}
+      location.hash = ''; location.reload();
+    };
+    document.getElementById('scHome').onclick = function(){ location.hash = ''; location.reload(); };
+  }
+  setTimeout(look, 1600);
+  setTimeout(look, 4000);
+})();
 </script>
 
 </body>

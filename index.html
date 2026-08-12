@@ -1096,6 +1096,10 @@ body.booting{overflow:hidden}
 #screenAdmin .ad-build{
   margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--faint);opacity:.7;
 }
+
+/* display:grid у карточки входа сильнее браузерного правила для [hidden],
+   поэтому прячем явно — иначе форма остаётся на экране после входа */
+#screenAdmin .ad-gate[hidden], #screenAdmin .ad-panel[hidden]{display:none !important}
 </style>
 
 <!-- ============ стили хаба ============ -->
@@ -1793,7 +1797,7 @@ body.booting{overflow:hidden}
       <button type="button" class="ad-gate-go" id="adGo">Войти</button>
       <div class="ad-gate-err" id="adErr"></div>
       <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 10:20</div>
+      <div class="ad-build">сборка 12.08 · 10:35</div>
     </form>
   </div>
   <div class="ad-panel" id="adPanel" hidden>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck Hub · управление</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<script>
+/* тема ставится до отрисовки, ключ общий с хабом */
+(function(){
+  var t=null; try{ t=localStorage.getItem('deckhub.theme') }catch(e){}
+  if(t!=='dark'&&t!=='light') t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<style>
+/* Отдельная страница, поэтому экран всегда видим. Обёртка #screenAdmin
+   сохранена, чтобы стили работали без переписывания. */
+*{box-sizing:border-box}
+html,body{margin:0}
+#screenAdmin{display:block;min-height:100vh}
+.build-badge{
+  position:fixed;right:8px;bottom:6px;z-index:200;pointer-events:none;
+  font:9.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;color:#8A94A3;opacity:.55;
+}
+#screenAdmin{
+    --bg:#E7EBEF; --panel:#FFFFFF; --panel-2:#F4F6F9; --panel-3:#EDF0F4;
+    --ink:#161B23; --muted:#616B7A; --faint:#8A94A3;
+    --line:#D6DCE3; --line-soft:#E7EBEF;
+    --accent:#2F6BFF; --accent-soft:#E7EEFF; --accent-line:#CFE0FF;
+    --ok:#1F9D6B; --ok-soft:#E1F4EC;
+    --warn:#E0870B; --warn-soft:#FCEFD6;
+    --bad:#D63C4E; --bmgmt-soft:#FBE6E9;
+    --shadow:0 1px 2px rgba(20,27,35,.05), 0 8px 24px rgba(20,27,35,.06);
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+  }
+:root[data-theme="dark"] #screenAdmin{
+    --bg:#0F1319; --panel:#171C24; --panel-2:#1E242E; --panel-3:#252C37;
+    --ink:#E8ECF2; --muted:#98A3B2; --faint:#6C7787;
+    --line:#2A323E; --line-soft:#222933;
+    --accent:#5C8CFF; --accent-soft:#1A2338; --accent-line:#2C3B5E;
+    --ok:#3FBE8A; --ok-soft:#152A22;
+    --warn:#E8A33C; --warn-soft:#2C2415;
+    --bad:#E8596A; --bmgmt-soft:#2E181C;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+  }
+#screenAdmin{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.5;
+       -webkit-font-smoothing:antialiased;padding:24px 20px 80px}
+#screenAdmin .mgmt-wrap{max-width:1180px;margin:0 auto}
+#screenAdmin button{font:inherit;color:inherit;cursor:pointer}
+#screenAdmin input, #screenAdmin select, #screenAdmin textarea{font:inherit;color:inherit}
+#screenAdmin .mgmt-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+#screenAdmin .mgmt-top h1{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:-.025em;margin:0}
+#screenAdmin .mgmt-top .mgmt-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+            border:1px solid var(--line);border-radius:20px;padding:3px 9px}
+#screenAdmin .mgmt-top .mgmt-sp{margin-left:auto}
+#screenAdmin .mgmt-btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
+       color:var(--muted);padding:8px 13px;border-radius:10px;box-shadow:var(--shadow);transition:all .14s;
+       font-family:var(--disp);font-size:13px}
+#screenAdmin .mgmt-btn:hover{color:var(--ink);border-color:var(--faint)}
+#screenAdmin .mgmt-btn.mgmt-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#screenAdmin .mgmt-btn.mgmt-go:hover{filter:brightness(1.07);color:#fff}
+#screenAdmin .mgmt-btn.mgmt-bad{color:var(--bad);border-color:var(--line)}
+#screenAdmin .mgmt-btn.mgmt-bad:hover{border-color:var(--bad);background:var(--bmgmt-soft)}
+#screenAdmin .mgmt-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+#screenAdmin html[data-theme="dark"] .mgmt-sun{display:none}
+#screenAdmin html[data-theme="light"] .mgmt-moon{display:none}
+#screenAdmin .mgmt-tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;margin-bottom:18px}
+#screenAdmin .mgmt-tabs button{background:none;border:0;padding:8px 15px;border-radius:8px;font-family:var(--disp);font-size:13.5px;color:var(--muted);transition:all .14s}
+#screenAdmin .mgmt-tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+#screenAdmin .mgmt-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+#screenAdmin .mgmt-card+.mgmt-card{margin-top:14px}
+#screenAdmin .mgmt-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+#screenAdmin .mgmt-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+#screenAdmin .mgmt-kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+#screenAdmin .mgmt-kpi .mgmt-v{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+#screenAdmin .mgmt-kpi .mgmt-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+#screenAdmin .mgmt-kpi .mgmt-d{font-size:12px;color:var(--muted);margin-top:5px}
+#screenAdmin .mgmt-bars{display:flex;flex-direction:column;gap:9px}
+#screenAdmin .mgmt-bar{display:grid;grid-template-columns:1fr 52px;gap:4px 10px;align-items:baseline}
+#screenAdmin .mgmt-bar .mgmt-n{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenAdmin .mgmt-bar .mgmt-c{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right}
+#screenAdmin .mgmt-bar .mgmt-t{grid-column:1/-1;height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden}
+#screenAdmin .mgmt-bar .mgmt-t i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+#screenAdmin .mgmt-spark{display:flex;align-items:flex-end;gap:3px;height:82px}
+#screenAdmin .mgmt-spark div{flex:1;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:3px 3px 0 0;position:relative;min-height:3px}
+#screenAdmin .mgmt-spark div i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:2px 2px 0 0}
+#screenAdmin .mgmt-spark-x{display:flex;gap:3px;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--faint)}
+#screenAdmin .mgmt-spark-x span{flex:1;text-align:center;overflow:hidden}
+#screenAdmin table{width:100%;border-collapse:collapse;font-size:13.5px}
+#screenAdmin th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+     text-align:left;font-weight:400;padding:0 10px 9px 0;border-bottom:1px solid var(--line)}
+#screenAdmin td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+#screenAdmin tr:last-child td{border-bottom:0}
+#screenAdmin td.mgmt-mono, #screenAdmin th.mgmt-mono{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+#screenAdmin .mgmt-in{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;outline:none;transition:border .14s}
+#screenAdmin .mgmt-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+#screenAdmin .mgmt-in.mgmt-s{width:92px}
+#screenAdmin select.mgmt-in{cursor:pointer}
+#screenAdmin .mgmt-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+        text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid}
+#screenAdmin .mgmt-pill.mgmt-ready{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:var(--ok-soft)}
+#screenAdmin .mgmt-pill.mgmt-beta{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+#screenAdmin .mgmt-pill.mgmt-soon{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);background:var(--warn-soft)}
+#screenAdmin .mgmt-swatch{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);padding:0;background:none}
+#screenAdmin .mgmt-rowbtns{display:flex;gap:5px;justify-content:flex-end}
+#screenAdmin .mgmt-ico{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center;transition:all .13s}
+#screenAdmin .mgmt-ico:hover{border-color:var(--faint)}
+#screenAdmin .mgmt-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+#screenAdmin .mgmt-note{padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.55;display:flex;gap:9px;margin-top:12px}
+#screenAdmin .mgmt-note.mgmt-info{background:var(--accent-soft);border:1px solid var(--accent-line)}
+#screenAdmin .mgmt-note.mgmt-warn{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent)}
+#screenAdmin .mgmt-note b{font-weight:600}
+#screenAdmin .mgmt-empty{color:var(--faint);font-size:13px;padding:20px 0;text-align:center}
+#screenAdmin .mgmt-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--ink);color:var(--bg);
+         padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s;z-index:50}
+#screenAdmin .mgmt-toast.mgmt-on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:720px){
+#screenAdmin .mgmt-spark{height:60px}
+#screenAdmin table{font-size:12.5px}
+#screenAdmin td, #screenAdmin th{padding-right:6px}}
+/* ── вход ───────────────────────────────────────────────────────── */
+#screenAdmin .mgmt-gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+#screenAdmin .mgmt-gate-card{width:100%;max-width:330px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px 24px;text-align:center}
+#screenAdmin .mgmt-gate-mark{color:var(--accent);font-size:18px;line-height:1;margin-bottom:14px}
+#screenAdmin .mgmt-gate-card h2{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0 0 7px}
+#screenAdmin .mgmt-gate-card p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 18px}
+#screenAdmin .mgmt-gate-card input{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;text-align:center;font-size:14px;transition:border .14s}
+#screenAdmin .mgmt-gate-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+#screenAdmin .mgmt-gate-go{width:100%;margin-top:10px;background:var(--accent);border:0;color:#fff;border-radius:10px;padding:11px;font-family:var(--disp);font-size:14px;font-weight:600;cursor:pointer;transition:filter .14s}
+#screenAdmin .mgmt-gate-go:hover{filter:brightness(1.07)}
+#screenAdmin .mgmt-gate-err{color:var(--bad);font-size:12.5px;min-height:18px;margin-top:10px}
+#screenAdmin .mgmt-gate-back{background:none;border:0;color:var(--faint);font-size:12.5px;cursor:pointer;margin-top:6px}
+#screenAdmin .mgmt-gate-back:hover{color:var(--ink)}
+#screenAdmin .mgmt-panel-top{display:flex;gap:9px;margin-bottom:16px}
+#screenAdmin .mgmt-panel-top .mgmt-btn{padding:7px 12px}
+
+#screenAdmin .mgmt-pass-wrap{position:relative}
+#screenAdmin .mgmt-pass-eye{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:none;border:0;color:var(--faint);cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;
+}
+#screenAdmin .mgmt-pass-eye:hover{color:var(--accent)}
+#screenAdmin .mgmt-build{
+  margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--faint);opacity:.7;
+}
+
+/* display:grid у карточки входа сильнее браузерного правила для [hidden],
+   поэтому прячем явно — иначе форма остаётся на экране после входа */
+/* Видимостью управляет один класс на самом экране. Раньше здесь были
+   атрибуты hidden у двух узлов, и если один из них не находился,
+   страница оставалась пустой без всяких ошибок. */
+#screenAdmin .mgmt-panel{display:none}
+#screenAdmin.authed .mgmt-panel{display:block}
+#screenAdmin.authed .mgmt-gate{display:none}
+</style>
+</head>
+<body>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   Диагностика. Если скрипт где-то падает, страница обычно остаётся
+   пустой: экраны скрыты и открывает их только код. Здесь мы ловим
+   любую ошибку и показываем её прямо на странице, чтобы не искать
+   в консоли.
+   ═══════════════════════════════════════════════════════════════════ */
+(function(){
+  var box = null;
+  function show(kind, text){
+    if(!box){
+      box = document.createElement('div');
+      box.setAttribute('style',
+        'position:fixed;left:0;right:0;bottom:0;z-index:99999;max-height:52vh;overflow:auto;'+
+        'background:#2B1114;color:#FFD9DC;border-top:2px solid #E8596A;'+
+        'font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;padding:12px 14px 40px;');
+      var close = document.createElement('button');
+      close.textContent = 'скрыть';
+      close.setAttribute('style','position:absolute;right:10px;top:8px;background:none;border:1px solid #E8596A;'+
+        'color:#FFD9DC;border-radius:6px;padding:3px 9px;font:inherit;cursor:pointer');
+      close.onclick = function(){ box.remove(); box = null; };
+      box.appendChild(close);
+      var head = document.createElement('div');
+      head.textContent = 'Ошибка на странице — покажите этот текст';
+      head.setAttribute('style','font-weight:700;margin-bottom:8px');
+      box.appendChild(head);
+      (document.body || document.documentElement).appendChild(box);
+    }
+    var row = document.createElement('div');
+    row.setAttribute('style','margin-bottom:7px;white-space:pre-wrap;word-break:break-word');
+    row.textContent = kind + ': ' + text;
+    box.appendChild(row);
+  }
+  window.addEventListener('error', function(e){
+    show('Ошибка', (e.message || 'без описания') + '  →  ' +
+      String(e.filename || '').split('/').pop() + ':' + (e.lineno || '?'));
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    var r = e.reason;
+    show('Обещание', (r && (r.message || r)) || 'без описания');
+  });
+})();
+</script>
+<div class="build-badge">сборка 12.08 · 14:10</div>
+
+<section id="screenAdmin">
+<div class="mgmt-gate" id="mgGate">
+    <form class="mgmt-gate-card" id="mgGateForm">
+      <div class="mgmt-gate-mark">◤</div>
+      <h2>Админ-панель</h2>
+      <p>Статистика и управление сервисами. Доступ по паролю.</p>
+      <div class="mgmt-pass-wrap">
+      <input type="password" id="mgPass" placeholder="Пароль" autocomplete="new-password" autofocus>
+      <button type="button" class="mgmt-pass-eye" id="mgEye" title="Показать пароль" aria-label="Показать пароль">показать</button>
+    </div>
+      <button type="button" class="mgmt-gate-go" id="mgGo">Войти</button>
+      <div class="mgmt-gate-err" id="mgErr"></div>
+      <button type="button" class="mgmt-gate-back" id="hubBackAdmin">← Все сервисы</button>
+      <div class="mgmt-build">сборка 12.08 · 14:10</div>
+    </form>
+  </div>
+  <div class="mgmt-panel" id="mgPanel">
+  <div class="mgmt-panel-top">
+    <button class="mgmt-btn" id="hubBackAdmin2">← Все сервисы</button>
+    <button class="mgmt-btn" id="mgLock">Выйти</button>
+    <span class="mgmt-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 14:10</span>
+  </div>
+<div class="mgmt-wrap">
+
+  <div class="mgmt-top">
+    <h1>Deck Hub</h1>
+    <span class="mgmt-tag">админка</span>
+    <span class="mgmt-sp"></span>
+    <button class="mgmt-btn" id="mgmt-reload">
+      <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.5 5.8"/><path d="M20 4v7h-7"/></svg>
+      Обновить
+    </button>
+    
+  </div>
+
+  <div class="mgmt-tabs" role="tablist">
+    <button role="tab" data-tab="stats" aria-selected="true">Статистика</button>
+    <button role="tab" data-tab="cfg" aria-selected="false">Сервисы</button>
+    <button role="tab" data-tab="ops" aria-selected="false">Обслуживание</button>
+  </div>
+
+  <div id="mgmt-tab-stats"></div>
+  <div id="mgmt-tab-cfg" style="display:none"></div>
+  <div id="mgmt-tab-ops" style="display:none"></div>
+</div>
+<div class="mgmt-toast" id="mgmt-toast"></div>
+  </div>
+</section>
+
+<script>
+(function(){
+/* =====================================================================
+   ВХОД В АДМИН-ПАНЕЛЬ
+   Пароль сверяется по хешу SHA-256, поэтому сам пароль в коде не лежит.
+   Но проверка идёт в браузере, а значит это защита от любопытных глаз,
+   а не настоящая: кто откроет исходник, обойдёт её. Настоящая — это
+   Supabase Auth плюс политики базы.
+
+   Текущий пароль: sixseven
+   Чтобы сменить, посчитайте хеш своего пароля в консоли браузера:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
+       .then(b => console.log([...new Uint8Array(b)]
+         .map(x => x.toString(16).padStart(2,'0')).join('')))
+   и подставьте результат в ADMIN_HASH.
+   ===================================================================== */
+const ADMIN_HASH = 'ed227bb0d191d168545bec592e8b9c1199ef4ffa122a7395ededa0cf888dc09f';
+const SESSION = 'deckhub.admin';
+
+/* SHA-256 на чистом JS. Нужен потому, что crypto.subtle доступен только
+   на https и на localhost: при открытии файла напрямую его нет вообще.
+   Значение хеша совпадает с crypto.subtle, поэтому ADMIN_HASH не меняется. */
+function sha256js(msg){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes=[...new TextEncoder().encode(msg)];
+  const bitLen=bytes.length*8;
+  bytes.push(0x80);
+  while(bytes.length%64!==56) bytes.push(0);
+  const hi=Math.floor(bitLen/0x100000000), lo=bitLen>>>0;
+  [24,16,8,0].forEach(s=>bytes.push((hi>>>s)&0xff));
+  [24,16,8,0].forEach(s=>bytes.push((lo>>>s)&0xff));
+
+  const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let i=0;i<bytes.length;i+=64){
+    const w=new Array(64);
+    for(let t=0;t<16;t++)
+      w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
+    for(let t=16;t<64;t++){
+      const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
+      const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
+      w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
+    }
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let t=0;t<64;t++){
+      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
+      const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K[t]+w[t])|0;
+      const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
+      const mj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+mj)|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+h)|0];
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+async function sha256(text){
+  try{
+    if(crypto && crypto.subtle && crypto.subtle.digest){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  return sha256js(text);           // https недоступен — считаем сами
+}
+const authed = () => { try{ return sessionStorage.getItem(SESSION)==='1' }catch(e){ return false } };
+/* Узлы берём через getElementById: в одном из браузеров querySelector
+   по этим же селекторам возвращал null. И видимость ставим прямым
+   стилем — он сильнее любого правила из таблицы стилей, поэтому
+   панель не может остаться скрытой из-за неожиданного CSS. */
+const byId = id => document.getElementById(id);
+function openPanel(){
+  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
+  if(screen) screen.classList.add('authed');
+  if(gate){ gate.style.setProperty('display','none','important'); gate.hidden=true; }
+  if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
+  window.scrollTo({top:0});
+  window.dispatchEvent(new CustomEvent('admin:open'));
+  guardPanel();
+}
+
+/* Страж. Панель показывается, а через мгновение исчезает — значит её
+   кто-то прячет уже после нас. Кто именно, снаружи не видно, поэтому
+   просто возвращаем видимость и запоминаем, сколько раз пришлось. */
+let guardFixes = 0, guardStop = null;
+function guardPanel(){
+  const panel=byId('mgPanel'), gate=byId('mgGate');
+  if(!panel) return;
+  clearInterval(guardStop);
+  const check = ()=>{
+    if(!authed()) return;
+    if(getComputedStyle(panel).display === 'none'){
+      guardFixes++;
+      panel.style.setProperty('display','block','important');
+      panel.hidden = false;
+      if(gate){ gate.style.setProperty('display','none','important'); gate.hidden = true; }
+      const badge = document.querySelector('.build-badge');
+      if(badge) badge.textContent = badge.textContent.replace(/ · вернул.*/,'') + ' · вернул панель ' + guardFixes + ' р.';
+    }
+  };
+  let ticks = 0;
+  guardStop = setInterval(()=>{ check(); if(++ticks > 40) clearInterval(guardStop); }, 150);
+  check();
+}
+function closePanel(){
+  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
+  if(screen) screen.classList.remove('authed');
+  if(gate){ gate.style.removeProperty('display'); gate.hidden=false; }
+  if(panel){ panel.style.setProperty('display','none','important'); panel.hidden=true; }
+}
+function initAdmin(){
+  const form=byId('mgGateForm'), inp=byId('mgPass'), err=byId('mgErr');
+  if(!form || !inp || !err) return;
+  async function tryLogin(){
+    const pass=(inp.value||'').trim();          // пробел из автозаполнения — частая причина отказа
+    if(!pass){ err.textContent='Введите пароль'; return; }
+    err.textContent='Проверяю…';
+    let ok=false;
+    try{ ok = (await sha256(pass)) === ADMIN_HASH; }
+    catch(e){ err.textContent='Не удалось проверить пароль: '+e.message; return; }
+    if(!ok){ err.textContent='Пароль не подошёл'; inp.value=''; inp.focus(); return; }
+    err.textContent='';
+    try{ sessionStorage.setItem(SESSION,'1') }catch(e){}
+    openPanel();
+  }
+  form.addEventListener('submit', e=>{ e.preventDefault(); tryLogin(); });
+  const go=byId('mgGo');
+  if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
+  /* браузер часто подставляет сюда сохранённый пароль от домена —
+     кнопка «показать» позволяет увидеть, что в поле на самом деле */
+  const eye=byId('mgEye');
+  if(eye) eye.onclick=()=>{
+    const hidden = inp.type==='password';
+    inp.type = hidden ? 'text' : 'password';
+    eye.textContent = hidden ? 'скрыть' : 'показать';
+    inp.focus();
+  };
+  const lock=byId('mgLock');
+  if(lock) lock.onclick=()=>{
+    try{ sessionStorage.removeItem(SESSION) }catch(e){}
+    closePanel(); inp.value=''; err.textContent='';
+  };
+  ['hubBackAdmin','hubBackAdmin2'].forEach(id=>{ const b=byId(id); if(b) b.onclick=()=>{ location.href='index.html' }; });
+}
+
+
+
+initAdmin();
+if(authed()) openPanel(); else { const p=byId('mgPass'); if(p) setTimeout(()=>p.focus(),50); }
+})();
+</script>
+
+<script>
+/* Админ-панель хаба. Открывается по ссылке #/admin и паролю.
+   Данные загружаются только после входа. */
+(function(){
+/* ═════════════════════════════════════════════════════════════════════
+   Админка Deck Hub.
+
+   Защиты нет: ключ публичный, страница открывается по ссылке. Это
+   осознанное решение для внутреннего инструмента — но помните, что
+   любой, кто знает адрес, увидит статистику и сможет менять конфиг.
+   ═══════════════════════════════════════════════════════════════════ */
+const MAIN = {            /* проект Prompt Deck: события, конфиг, промты */
+  url:'https://vkjhmnwcffrwktkekklc.supabase.co',
+  key:'sb_publishable_NOmZ1a99hmVtNjUJXPltkw_8oU8GMDu'
+};
+const MUSIC = {           /* проект музыки: только для выгрузки треков */
+  url:'https://gbbpyrcyhpkngkngpvrd.supabase.co',
+  key:'sb_publishable_aQXEoDBO7PC8z1IG3_ytcg_00UuSJjC'
+};
+const DAYS = 30;
+
+/* сервисы и ссылки по умолчанию — ими заполняются пустые таблицы */
+const DEFAULT_SERVICES = [
+  {id:'prompt-deck',name:'Prompt Deck',kicker:'Промты',status:'ready',screen:'deck',tab:null,color:'#mgmt-2FA37A',preview:'prompts',cta:'Открыть деку',sort:10,
+   descr:'Общая база промтов команды: видео и фото, категории, теги, авторы, копирование в один клик.'},
+  {id:'points',name:'Расчёт поинтов',kicker:'Оценка задач',status:'ready',screen:'calc',tab:null,color:'#mgmt-2F6BFF',preview:'tiers',cta:'Открыть калькулятор',sort:20,
+   descr:'Определяет сложность задачи и считает поинты. Звёздочки поднимают тир выше.'},
+  {id:'music',name:'Актуальная музыка',kicker:'Музыка',status:'ready',screen:'music',tab:null,color:'#mgmt-E8A33C',preview:'wave',cta:'Открыть библиотеку',sort:30,
+   descr:'Библиотека треков команды: свежие сверху, старые уезжают в архив сами.'},
+];
+const DEFAULT_LINKS = [
+  {id:'kling',name:'Kling',kicker:'Видео',color:'#mgmt-2F6BFF',sort:10,descr:'Генерация видео из текста и картинок.',url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
+  {id:'openart',name:'OpenArt',kicker:'Изображения',color:'#mgmt-7A5AF8',sort:20,descr:'Картинки, стили и апскейл.',url:'https://openart.ai/home'},
+  {id:'vozo',name:'Vozo',kicker:'Липсинк',color:'#mgmt-E0870B',sort:30,descr:'Подгоняет движение губ под новую озвучку.',url:'https://app.vozo.ai/'},
+  {id:'vmake',name:'Vmake',kicker:'Очистка',color:'#mgmt-E8596A',sort:40,descr:'Удаление субтитров и водяных знаков.',url:'https://vmake.ai/workspace'},
+  {id:'transcribe',name:'Transcribe',kicker:'Расшифровка',color:'#mgmt-4E86C6',sort:50,descr:'Достаёт текст из озвучки.',url:'https://login.go-transcribe.com/'},
+  {id:'heygen',name:'HeyGen',kicker:'Аватары',color:'#mgmt-14A5C4',sort:60,descr:'Говорящие аватары для креативов.',url:'https://app.heygen.com/projects/avatar-videos'},
+  {id:'topview',name:'TopView',kicker:'Аватары',color:'#mgmt-2FA37A',sort:70,descr:'UGC-аватары для перформанс-креативов.',url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'},
+];
+
+const NAMES = {hub:'Главная', 'prompt-deck':'Prompt Deck', points:'Расчёт поинтов', talk:'Разговорные генерации', music:'Актуальная музыка'};
+
+/* Что именно означает каждое действие — словами, а не кодом */
+const DEEDS = {
+  'prompt-deck|copy'   : 'Скопировали промт',
+  'prompt-deck|add'    : 'Открыли форму добавления промта',
+  'points|copy'        : 'Скопировали расчёт поинтов',
+  'talk|open'          : 'Открыли опросник по генерациям',
+  'talk|copy'          : 'Скопировали вывод опросника',
+  'music|download'     : 'Скачали трек',
+  'music|upload'       : 'Открыли загрузку треков',
+};
+const deedName = e => {
+  if(e.service.startsWith('link:')) return 'Перешли в ' + linkName(e.service.slice(5));
+  return DEEDS[e.service+'|'+(e.detail||'open')]
+      || ((NAMES[e.service]||e.service) + ' · ' + (e.detail||'действие'));
+};
+/* имя внешнего сервиса: из базы, иначе из списка по умолчанию, иначе сам id */
+function linkName(id){
+  /* до 11 августа у встроенных ссылок не было id, и в базу писалось
+     link:undefined — такие записи уже не восстановить, подписываем честно */
+  if(!id || id === 'undefined' || id === 'null') return 'внешний сервис (не определился)';
+  const fromDb = links.find(l => l.id === id);
+  if(fromDb) return fromDb.name;
+  const fallback = DEFAULT_LINKS.find(l => l.id === id);
+  return fallback ? fallback.name : id;
+}
+
+const ROOT = document.getElementById('screenAdmin');
+const $ = s => ROOT.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plural = (n,a,b,c) => { const x=Math.abs(n)%100, y=x%10;
+  return x>10&&x<20?c : y>1&&y<5?b : y===1?a : c; };
+const dayKey = d => d.toISOString().slice(0,10);
+let tt;
+function toast(m){ const e=$('#mgmt-toast'); e.textContent=m; e.classList.add('mgmt-on'); clearTimeout(tt); tt=setTimeout(()=>e.classList.remove('mgmt-on'),2600); }
+
+/* ── запросы ─────────────────────────────────────────────────────── */
+async function api(db, path, opts={}){
+  /* headers достаём отдельно: если слить наивно, opts.headers перетрёт
+     объект с ключом, и база ответит «No API key found in request» */
+  const { headers, ...rest } = opts;
+  const r = await fetch(db.url+'/rest/v1/'+path, Object.assign({}, rest, {
+    headers: Object.assign({ apikey:db.key, 'Content-Type':'application/json' }, headers || {})
+  }));
+  const txt = await r.text();
+  let data=null; try{ data = txt ? JSON.parse(txt) : null }catch(e){ data = txt }
+  if(!r.ok) throw new Error((data && (data.message||data.hint)) || ('HTTP '+r.status));
+  return data;
+}
+const get   = (db,p) => api(db,p);
+const patch = (db,p,body) => api(db,p,{method:'PATCH',body:JSON.stringify(body),headers:{Prefer:'return=representation'}});
+const post  = (db,p,body) => api(db,p,{method:'POST', body:JSON.stringify(body),headers:{Prefer:'return=representation'}});
+const del   = (db,p) => api(db,p,{method:'DELETE',headers:{Prefer:'return=minimal'}});
+
+/* ── состояние ───────────────────────────────────────────────────── */
+let events=[], services=[], links=[], presence=[], failed=null;
+
+async function loadAll(){
+  failed=null;
+  const since = new Date(Date.now() - DAYS*864e5).toISOString();
+  try{
+    [events, services, links, presence] = await Promise.all([
+      get(MAIN, `hub_events?select=*&at=gte.${since}&order=at.desc&limit=5000`),
+      get(MAIN, 'hub_services?select=*&order=sort.asc'),
+      get(MAIN, 'hub_links?select=*&order=sort.asc'),
+      get(MAIN, 'hub_presence?select=*&order=last_seen.desc').catch(()=>[]),
+    ]);
+  }catch(e){ failed = e.message; events=[]; services=[]; links=[]; presence=[]; }
+  renderStats(); renderCfg(); renderOps();
+}
+
+/* ── статистика ──────────────────────────────────────────────────── */
+function renderStats(){
+  const box = $('#mgmt-tab-stats');
+  if(failed){
+    box.innerHTML = `<div class="mgmt-card"><div class="mgmt-lab">база не отвечает</div>
+      <div style="font-size:14px">${esc(failed)}</div>
+      <div class="mgmt-note mgmt-warn"><span>!</span><span>Если таблиц ещё нет — выполните <b>hub-admin.sql</b> в SQL Editor проекта Prompt Deck, затем нажмите «Обновить».</span></div></div>`;
+    return;
+  }
+  if(!events.length){
+    box.innerHTML = `<div class="mgmt-card"><div class="mgmt-lab">пока пусто</div>
+      <div class="mgmt-empty">Событий за ${DAYS} дней нет. Откройте хаб в другой вкладке — первое событие появится сразу.</div></div>`;
+    return;
+  }
+
+  const opens = events.filter(e => e.kind === 'open');
+  const acts  = events.filter(e => e.kind === 'action');
+  const d7 = Date.now() - 7*864e5;
+  const opens7 = opens.filter(e => new Date(e.at) >= d7);
+  const visitors = new Set(events.map(e => e.visitor));
+  const visitors7 = new Set(events.filter(e => new Date(e.at) >= d7).map(e => e.visitor));
+  const mobile = events.filter(e => e.device === 'mobile').length;
+
+  /* по сервисам */
+  const byService = {};
+  opens.filter(e => e.service !== 'hub').forEach(e => byService[e.service] = (byService[e.service]||0)+1);
+  const svcRows = Object.entries(byService).sort((a,b)=>b[1]-a[1]);
+
+  /* по дням */
+  const days = [];
+  for(let i=13;i>=0;i--){ const d=new Date(Date.now()-i*864e5); days.push([dayKey(d), 0]); }
+  const idx = Object.fromEntries(days.map(([k],i)=>[k,i]));
+  opens.forEach(e => { const k = dayKey(new Date(e.at)); if(k in idx) days[idx[k]][1]++; });
+  const maxDay = Math.max(1, ...days.map(d=>d[1]));
+
+  /* внешние ссылки */
+  const byLink = {};
+  acts.filter(e => e.service.startsWith('link:')).forEach(e => {
+    const id = e.service.slice(5); byLink[id] = (byLink[id]||0)+1;
+  });
+  const linkRows = Object.entries(byLink).sort((a,b)=>b[1]-a[1]);
+
+  /* действия — все, включая переходы по внешним ссылкам, одним списком */
+  const byAct = {};
+  acts.forEach(e => { const k = deedName(e); byAct[k] = (byAct[k]||0)+1; });
+  const actRows = Object.entries(byAct).sort((a,b)=>b[1]-a[1]);
+  const topDeed = actRows[0];
+
+  const bars = rows => {
+    const max = Math.max(1, ...rows.map(r=>r[1]));
+    return `<div class="mgmt-bars">${rows.map(([k,v]) => `
+      <div class="mgmt-bar"><span class="mgmt-n">${esc(k)}</span><span class="mgmt-c">${v}</span>
+        <span class="mgmt-t"><i style="width:${Math.round(v/max*100)}%"></i></span></div>`).join('')}</div>`;
+  };
+
+  /* онлайн — обновлялись за последние три минуты; вкладка в фоне тоже считается */
+  const ONLINE = 3*60*1000, now = Date.now();
+  const seen = presence.map(p => Object.assign({}, p, {ago: now - new Date(p.last_seen)}));
+  const online = seen.filter(p => p.ago < ONLINE);
+  const today  = seen.filter(p => p.ago >= ONLINE && new Date(p.last_seen).toDateString() === new Date().toDateString());
+  const ago = ms => ms < 60000 ? 'только что'
+    : ms < 36e5 ? Math.round(ms/60000)+' мин назад'
+    : Math.round(ms/36e5)+' ч назад';
+  const who = p => p.name ? esc(p.name) : '<span style="color:var(--faint)">браузер '+String(p.visitor).slice(0,6)+'</span>';
+  const where = p => NAMES[p.screen] || p.screen || 'хаб';
+
+  const presenceCard = presence.length ? `
+    <div class="mgmt-card">
+      <div class="mgmt-lab">сейчас в хабе — ${online.length}</div>
+      ${online.length ? `<table><tbody>${online.map(p => `
+        <tr>
+          <td style="width:34%">${who(p)}</td>
+          <td>${esc(where(p))}</td>
+          <td class="mgmt-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
+          <td class="mgmt-mono" style="text-align:right">${ago(p.ago)}</td>
+        </tr>`).join('')}</tbody></table>`
+        : '<div class="mgmt-empty">Прямо сейчас хаб ни у кого не открыт.</div>'}
+      ${today.length ? `<div class="mgmt-lab" style="margin:18px 0 10px">были сегодня</div>
+        <table><tbody>${today.map(p => `
+        <tr><td style="width:34%">${who(p)}</td><td>${esc(where(p))}</td>
+            <td class="mgmt-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
+            <td class="mgmt-mono" style="text-align:right">${ago(p.ago)}</td></tr>`).join('')}</tbody></table>` : ''}
+      <div class="mgmt-note mgmt-info"><span>i</span><span>Имя берётся из деки — его выбирают при добавлении промта. Кто ничего не добавлял, показан как браузер. Вкладка в фоне тоже считается открытой.</span></div>
+    </div>` : '';
+
+  box.innerHTML = presenceCard + `
+    <div class="mgmt-kpis">
+      <div class="mgmt-kpi"><div class="mgmt-v">${opens7.length}</div><div class="mgmt-k">открытий за 7 дней</div>
+        <div class="mgmt-d">за ${DAYS} дней — ${opens.length}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${visitors7.size}</div><div class="mgmt-k">браузеров за 7 дней</div>
+        <div class="mgmt-d">всего ${visitors.size} ${plural(visitors.size,'браузер','браузера','браузеров')}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${acts.length}</div><div class="mgmt-k">нажатий кнопок</div>
+        <div class="mgmt-d">${topDeed ? 'чаще всего: ' + esc(topDeed[0].toLowerCase()) + ' — ' + topDeed[1] : 'пока ничего не нажимали'}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${Math.round(mobile/events.length*100)}%</div><div class="mgmt-k">с телефона</div>
+        <div class="mgmt-d">по ширине экрана</div></div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">открытия по дням, две недели</div>
+      <div class="mgmt-spark">${days.map(([k,v]) =>
+        `<div title="${k}: ${v}"><i style="height:${Math.round(v/maxDay*100)}%"></i></div>`).join('')}</div>
+      <div class="mgmt-spark-x">${days.map(([k],i) =>
+        `<span>${i%2===0 ? k.slice(8)+'.'+k.slice(5,7) : ''}</span>`).join('')}</div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">какие сервисы открывают</div>
+      ${svcRows.length ? bars(svcRows.map(([k,v]) => [NAMES[k]||k, v])) : '<div class="mgmt-empty">Пока никто не заходил внутрь сервисов.</div>'}
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">внешние сервисы</div>
+      ${linkRows.length ? bars(linkRows.map(([k,v]) => [linkName(k), v])) : '<div class="mgmt-empty">Внешние ссылки ещё не нажимали.</div>'}
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">что именно нажимали</div>
+      ${actRows.length ? `<table>
+        <thead><tr><th>Действие</th><th class="mgmt-mono" style="text-align:right;width:70px">раз</th></tr></thead>
+        <tbody>${actRows.map(([k,v]) => `<tr><td>${esc(k)}</td>
+          <td class="mgmt-mono" style="text-align:right">${v}</td></tr>`).join('')}</tbody></table>`
+        : '<div class="mgmt-empty">Кнопки внутри сервисов пока не нажимали.</div>'}
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">последние события</div>
+      <table>
+        <thead><tr><th class="mgmt-mono">когда</th><th>что</th><th>где</th><th class="mgmt-mono">браузер</th></tr></thead>
+        <tbody>${events.slice(0,25).map(e => `
+          <tr>
+            <td class="mgmt-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+            <td>${e.kind === 'open' ? 'открыл' : esc(deedName(e))}</td>
+            <td>${esc(e.kind === 'open' ? (NAMES[e.service]||e.service)
+                  : (e.service.startsWith('link:') ? 'внешний сервис' : (NAMES[e.service]||e.service)))}</td>
+            <td class="mgmt-mono">${String(e.visitor).slice(0,6)}${e.device==='mobile'?' · моб':''}</td>
+          </tr>`).join('')}</tbody>
+      </table>
+    </div>
+
+    <div class="mgmt-note mgmt-info"><span>i</span><span>Считаются браузеры, а не люди: другой браузер или очистка данных дают новый идентификатор. Один человек с телефона и ноутбука — это два браузера.</span></div>`;
+}
+
+/* ── управление ──────────────────────────────────────────────────── */
+function renderCfg(){
+  const box = $('#mgmt-tab-cfg');
+  if(failed){ box.innerHTML = `<div class="mgmt-card"><div class="mgmt-empty">${esc(failed)}</div></div>`; return; }
+
+  if(!services.length && !links.length){
+    box.innerHTML = `<div class="mgmt-card">
+      <div class="mgmt-lab">таблицы пустые</div>
+      <div style="font-size:14px;margin-bottom:14px">Пока в базе нет ни сервисов, ни ссылок — хаб работает на встроенном в код списке. Заполните таблицы текущими значениями, и дальше правки можно делать здесь.</div>
+      <button class="mgmt-btn mgmt-go" id="mgmt-seed">Заполнить из кода</button>
+      <div class="mgmt-note mgmt-warn"><span>!</span><span>После заполнения хаб начнёт брать список из базы. Встроенный список останется запасным — если база не ответит, страница покажет его.</span></div>
+    </div>`;
+    $('#mgmt-seed').onclick = seed;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="mgmt-card">
+      <div class="mgmt-lab">сервисы внутри хаба</div>
+      <table><thead><tr>
+        <th>Название</th><th>Раздел</th><th>Статус</th><th class="mgmt-mono">порядок</th><th></th>
+      </tr></thead><tbody>
+      ${services.map(s => `
+        <tr data-id="${esc(s.id)}" data-kind="svc">
+          <td><input class="mgmt-in" data-f="name" value="${esc(s.name)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="kicker" value="${esc(s.kicker||'')}"></td>
+          <td>
+            <select class="mgmt-in mgmt-s" data-f="status">
+              ${['ready','beta','soon'].map(v=>`<option value="${v}"${s.status===v?' selected':''}>${{ready:'работает',beta:'бета',soon:'скоро'}[v]}</option>`).join('')}
+            </select>
+          </td>
+          <td><input class="mgmt-in mgmt-s" data-f="sort" type="number" value="${s.sort ?? 0}"></td>
+          <td class="mgmt-rowbtns">
+            <button class="mgmt-ico" data-act="hide" title="${s.hidden?'Показать':'Скрыть'}">${s.hidden
+              ? '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+              : '<svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 004.2 4.2"/><path d="M9.9 5.2A9.7 9.7 0 0112 5c6 0 10 7 10 7a18 18 0 01-2.4 3.2M6.5 6.6A18 18 0 002 12s4 7 10 7c1 0 2-.2 2.8-.5"/></svg>'}</button>
+            <button class="mgmt-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+          </td>
+        </tr>
+        <tr data-id="${esc(s.id)}" data-kind="svc">
+          <td colspan="5" style="padding-top:0"><input class="mgmt-in" data-f="descr" value="${esc(s.descr||'')}" placeholder="описание на плитке"></td>
+        </tr>`).join('')}
+      </tbody></table>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>Скрытый сервис исчезает с главной, но остаётся в базе. Порядок задаётся числом: меньше — выше.</span></div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">внешние сервисы</div>
+      <table><thead><tr>
+        <th>Название</th><th>Раздел</th><th>Ссылка</th><th class="mgmt-mono">порядок</th><th></th>
+      </tr></thead><tbody>
+      ${links.map(l => `
+        <tr data-id="${esc(l.id)}" data-kind="link">
+          <td><input class="mgmt-in" data-f="name" value="${esc(l.name)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="kicker" value="${esc(l.kicker||'')}"></td>
+          <td><input class="mgmt-in" data-f="url" value="${esc(l.url)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="sort" type="number" value="${l.sort ?? 0}"></td>
+          <td class="mgmt-rowbtns">
+            <button class="mgmt-ico" data-act="hide" title="${l.hidden?'Показать':'Скрыть'}">${l.hidden?'👁':'∅'}</button>
+            <button class="mgmt-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+            <button class="mgmt-ico" data-act="del" title="Удалить"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+          </td>
+        </tr>
+        <tr data-id="${esc(l.id)}" data-kind="link">
+          <td colspan="5" style="padding-top:0"><input class="mgmt-in" data-f="descr" value="${esc(l.descr||'')}" placeholder="описание на плитке"></td>
+        </tr>`).join('')}
+      </tbody></table>
+
+      <div style="display:flex;gap:9px;align-items:center;margin-top:14px;flex-wrap:wrap">
+        <input class="mgmt-in" id="mgmt-newId" placeholder="id, латиницей" style="width:150px">
+        <input class="mgmt-in" id="mgmt-newName" placeholder="Название" style="width:170px">
+        <input class="mgmt-in" id="mgmt-newUrl" placeholder="https://…" style="flex:1;min-width:200px">
+        <button class="mgmt-btn mgmt-go" id="mgmt-addLink">Добавить</button>
+      </div>
+    </div>`;
+
+  box.querySelectorAll('.mgmt-ico').forEach(b => b.onclick = () => rowAction(b));
+  $('#mgmt-addLink').onclick = addLink;
+}
+
+function rowFields(id, kind){
+  const out = {};
+  document.querySelectorAll(`#tab-cfg tr[data-id="${id}"][data-kind="${kind}"] [data-f]`).forEach(el => {
+    out[el.dataset.f] = el.type === 'number' ? Number(el.value) : el.value.trim();
+  });
+  return out;
+}
+async function rowAction(btn){
+  const tr = btn.closest('tr'), id = tr.dataset.id, kind = tr.dataset.kind;
+  const table = kind === 'svc' ? 'hub_services' : 'hub_links';
+  const list  = kind === 'svc' ? services : links;
+  const row   = list.find(x => x.id === id);
+  try{
+    if(btn.dataset.act === 'save'){
+      await patch(MAIN, `${table}?id=eq.${encodeURIComponent(id)}`, rowFields(id, kind));
+      toast('Сохранено');
+    }
+    if(btn.dataset.act === 'hide'){
+      await patch(MAIN, `${table}?id=eq.${encodeURIComponent(id)}`, { hidden: !row.hidden });
+      toast(row.hidden ? 'Показан' : 'Скрыт');
+    }
+    if(btn.dataset.act === 'del'){
+      if(!confirm(`Удалить «${row.name}» из хаба?`)) return;
+      await del(MAIN, `${table}?id=eq.${encodeURIComponent(id)}`);
+      toast('Удалено');
+    }
+    await loadAll();
+  }catch(e){ toast('Не получилось: ' + e.message); }
+}
+async function addLink(){
+  const id = $('#mgmt-newId').value.trim(), name = $('#mgmt-newName').value.trim();
+  let url = $('#mgmt-newUrl').value.trim();
+  if(!id || !name || !url){ toast('Нужны id, название и ссылка'); return; }
+  if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  try{
+    await post(MAIN, 'hub_links', { id, name, url, sort:(links.length+1)*10, color:'#mgmt-2F6BFF' });
+    toast('Добавлено'); await loadAll();
+  }catch(e){ toast('Не получилось: ' + e.message); }
+}
+async function seed(){
+  try{
+    await post(MAIN, 'hub_services', DEFAULT_SERVICES);
+    await post(MAIN, 'hub_links', DEFAULT_LINKS);
+    toast('Таблицы заполнены'); await loadAll();
+  }catch(e){ toast('Не получилось: ' + e.message); }
+}
+
+/* ── обслуживание ────────────────────────────────────────────────── */
+function renderOps(){
+  const mine = (()=>{ try{ return localStorage.getItem('deckhub.visitor') || '' }catch(e){ return '' } })();
+  $('#mgmt-tab-ops').innerHTML = `
+    <div class="mgmt-card">
+      <div class="mgmt-lab">резервные копии</div>
+      <div style="font-size:14px;margin-bottom:14px">Скачивает содержимое базы в JSON. Файлы — единственная защита от случайного удаления: политики доступа открыты, и промт может удалить любой, кто открыл деку.</div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="mgmt-btn" id="mgmt-dumpPrompts">Промты</button>
+        <button class="mgmt-btn" id="mgmt-dumpMusic">Треки</button>
+        <button class="mgmt-btn" id="mgmt-dumpEvents">События</button>
+      </div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">чистка статистики</div>
+      <div style="font-size:14px;margin-bottom:14px">Удаляет строки из таблицы событий. Отменить нельзя — сначала скачайте выгрузку выше.</div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="mgmt-btn" id="mgmt-wipeOld">Старше 90 дней</button>
+        <button class="mgmt-btn" id="mgmt-wipeMine"${mine?'':' disabled title="в этом браузере хаб ещё не открывали"'}>Свои события</button>
+        <button class="mgmt-btn mgmt-bad" id="mgmt-wipeAll">Удалить всё</button>
+      </div>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>«Свои» — события этого браузера${mine?' ('+mine.slice(0,6)+'…)':''}: то, что вы наделали при проверке. Список «кто сейчас в хабе» живёт в другой таблице и чистится сам.</span></div>
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">если понадобится закрыть удаление</div>
+      <div style="font-size:14px;margin-bottom:12px">Кнопки работают, потому что политика разрешает удаление всем, кто открыл сайт. Вернуть запрет — выполнить в SQL Editor:</div>
+      <div style="font-family:var(--mono);font-size:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:12px;white-space:pre-wrap">drop policy "hub_events delete" on public.hub_events;</div>
+    </div>`;
+
+  $('#mgmt-dumpPrompts').onclick = () => dump(MAIN, 'prompts?select=*', 'prompts');
+  $('#mgmt-dumpMusic').onclick   = () => dump(MUSIC, 'music?select=*', 'music');
+  $('#mgmt-dumpEvents').onclick  = () => dump(MAIN, 'hub_events?select=*&order=at.desc&limit=20000', 'hub_events');
+
+  $('#mgmt-wipeOld').onclick = () => {
+    const edge = new Date(Date.now() - 90*864e5).toISOString();
+    wipe(`hub_events?at=lt.${edge}`, 'Удалить события старше 90 дней?');
+  };
+  $('#mgmt-wipeMine').onclick = () => {
+    if(!mine) return;
+    wipe(`hub_events?visitor=eq.${mine}`, 'Удалить все события этого браузера?');
+  };
+  $('#mgmt-wipeAll').onclick = async () => {
+    const word = prompt('Удалить всю статистику без возврата.\nВведите УДАЛИТЬ, чтобы подтвердить:');
+    if((word||'').trim().toUpperCase() !== 'УДАЛИТЬ'){ toast('Отменено'); return; }
+    wipe('hub_events?id=gt.0', null);
+  };
+}
+
+/* PostgREST требует фильтр в DELETE, поэтому «всё» — это id больше нуля */
+async function wipe(path, ask){
+  if(ask && !confirm(ask)) return;
+  try{
+    const rows = await api(MAIN, path, {method:'DELETE', headers:{Prefer:'return=representation'}});
+    const n = Array.isArray(rows) ? rows.length : 0;
+    toast(n ? `Удалено ${n} ${plural(n,'событие','события','событий')}` : 'Удалять было нечего');
+    await loadAll();
+  }catch(e){
+    toast(/permission|denied|policy|42501/i.test(e.message)
+      ? 'База не разрешает удаление — выполните последний блок из hub-admin.sql'
+      : 'Не получилось: ' + e.message);
+  }
+}
+
+async function dump(db, path, name){
+  try{
+    const rows = await get(db, path);
+    const blob = new Blob([JSON.stringify(rows, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name}-${dayKey(new Date())}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    toast(`${rows.length} ${plural(rows.length,'запись','записи','записей')} в файле`);
+  }catch(e){ toast('Не получилось: ' + e.message); }
+}
+
+/* ── связка ──────────────────────────────────────────────────────── */
+ROOT.querySelectorAll('.mgmt-tabs button').forEach(b => b.onclick = () => {
+  ROOT.querySelectorAll('.mgmt-tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  ['stats','cfg','ops'].forEach(k => {
+    const el = ROOT.querySelector('#mgmt-tab-'+k);
+    if(el) el.style.display = b.dataset.tab === k ? '' : 'none';
+  });
+});
+$('#mgmt-reload').onclick = () => { toast('Обновляю…'); loadAll(); };
+/* список «кто сейчас» быстро устаёт, поэтому подтягиваем его сам раз в минуту */
+setInterval(async () => {
+  if(failed || document.hidden) return;
+  try{
+    presence = await get(MAIN, 'hub_presence?select=*&order=last_seen.desc');
+    if($('#mgmt-tab-stats').style.display !== 'none') renderStats();
+  }catch(e){}
+}, 60000);
+
+  /* грузим по событию входа, а не при открытии страницы */
+  window.addEventListener('admin:open', () => loadAll());
+})();
+</script>
+</body>
+</html>

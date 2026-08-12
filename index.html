@@ -113,7 +113,7 @@ body.booting{overflow:hidden}
   });
 })();
 </script>
-<div class="build-badge">сборка 12.08 · 13:10</div>
+<div class="build-badge">сборка 12.08 · 13:40</div>
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1024,7 +1024,7 @@ body.booting{overflow:hidden}
     --accent:#2F6BFF; --accent-soft:#E7EEFF; --accent-line:#CFE0FF;
     --ok:#1F9D6B; --ok-soft:#E1F4EC;
     --warn:#E0870B; --warn-soft:#FCEFD6;
-    --bad:#D63C4E; --bad-soft:#FBE6E9;
+    --bad:#D63C4E; --bmgmt-soft:#FBE6E9;
     --shadow:0 1px 2px rgba(20,27,35,.05), 0 8px 24px rgba(20,27,35,.06);
     --mono:'IBM Plex Mono',ui-monospace,monospace;
     --disp:'Space Grotesk',system-ui,sans-serif;
@@ -1036,108 +1036,108 @@ body.booting{overflow:hidden}
     --accent:#5C8CFF; --accent-soft:#1A2338; --accent-line:#2C3B5E;
     --ok:#3FBE8A; --ok-soft:#152A22;
     --warn:#E8A33C; --warn-soft:#2C2415;
-    --bad:#E8596A; --bad-soft:#2E181C;
+    --bad:#E8596A; --bmgmt-soft:#2E181C;
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
   }
 #screenAdmin{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.5;
        -webkit-font-smoothing:antialiased;padding:24px 20px 80px}
-#screenAdmin .ad-wrap{max-width:1180px;margin:0 auto}
+#screenAdmin .mgmt-wrap{max-width:1180px;margin:0 auto}
 #screenAdmin button{font:inherit;color:inherit;cursor:pointer}
 #screenAdmin input, #screenAdmin select, #screenAdmin textarea{font:inherit;color:inherit}
-#screenAdmin .ad-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-#screenAdmin .ad-top h1{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:-.025em;margin:0}
-#screenAdmin .ad-top .ad-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
+#screenAdmin .mgmt-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+#screenAdmin .mgmt-top h1{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:-.025em;margin:0}
+#screenAdmin .mgmt-top .mgmt-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
             border:1px solid var(--line);border-radius:20px;padding:3px 9px}
-#screenAdmin .ad-top .ad-sp{margin-left:auto}
-#screenAdmin .ad-btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
+#screenAdmin .mgmt-top .mgmt-sp{margin-left:auto}
+#screenAdmin .mgmt-btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
        color:var(--muted);padding:8px 13px;border-radius:10px;box-shadow:var(--shadow);transition:all .14s;
        font-family:var(--disp);font-size:13px}
-#screenAdmin .ad-btn:hover{color:var(--ink);border-color:var(--faint)}
-#screenAdmin .ad-btn.ad-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-#screenAdmin .ad-btn.ad-go:hover{filter:brightness(1.07);color:#fff}
-#screenAdmin .ad-btn.ad-bad{color:var(--bad);border-color:var(--line)}
-#screenAdmin .ad-btn.ad-bad:hover{border-color:var(--bad);background:var(--bad-soft)}
-#screenAdmin .ad-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
-#screenAdmin html[data-theme="dark"] .ad-sun{display:none}
-#screenAdmin html[data-theme="light"] .ad-moon{display:none}
-#screenAdmin .ad-tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;margin-bottom:18px}
-#screenAdmin .ad-tabs button{background:none;border:0;padding:8px 15px;border-radius:8px;font-family:var(--disp);font-size:13.5px;color:var(--muted);transition:all .14s}
-#screenAdmin .ad-tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
-#screenAdmin .ad-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px}
-#screenAdmin .ad-card+.ad-card{margin-top:14px}
-#screenAdmin .ad-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
-#screenAdmin .ad-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
-#screenAdmin .ad-kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}
-#screenAdmin .ad-kpi .ad-v{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-#screenAdmin .ad-kpi .ad-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:8px}
-#screenAdmin .ad-kpi .ad-d{font-size:12px;color:var(--muted);margin-top:5px}
-#screenAdmin .ad-bars{display:flex;flex-direction:column;gap:9px}
-#screenAdmin .ad-bar{display:grid;grid-template-columns:1fr 52px;gap:4px 10px;align-items:baseline}
-#screenAdmin .ad-bar .ad-n{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#screenAdmin .ad-bar .ad-c{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right}
-#screenAdmin .ad-bar .ad-t{grid-column:1/-1;height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden}
-#screenAdmin .ad-bar .ad-t i{display:block;height:100%;border-radius:3px;background:var(--accent)}
-#screenAdmin .ad-spark{display:flex;align-items:flex-end;gap:3px;height:82px}
-#screenAdmin .ad-spark div{flex:1;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:3px 3px 0 0;position:relative;min-height:3px}
-#screenAdmin .ad-spark div i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:2px 2px 0 0}
-#screenAdmin .ad-spark-x{display:flex;gap:3px;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--faint)}
-#screenAdmin .ad-spark-x span{flex:1;text-align:center;overflow:hidden}
+#screenAdmin .mgmt-btn:hover{color:var(--ink);border-color:var(--faint)}
+#screenAdmin .mgmt-btn.mgmt-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#screenAdmin .mgmt-btn.mgmt-go:hover{filter:brightness(1.07);color:#fff}
+#screenAdmin .mgmt-btn.mgmt-bad{color:var(--bad);border-color:var(--line)}
+#screenAdmin .mgmt-btn.mgmt-bad:hover{border-color:var(--bad);background:var(--bmgmt-soft)}
+#screenAdmin .mgmt-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+#screenAdmin html[data-theme="dark"] .mgmt-sun{display:none}
+#screenAdmin html[data-theme="light"] .mgmt-moon{display:none}
+#screenAdmin .mgmt-tabs{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;margin-bottom:18px}
+#screenAdmin .mgmt-tabs button{background:none;border:0;padding:8px 15px;border-radius:8px;font-family:var(--disp);font-size:13.5px;color:var(--muted);transition:all .14s}
+#screenAdmin .mgmt-tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+#screenAdmin .mgmt-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+#screenAdmin .mgmt-card+.mgmt-card{margin-top:14px}
+#screenAdmin .mgmt-lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+#screenAdmin .mgmt-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+#screenAdmin .mgmt-kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+#screenAdmin .mgmt-kpi .mgmt-v{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+#screenAdmin .mgmt-kpi .mgmt-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+#screenAdmin .mgmt-kpi .mgmt-d{font-size:12px;color:var(--muted);margin-top:5px}
+#screenAdmin .mgmt-bars{display:flex;flex-direction:column;gap:9px}
+#screenAdmin .mgmt-bar{display:grid;grid-template-columns:1fr 52px;gap:4px 10px;align-items:baseline}
+#screenAdmin .mgmt-bar .mgmt-n{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#screenAdmin .mgmt-bar .mgmt-c{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right}
+#screenAdmin .mgmt-bar .mgmt-t{grid-column:1/-1;height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden}
+#screenAdmin .mgmt-bar .mgmt-t i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+#screenAdmin .mgmt-spark{display:flex;align-items:flex-end;gap:3px;height:82px}
+#screenAdmin .mgmt-spark div{flex:1;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:3px 3px 0 0;position:relative;min-height:3px}
+#screenAdmin .mgmt-spark div i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:2px 2px 0 0}
+#screenAdmin .mgmt-spark-x{display:flex;gap:3px;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--faint)}
+#screenAdmin .mgmt-spark-x span{flex:1;text-align:center;overflow:hidden}
 #screenAdmin table{width:100%;border-collapse:collapse;font-size:13.5px}
 #screenAdmin th{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);
      text-align:left;font-weight:400;padding:0 10px 9px 0;border-bottom:1px solid var(--line)}
 #screenAdmin td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line-soft);vertical-align:middle}
 #screenAdmin tr:last-child td{border-bottom:0}
-#screenAdmin td.ad-mono, #screenAdmin th.ad-mono{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-#screenAdmin .ad-in{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;outline:none;transition:border .14s}
-#screenAdmin .ad-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
-#screenAdmin .ad-in.ad-s{width:92px}
-#screenAdmin select.ad-in{cursor:pointer}
-#screenAdmin .ad-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+#screenAdmin td.mgmt-mono, #screenAdmin th.mgmt-mono{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+#screenAdmin .mgmt-in{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;outline:none;transition:border .14s}
+#screenAdmin .mgmt-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+#screenAdmin .mgmt-in.mgmt-s{width:92px}
+#screenAdmin select.mgmt-in{cursor:pointer}
+#screenAdmin .mgmt-pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
         text-transform:uppercase;padding:3px 8px;border-radius:20px;border:1px solid}
-#screenAdmin .ad-pill.ad-ready{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:var(--ok-soft)}
-#screenAdmin .ad-pill.ad-beta{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
-#screenAdmin .ad-pill.ad-soon{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);background:var(--warn-soft)}
-#screenAdmin .ad-swatch{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);padding:0;background:none}
-#screenAdmin .ad-rowbtns{display:flex;gap:5px;justify-content:flex-end}
-#screenAdmin .ad-ico{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center;transition:all .13s}
-#screenAdmin .ad-ico:hover{border-color:var(--faint)}
-#screenAdmin .ad-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
-#screenAdmin .ad-note{padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.55;display:flex;gap:9px;margin-top:12px}
-#screenAdmin .ad-note.ad-info{background:var(--accent-soft);border:1px solid var(--accent-line)}
-#screenAdmin .ad-note.ad-warn{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent)}
-#screenAdmin .ad-note b{font-weight:600}
-#screenAdmin .ad-empty{color:var(--faint);font-size:13px;padding:20px 0;text-align:center}
-#screenAdmin .ad-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--ink);color:var(--bg);
+#screenAdmin .mgmt-pill.mgmt-ready{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:var(--ok-soft)}
+#screenAdmin .mgmt-pill.mgmt-beta{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+#screenAdmin .mgmt-pill.mgmt-soon{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent);background:var(--warn-soft)}
+#screenAdmin .mgmt-swatch{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);padding:0;background:none}
+#screenAdmin .mgmt-rowbtns{display:flex;gap:5px;justify-content:flex-end}
+#screenAdmin .mgmt-ico{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center;transition:all .13s}
+#screenAdmin .mgmt-ico:hover{border-color:var(--faint)}
+#screenAdmin .mgmt-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+#screenAdmin .mgmt-note{padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.55;display:flex;gap:9px;margin-top:12px}
+#screenAdmin .mgmt-note.mgmt-info{background:var(--accent-soft);border:1px solid var(--accent-line)}
+#screenAdmin .mgmt-note.mgmt-warn{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent)}
+#screenAdmin .mgmt-note b{font-weight:600}
+#screenAdmin .mgmt-empty{color:var(--faint);font-size:13px;padding:20px 0;text-align:center}
+#screenAdmin .mgmt-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--ink);color:var(--bg);
          padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s;z-index:50}
-#screenAdmin .ad-toast.ad-on{opacity:1;transform:translate(-50%,0)}
+#screenAdmin .mgmt-toast.mgmt-on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:720px){
-#screenAdmin .ad-spark{height:60px}
+#screenAdmin .mgmt-spark{height:60px}
 #screenAdmin table{font-size:12.5px}
 #screenAdmin td, #screenAdmin th{padding-right:6px}}
 /* ── вход ───────────────────────────────────────────────────────── */
-#screenAdmin .ad-gate{min-height:100vh;display:grid;place-items:center;padding:24px}
-#screenAdmin .ad-gate-card{width:100%;max-width:330px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px 24px;text-align:center}
-#screenAdmin .ad-gate-mark{color:var(--accent);font-size:18px;line-height:1;margin-bottom:14px}
-#screenAdmin .ad-gate-card h2{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0 0 7px}
-#screenAdmin .ad-gate-card p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 18px}
-#screenAdmin .ad-gate-card input{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;text-align:center;font-size:14px;transition:border .14s}
-#screenAdmin .ad-gate-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
-#screenAdmin .ad-gate-go{width:100%;margin-top:10px;background:var(--accent);border:0;color:#fff;border-radius:10px;padding:11px;font-family:var(--disp);font-size:14px;font-weight:600;cursor:pointer;transition:filter .14s}
-#screenAdmin .ad-gate-go:hover{filter:brightness(1.07)}
-#screenAdmin .ad-gate-err{color:var(--bad);font-size:12.5px;min-height:18px;margin-top:10px}
-#screenAdmin .ad-gate-back{background:none;border:0;color:var(--faint);font-size:12.5px;cursor:pointer;margin-top:6px}
-#screenAdmin .ad-gate-back:hover{color:var(--ink)}
-#screenAdmin .ad-panel-top{display:flex;gap:9px;margin-bottom:16px}
-#screenAdmin .ad-panel-top .ad-btn{padding:7px 12px}
+#screenAdmin .mgmt-gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+#screenAdmin .mgmt-gate-card{width:100%;max-width:330px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px 24px;text-align:center}
+#screenAdmin .mgmt-gate-mark{color:var(--accent);font-size:18px;line-height:1;margin-bottom:14px}
+#screenAdmin .mgmt-gate-card h2{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:-.02em;margin:0 0 7px}
+#screenAdmin .mgmt-gate-card p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 18px}
+#screenAdmin .mgmt-gate-card input{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;text-align:center;font-size:14px;transition:border .14s}
+#screenAdmin .mgmt-gate-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+#screenAdmin .mgmt-gate-go{width:100%;margin-top:10px;background:var(--accent);border:0;color:#fff;border-radius:10px;padding:11px;font-family:var(--disp);font-size:14px;font-weight:600;cursor:pointer;transition:filter .14s}
+#screenAdmin .mgmt-gate-go:hover{filter:brightness(1.07)}
+#screenAdmin .mgmt-gate-err{color:var(--bad);font-size:12.5px;min-height:18px;margin-top:10px}
+#screenAdmin .mgmt-gate-back{background:none;border:0;color:var(--faint);font-size:12.5px;cursor:pointer;margin-top:6px}
+#screenAdmin .mgmt-gate-back:hover{color:var(--ink)}
+#screenAdmin .mgmt-panel-top{display:flex;gap:9px;margin-bottom:16px}
+#screenAdmin .mgmt-panel-top .mgmt-btn{padding:7px 12px}
 
-#screenAdmin .ad-pass-wrap{position:relative}
-#screenAdmin .ad-pass-eye{
+#screenAdmin .mgmt-pass-wrap{position:relative}
+#screenAdmin .mgmt-pass-eye{
   position:absolute;right:8px;top:50%;transform:translateY(-50%);
   background:none;border:0;color:var(--faint);cursor:pointer;
   font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;
 }
-#screenAdmin .ad-pass-eye:hover{color:var(--accent)}
-#screenAdmin .ad-build{
+#screenAdmin .mgmt-pass-eye:hover{color:var(--accent)}
+#screenAdmin .mgmt-build{
   margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--faint);opacity:.7;
 }
 
@@ -1146,9 +1146,9 @@ body.booting{overflow:hidden}
 /* Видимостью управляет один класс на самом экране. Раньше здесь были
    атрибуты hidden у двух узлов, и если один из них не находился,
    страница оставалась пустой без всяких ошибок. */
-#screenAdmin .ad-panel{display:none}
-#screenAdmin.authed .ad-panel{display:block}
-#screenAdmin.authed .ad-gate{display:none}
+#screenAdmin .mgmt-panel{display:none}
+#screenAdmin.authed .mgmt-panel{display:block}
+#screenAdmin.authed .mgmt-gate{display:none}
 </style>
 
 <!-- ============ стили хаба ============ -->
@@ -1844,51 +1844,51 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 
 <!-- ============ экран: админ-панель, вход по #/admin ============ -->
 <section class="screen" id="screenAdmin">
-  <div class="ad-gate" id="adGate">
-    <form class="ad-gate-card" id="adGateForm">
-      <div class="ad-gate-mark">◤</div>
+  <div class="mgmt-gate" id="mgGate">
+    <form class="mgmt-gate-card" id="mgGateForm">
+      <div class="mgmt-gate-mark">◤</div>
       <h2>Админ-панель</h2>
       <p>Статистика и управление сервисами. Доступ по паролю.</p>
-      <div class="ad-pass-wrap">
-      <input type="password" id="adPass" placeholder="Пароль" autocomplete="new-password" autofocus>
-      <button type="button" class="ad-pass-eye" id="adEye" title="Показать пароль" aria-label="Показать пароль">показать</button>
+      <div class="mgmt-pass-wrap">
+      <input type="password" id="mgPass" placeholder="Пароль" autocomplete="new-password" autofocus>
+      <button type="button" class="mgmt-pass-eye" id="mgEye" title="Показать пароль" aria-label="Показать пароль">показать</button>
     </div>
-      <button type="button" class="ad-gate-go" id="adGo">Войти</button>
-      <div class="ad-gate-err" id="adErr"></div>
-      <button type="button" class="ad-gate-back" id="hubBackAdmin">← Все сервисы</button>
-      <div class="ad-build">сборка 12.08 · 13:10</div>
+      <button type="button" class="mgmt-gate-go" id="mgGo">Войти</button>
+      <div class="mgmt-gate-err" id="mgErr"></div>
+      <button type="button" class="mgmt-gate-back" id="hubBackAdmin">← Все сервисы</button>
+      <div class="mgmt-build">сборка 12.08 · 13:40</div>
     </form>
   </div>
-  <div class="ad-panel" id="adPanel">
-    <div class="ad-panel-top">
-      <button class="ad-btn" id="hubBackAdmin2">← Все сервисы</button>
-      <button class="ad-btn" id="adLock">Выйти</button>
-      <span class="ad-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 13:10</span>
+  <div class="mgmt-panel" id="mgPanel">
+    <div class="mgmt-panel-top">
+      <button class="mgmt-btn" id="hubBackAdmin2">← Все сервисы</button>
+      <button class="mgmt-btn" id="mgLock">Выйти</button>
+      <span class="mgmt-build" style="margin:0 0 0 auto;align-self:center">сборка 12.08 · 13:40</span>
     </div>
-<div class="ad-wrap">
+<div class="mgmt-wrap">
 
-  <div class="ad-top">
+  <div class="mgmt-top">
     <h1>Deck Hub</h1>
-    <span class="ad-tag">админка</span>
-    <span class="ad-sp"></span>
-    <button class="ad-btn" id="ad-reload">
+    <span class="mgmt-tag">админка</span>
+    <span class="mgmt-sp"></span>
+    <button class="mgmt-btn" id="mgmt-reload">
       <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.5 5.8"/><path d="M20 4v7h-7"/></svg>
       Обновить
     </button>
     
   </div>
 
-  <div class="ad-tabs" role="tablist">
+  <div class="mgmt-tabs" role="tablist">
     <button role="tab" data-tab="stats" aria-selected="true">Статистика</button>
     <button role="tab" data-tab="cfg" aria-selected="false">Сервисы</button>
     <button role="tab" data-tab="ops" aria-selected="false">Обслуживание</button>
   </div>
 
-  <div id="ad-tab-stats"></div>
-  <div id="ad-tab-cfg" style="display:none"></div>
-  <div id="ad-tab-ops" style="display:none"></div>
+  <div id="mgmt-tab-stats"></div>
+  <div id="mgmt-tab-cfg" style="display:none"></div>
+  <div id="mgmt-tab-ops" style="display:none"></div>
 </div>
-<div class="ad-toast" id="ad-toast"></div>
+<div class="mgmt-toast" id="mgmt-toast"></div>
   </div>
 </section>
 
@@ -3932,21 +3932,21 @@ const DAYS = 30;
 
 /* сервисы и ссылки по умолчанию — ими заполняются пустые таблицы */
 const DEFAULT_SERVICES = [
-  {id:'prompt-deck',name:'Prompt Deck',kicker:'Промты',status:'ready',screen:'deck',tab:null,color:'#ad-2FA37A',preview:'prompts',cta:'Открыть деку',sort:10,
+  {id:'prompt-deck',name:'Prompt Deck',kicker:'Промты',status:'ready',screen:'deck',tab:null,color:'#mgmt-2FA37A',preview:'prompts',cta:'Открыть деку',sort:10,
    descr:'Общая база промтов команды: видео и фото, категории, теги, авторы, копирование в один клик.'},
-  {id:'points',name:'Расчёт поинтов',kicker:'Оценка задач',status:'ready',screen:'calc',tab:null,color:'#ad-2F6BFF',preview:'tiers',cta:'Открыть калькулятор',sort:20,
+  {id:'points',name:'Расчёт поинтов',kicker:'Оценка задач',status:'ready',screen:'calc',tab:null,color:'#mgmt-2F6BFF',preview:'tiers',cta:'Открыть калькулятор',sort:20,
    descr:'Определяет сложность задачи и считает поинты. Звёздочки поднимают тир выше.'},
-  {id:'music',name:'Актуальная музыка',kicker:'Музыка',status:'ready',screen:'music',tab:null,color:'#ad-E8A33C',preview:'wave',cta:'Открыть библиотеку',sort:30,
+  {id:'music',name:'Актуальная музыка',kicker:'Музыка',status:'ready',screen:'music',tab:null,color:'#mgmt-E8A33C',preview:'wave',cta:'Открыть библиотеку',sort:30,
    descr:'Библиотека треков команды: свежие сверху, старые уезжают в архив сами.'},
 ];
 const DEFAULT_LINKS = [
-  {id:'kling',name:'Kling',kicker:'Видео',color:'#ad-2F6BFF',sort:10,descr:'Генерация видео из текста и картинок.',url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
-  {id:'openart',name:'OpenArt',kicker:'Изображения',color:'#ad-7A5AF8',sort:20,descr:'Картинки, стили и апскейл.',url:'https://openart.ai/home'},
-  {id:'vozo',name:'Vozo',kicker:'Липсинк',color:'#ad-E0870B',sort:30,descr:'Подгоняет движение губ под новую озвучку.',url:'https://app.vozo.ai/'},
-  {id:'vmake',name:'Vmake',kicker:'Очистка',color:'#ad-E8596A',sort:40,descr:'Удаление субтитров и водяных знаков.',url:'https://vmake.ai/workspace'},
-  {id:'transcribe',name:'Transcribe',kicker:'Расшифровка',color:'#ad-4E86C6',sort:50,descr:'Достаёт текст из озвучки.',url:'https://login.go-transcribe.com/'},
-  {id:'heygen',name:'HeyGen',kicker:'Аватары',color:'#ad-14A5C4',sort:60,descr:'Говорящие аватары для креативов.',url:'https://app.heygen.com/projects/avatar-videos'},
-  {id:'topview',name:'TopView',kicker:'Аватары',color:'#ad-2FA37A',sort:70,descr:'UGC-аватары для перформанс-креативов.',url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'},
+  {id:'kling',name:'Kling',kicker:'Видео',color:'#mgmt-2F6BFF',sort:10,descr:'Генерация видео из текста и картинок.',url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
+  {id:'openart',name:'OpenArt',kicker:'Изображения',color:'#mgmt-7A5AF8',sort:20,descr:'Картинки, стили и апскейл.',url:'https://openart.ai/home'},
+  {id:'vozo',name:'Vozo',kicker:'Липсинк',color:'#mgmt-E0870B',sort:30,descr:'Подгоняет движение губ под новую озвучку.',url:'https://app.vozo.ai/'},
+  {id:'vmake',name:'Vmake',kicker:'Очистка',color:'#mgmt-E8596A',sort:40,descr:'Удаление субтитров и водяных знаков.',url:'https://vmake.ai/workspace'},
+  {id:'transcribe',name:'Transcribe',kicker:'Расшифровка',color:'#mgmt-4E86C6',sort:50,descr:'Достаёт текст из озвучки.',url:'https://login.go-transcribe.com/'},
+  {id:'heygen',name:'HeyGen',kicker:'Аватары',color:'#mgmt-14A5C4',sort:60,descr:'Говорящие аватары для креативов.',url:'https://app.heygen.com/projects/avatar-videos'},
+  {id:'topview',name:'TopView',kicker:'Аватары',color:'#mgmt-2FA37A',sort:70,descr:'UGC-аватары для перформанс-креативов.',url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'},
 ];
 
 const NAMES = {hub:'Главная', 'prompt-deck':'Prompt Deck', points:'Расчёт поинтов', talk:'Разговорные генерации', music:'Актуальная музыка'};
@@ -3984,7 +3984,7 @@ const plural = (n,a,b,c) => { const x=Math.abs(n)%100, y=x%10;
   return x>10&&x<20?c : y>1&&y<5?b : y===1?a : c; };
 const dayKey = d => d.toISOString().slice(0,10);
 let tt;
-function toast(m){ const e=$('#ad-toast'); e.textContent=m; e.classList.add('ad-on'); clearTimeout(tt); tt=setTimeout(()=>e.classList.remove('ad-on'),2600); }
+function toast(m){ const e=$('#mgmt-toast'); e.textContent=m; e.classList.add('mgmt-on'); clearTimeout(tt); tt=setTimeout(()=>e.classList.remove('mgmt-on'),2600); }
 
 /* ── запросы ─────────────────────────────────────────────────────── */
 async function api(db, path, opts={}){
@@ -4023,16 +4023,16 @@ async function loadAll(){
 
 /* ── статистика ──────────────────────────────────────────────────── */
 function renderStats(){
-  const box = $('#ad-tab-stats');
+  const box = $('#mgmt-tab-stats');
   if(failed){
-    box.innerHTML = `<div class="ad-card"><div class="ad-lab">база не отвечает</div>
+    box.innerHTML = `<div class="mgmt-card"><div class="mgmt-lab">база не отвечает</div>
       <div style="font-size:14px">${esc(failed)}</div>
-      <div class="ad-note ad-warn"><span>!</span><span>Если таблиц ещё нет — выполните <b>hub-admin.sql</b> в SQL Editor проекта Prompt Deck, затем нажмите «Обновить».</span></div></div>`;
+      <div class="mgmt-note mgmt-warn"><span>!</span><span>Если таблиц ещё нет — выполните <b>hub-admin.sql</b> в SQL Editor проекта Prompt Deck, затем нажмите «Обновить».</span></div></div>`;
     return;
   }
   if(!events.length){
-    box.innerHTML = `<div class="ad-card"><div class="ad-lab">пока пусто</div>
-      <div class="ad-empty">Событий за ${DAYS} дней нет. Откройте хаб в другой вкладке — первое событие появится сразу.</div></div>`;
+    box.innerHTML = `<div class="mgmt-card"><div class="mgmt-lab">пока пусто</div>
+      <div class="mgmt-empty">Событий за ${DAYS} дней нет. Откройте хаб в другой вкладке — первое событие появится сразу.</div></div>`;
     return;
   }
 
@@ -4071,9 +4071,9 @@ function renderStats(){
 
   const bars = rows => {
     const max = Math.max(1, ...rows.map(r=>r[1]));
-    return `<div class="ad-bars">${rows.map(([k,v]) => `
-      <div class="ad-bar"><span class="ad-n">${esc(k)}</span><span class="ad-c">${v}</span>
-        <span class="ad-t"><i style="width:${Math.round(v/max*100)}%"></i></span></div>`).join('')}</div>`;
+    return `<div class="mgmt-bars">${rows.map(([k,v]) => `
+      <div class="mgmt-bar"><span class="mgmt-n">${esc(k)}</span><span class="mgmt-c">${v}</span>
+        <span class="mgmt-t"><i style="width:${Math.round(v/max*100)}%"></i></span></div>`).join('')}</div>`;
   };
 
   /* онлайн — обновлялись за последние три минуты; вкладка в фоне тоже считается */
@@ -4088,159 +4088,159 @@ function renderStats(){
   const where = p => NAMES[p.screen] || p.screen || 'хаб';
 
   const presenceCard = presence.length ? `
-    <div class="ad-card">
-      <div class="ad-lab">сейчас в хабе — ${online.length}</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">сейчас в хабе — ${online.length}</div>
       ${online.length ? `<table><tbody>${online.map(p => `
         <tr>
           <td style="width:34%">${who(p)}</td>
           <td>${esc(where(p))}</td>
-          <td class="ad-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
-          <td class="ad-mono" style="text-align:right">${ago(p.ago)}</td>
+          <td class="mgmt-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
+          <td class="mgmt-mono" style="text-align:right">${ago(p.ago)}</td>
         </tr>`).join('')}</tbody></table>`
-        : '<div class="ad-empty">Прямо сейчас хаб ни у кого не открыт.</div>'}
-      ${today.length ? `<div class="ad-lab" style="margin:18px 0 10px">были сегодня</div>
+        : '<div class="mgmt-empty">Прямо сейчас хаб ни у кого не открыт.</div>'}
+      ${today.length ? `<div class="mgmt-lab" style="margin:18px 0 10px">были сегодня</div>
         <table><tbody>${today.map(p => `
         <tr><td style="width:34%">${who(p)}</td><td>${esc(where(p))}</td>
-            <td class="ad-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
-            <td class="ad-mono" style="text-align:right">${ago(p.ago)}</td></tr>`).join('')}</tbody></table>` : ''}
-      <div class="ad-note ad-info"><span>i</span><span>Имя берётся из деки — его выбирают при добавлении промта. Кто ничего не добавлял, показан как браузер. Вкладка в фоне тоже считается открытой.</span></div>
+            <td class="mgmt-mono">${p.device === 'mobile' ? 'телефон' : 'компьютер'}</td>
+            <td class="mgmt-mono" style="text-align:right">${ago(p.ago)}</td></tr>`).join('')}</tbody></table>` : ''}
+      <div class="mgmt-note mgmt-info"><span>i</span><span>Имя берётся из деки — его выбирают при добавлении промта. Кто ничего не добавлял, показан как браузер. Вкладка в фоне тоже считается открытой.</span></div>
     </div>` : '';
 
   box.innerHTML = presenceCard + `
-    <div class="ad-kpis">
-      <div class="ad-kpi"><div class="ad-v">${opens7.length}</div><div class="ad-k">открытий за 7 дней</div>
-        <div class="ad-d">за ${DAYS} дней — ${opens.length}</div></div>
-      <div class="ad-kpi"><div class="ad-v">${visitors7.size}</div><div class="ad-k">браузеров за 7 дней</div>
-        <div class="ad-d">всего ${visitors.size} ${plural(visitors.size,'браузер','браузера','браузеров')}</div></div>
-      <div class="ad-kpi"><div class="ad-v">${acts.length}</div><div class="ad-k">нажатий кнопок</div>
-        <div class="ad-d">${topDeed ? 'чаще всего: ' + esc(topDeed[0].toLowerCase()) + ' — ' + topDeed[1] : 'пока ничего не нажимали'}</div></div>
-      <div class="ad-kpi"><div class="ad-v">${Math.round(mobile/events.length*100)}%</div><div class="ad-k">с телефона</div>
-        <div class="ad-d">по ширине экрана</div></div>
+    <div class="mgmt-kpis">
+      <div class="mgmt-kpi"><div class="mgmt-v">${opens7.length}</div><div class="mgmt-k">открытий за 7 дней</div>
+        <div class="mgmt-d">за ${DAYS} дней — ${opens.length}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${visitors7.size}</div><div class="mgmt-k">браузеров за 7 дней</div>
+        <div class="mgmt-d">всего ${visitors.size} ${plural(visitors.size,'браузер','браузера','браузеров')}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${acts.length}</div><div class="mgmt-k">нажатий кнопок</div>
+        <div class="mgmt-d">${topDeed ? 'чаще всего: ' + esc(topDeed[0].toLowerCase()) + ' — ' + topDeed[1] : 'пока ничего не нажимали'}</div></div>
+      <div class="mgmt-kpi"><div class="mgmt-v">${Math.round(mobile/events.length*100)}%</div><div class="mgmt-k">с телефона</div>
+        <div class="mgmt-d">по ширине экрана</div></div>
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">открытия по дням, две недели</div>
-      <div class="ad-spark">${days.map(([k,v]) =>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">открытия по дням, две недели</div>
+      <div class="mgmt-spark">${days.map(([k,v]) =>
         `<div title="${k}: ${v}"><i style="height:${Math.round(v/maxDay*100)}%"></i></div>`).join('')}</div>
-      <div class="ad-spark-x">${days.map(([k],i) =>
+      <div class="mgmt-spark-x">${days.map(([k],i) =>
         `<span>${i%2===0 ? k.slice(8)+'.'+k.slice(5,7) : ''}</span>`).join('')}</div>
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">какие сервисы открывают</div>
-      ${svcRows.length ? bars(svcRows.map(([k,v]) => [NAMES[k]||k, v])) : '<div class="ad-empty">Пока никто не заходил внутрь сервисов.</div>'}
+    <div class="mgmt-card">
+      <div class="mgmt-lab">какие сервисы открывают</div>
+      ${svcRows.length ? bars(svcRows.map(([k,v]) => [NAMES[k]||k, v])) : '<div class="mgmt-empty">Пока никто не заходил внутрь сервисов.</div>'}
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">внешние сервисы</div>
-      ${linkRows.length ? bars(linkRows.map(([k,v]) => [linkName(k), v])) : '<div class="ad-empty">Внешние ссылки ещё не нажимали.</div>'}
+    <div class="mgmt-card">
+      <div class="mgmt-lab">внешние сервисы</div>
+      ${linkRows.length ? bars(linkRows.map(([k,v]) => [linkName(k), v])) : '<div class="mgmt-empty">Внешние ссылки ещё не нажимали.</div>'}
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">что именно нажимали</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">что именно нажимали</div>
       ${actRows.length ? `<table>
-        <thead><tr><th>Действие</th><th class="ad-mono" style="text-align:right;width:70px">раз</th></tr></thead>
+        <thead><tr><th>Действие</th><th class="mgmt-mono" style="text-align:right;width:70px">раз</th></tr></thead>
         <tbody>${actRows.map(([k,v]) => `<tr><td>${esc(k)}</td>
-          <td class="ad-mono" style="text-align:right">${v}</td></tr>`).join('')}</tbody></table>`
-        : '<div class="ad-empty">Кнопки внутри сервисов пока не нажимали.</div>'}
+          <td class="mgmt-mono" style="text-align:right">${v}</td></tr>`).join('')}</tbody></table>`
+        : '<div class="mgmt-empty">Кнопки внутри сервисов пока не нажимали.</div>'}
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">последние события</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">последние события</div>
       <table>
-        <thead><tr><th class="ad-mono">когда</th><th>что</th><th>где</th><th class="ad-mono">браузер</th></tr></thead>
+        <thead><tr><th class="mgmt-mono">когда</th><th>что</th><th>где</th><th class="mgmt-mono">браузер</th></tr></thead>
         <tbody>${events.slice(0,25).map(e => `
           <tr>
-            <td class="ad-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+            <td class="mgmt-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
             <td>${e.kind === 'open' ? 'открыл' : esc(deedName(e))}</td>
             <td>${esc(e.kind === 'open' ? (NAMES[e.service]||e.service)
                   : (e.service.startsWith('link:') ? 'внешний сервис' : (NAMES[e.service]||e.service)))}</td>
-            <td class="ad-mono">${String(e.visitor).slice(0,6)}${e.device==='mobile'?' · моб':''}</td>
+            <td class="mgmt-mono">${String(e.visitor).slice(0,6)}${e.device==='mobile'?' · моб':''}</td>
           </tr>`).join('')}</tbody>
       </table>
     </div>
 
-    <div class="ad-note ad-info"><span>i</span><span>Считаются браузеры, а не люди: другой браузер или очистка данных дают новый идентификатор. Один человек с телефона и ноутбука — это два браузера.</span></div>`;
+    <div class="mgmt-note mgmt-info"><span>i</span><span>Считаются браузеры, а не люди: другой браузер или очистка данных дают новый идентификатор. Один человек с телефона и ноутбука — это два браузера.</span></div>`;
 }
 
 /* ── управление ──────────────────────────────────────────────────── */
 function renderCfg(){
-  const box = $('#ad-tab-cfg');
-  if(failed){ box.innerHTML = `<div class="ad-card"><div class="ad-empty">${esc(failed)}</div></div>`; return; }
+  const box = $('#mgmt-tab-cfg');
+  if(failed){ box.innerHTML = `<div class="mgmt-card"><div class="mgmt-empty">${esc(failed)}</div></div>`; return; }
 
   if(!services.length && !links.length){
-    box.innerHTML = `<div class="ad-card">
-      <div class="ad-lab">таблицы пустые</div>
+    box.innerHTML = `<div class="mgmt-card">
+      <div class="mgmt-lab">таблицы пустые</div>
       <div style="font-size:14px;margin-bottom:14px">Пока в базе нет ни сервисов, ни ссылок — хаб работает на встроенном в код списке. Заполните таблицы текущими значениями, и дальше правки можно делать здесь.</div>
-      <button class="ad-btn ad-go" id="ad-seed">Заполнить из кода</button>
-      <div class="ad-note ad-warn"><span>!</span><span>После заполнения хаб начнёт брать список из базы. Встроенный список останется запасным — если база не ответит, страница покажет его.</span></div>
+      <button class="mgmt-btn mgmt-go" id="mgmt-seed">Заполнить из кода</button>
+      <div class="mgmt-note mgmt-warn"><span>!</span><span>После заполнения хаб начнёт брать список из базы. Встроенный список останется запасным — если база не ответит, страница покажет его.</span></div>
     </div>`;
-    $('#ad-seed').onclick = seed;
+    $('#mgmt-seed').onclick = seed;
     return;
   }
 
   box.innerHTML = `
-    <div class="ad-card">
-      <div class="ad-lab">сервисы внутри хаба</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">сервисы внутри хаба</div>
       <table><thead><tr>
-        <th>Название</th><th>Раздел</th><th>Статус</th><th class="ad-mono">порядок</th><th></th>
+        <th>Название</th><th>Раздел</th><th>Статус</th><th class="mgmt-mono">порядок</th><th></th>
       </tr></thead><tbody>
       ${services.map(s => `
         <tr data-id="${esc(s.id)}" data-kind="svc">
-          <td><input class="ad-in" data-f="name" value="${esc(s.name)}"></td>
-          <td><input class="ad-in ad-s" data-f="kicker" value="${esc(s.kicker||'')}"></td>
+          <td><input class="mgmt-in" data-f="name" value="${esc(s.name)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="kicker" value="${esc(s.kicker||'')}"></td>
           <td>
-            <select class="ad-in ad-s" data-f="status">
+            <select class="mgmt-in mgmt-s" data-f="status">
               ${['ready','beta','soon'].map(v=>`<option value="${v}"${s.status===v?' selected':''}>${{ready:'работает',beta:'бета',soon:'скоро'}[v]}</option>`).join('')}
             </select>
           </td>
-          <td><input class="ad-in ad-s" data-f="sort" type="number" value="${s.sort ?? 0}"></td>
-          <td class="ad-rowbtns">
-            <button class="ad-ico" data-act="hide" title="${s.hidden?'Показать':'Скрыть'}">${s.hidden
+          <td><input class="mgmt-in mgmt-s" data-f="sort" type="number" value="${s.sort ?? 0}"></td>
+          <td class="mgmt-rowbtns">
+            <button class="mgmt-ico" data-act="hide" title="${s.hidden?'Показать':'Скрыть'}">${s.hidden
               ? '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
               : '<svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 004.2 4.2"/><path d="M9.9 5.2A9.7 9.7 0 0112 5c6 0 10 7 10 7a18 18 0 01-2.4 3.2M6.5 6.6A18 18 0 002 12s4 7 10 7c1 0 2-.2 2.8-.5"/></svg>'}</button>
-            <button class="ad-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+            <button class="mgmt-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
           </td>
         </tr>
         <tr data-id="${esc(s.id)}" data-kind="svc">
-          <td colspan="5" style="padding-top:0"><input class="ad-in" data-f="descr" value="${esc(s.descr||'')}" placeholder="описание на плитке"></td>
+          <td colspan="5" style="padding-top:0"><input class="mgmt-in" data-f="descr" value="${esc(s.descr||'')}" placeholder="описание на плитке"></td>
         </tr>`).join('')}
       </tbody></table>
-      <div class="ad-note ad-info"><span>i</span><span>Скрытый сервис исчезает с главной, но остаётся в базе. Порядок задаётся числом: меньше — выше.</span></div>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>Скрытый сервис исчезает с главной, но остаётся в базе. Порядок задаётся числом: меньше — выше.</span></div>
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">внешние сервисы</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">внешние сервисы</div>
       <table><thead><tr>
-        <th>Название</th><th>Раздел</th><th>Ссылка</th><th class="ad-mono">порядок</th><th></th>
+        <th>Название</th><th>Раздел</th><th>Ссылка</th><th class="mgmt-mono">порядок</th><th></th>
       </tr></thead><tbody>
       ${links.map(l => `
         <tr data-id="${esc(l.id)}" data-kind="link">
-          <td><input class="ad-in" data-f="name" value="${esc(l.name)}"></td>
-          <td><input class="ad-in ad-s" data-f="kicker" value="${esc(l.kicker||'')}"></td>
-          <td><input class="ad-in" data-f="url" value="${esc(l.url)}"></td>
-          <td><input class="ad-in ad-s" data-f="sort" type="number" value="${l.sort ?? 0}"></td>
-          <td class="ad-rowbtns">
-            <button class="ad-ico" data-act="hide" title="${l.hidden?'Показать':'Скрыть'}">${l.hidden?'👁':'∅'}</button>
-            <button class="ad-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
-            <button class="ad-ico" data-act="del" title="Удалить"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+          <td><input class="mgmt-in" data-f="name" value="${esc(l.name)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="kicker" value="${esc(l.kicker||'')}"></td>
+          <td><input class="mgmt-in" data-f="url" value="${esc(l.url)}"></td>
+          <td><input class="mgmt-in mgmt-s" data-f="sort" type="number" value="${l.sort ?? 0}"></td>
+          <td class="mgmt-rowbtns">
+            <button class="mgmt-ico" data-act="hide" title="${l.hidden?'Показать':'Скрыть'}">${l.hidden?'👁':'∅'}</button>
+            <button class="mgmt-ico" data-act="save" title="Сохранить"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+            <button class="mgmt-ico" data-act="del" title="Удалить"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
           </td>
         </tr>
         <tr data-id="${esc(l.id)}" data-kind="link">
-          <td colspan="5" style="padding-top:0"><input class="ad-in" data-f="descr" value="${esc(l.descr||'')}" placeholder="описание на плитке"></td>
+          <td colspan="5" style="padding-top:0"><input class="mgmt-in" data-f="descr" value="${esc(l.descr||'')}" placeholder="описание на плитке"></td>
         </tr>`).join('')}
       </tbody></table>
 
       <div style="display:flex;gap:9px;align-items:center;margin-top:14px;flex-wrap:wrap">
-        <input class="ad-in" id="ad-newId" placeholder="id, латиницей" style="width:150px">
-        <input class="ad-in" id="ad-newName" placeholder="Название" style="width:170px">
-        <input class="ad-in" id="ad-newUrl" placeholder="https://…" style="flex:1;min-width:200px">
-        <button class="ad-btn ad-go" id="ad-addLink">Добавить</button>
+        <input class="mgmt-in" id="mgmt-newId" placeholder="id, латиницей" style="width:150px">
+        <input class="mgmt-in" id="mgmt-newName" placeholder="Название" style="width:170px">
+        <input class="mgmt-in" id="mgmt-newUrl" placeholder="https://…" style="flex:1;min-width:200px">
+        <button class="mgmt-btn mgmt-go" id="mgmt-addLink">Добавить</button>
       </div>
     </div>`;
 
-  box.querySelectorAll('.ad-ico').forEach(b => b.onclick = () => rowAction(b));
-  $('#ad-addLink').onclick = addLink;
+  box.querySelectorAll('.mgmt-ico').forEach(b => b.onclick = () => rowAction(b));
+  $('#mgmt-addLink').onclick = addLink;
 }
 
 function rowFields(id, kind){
@@ -4273,12 +4273,12 @@ async function rowAction(btn){
   }catch(e){ toast('Не получилось: ' + e.message); }
 }
 async function addLink(){
-  const id = $('#ad-newId').value.trim(), name = $('#ad-newName').value.trim();
-  let url = $('#ad-newUrl').value.trim();
+  const id = $('#mgmt-newId').value.trim(), name = $('#mgmt-newName').value.trim();
+  let url = $('#mgmt-newUrl').value.trim();
   if(!id || !name || !url){ toast('Нужны id, название и ссылка'); return; }
   if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
   try{
-    await post(MAIN, 'hub_links', { id, name, url, sort:(links.length+1)*10, color:'#ad-2F6BFF' });
+    await post(MAIN, 'hub_links', { id, name, url, sort:(links.length+1)*10, color:'#mgmt-2F6BFF' });
     toast('Добавлено'); await loadAll();
   }catch(e){ toast('Не получилось: ' + e.message); }
 }
@@ -4293,47 +4293,47 @@ async function seed(){
 /* ── обслуживание ────────────────────────────────────────────────── */
 function renderOps(){
   const mine = (()=>{ try{ return localStorage.getItem('deckhub.visitor') || '' }catch(e){ return '' } })();
-  $('#ad-tab-ops').innerHTML = `
-    <div class="ad-card">
-      <div class="ad-lab">резервные копии</div>
+  $('#mgmt-tab-ops').innerHTML = `
+    <div class="mgmt-card">
+      <div class="mgmt-lab">резервные копии</div>
       <div style="font-size:14px;margin-bottom:14px">Скачивает содержимое базы в JSON. Файлы — единственная защита от случайного удаления: политики доступа открыты, и промт может удалить любой, кто открыл деку.</div>
       <div style="display:flex;gap:9px;flex-wrap:wrap">
-        <button class="ad-btn" id="ad-dumpPrompts">Промты</button>
-        <button class="ad-btn" id="ad-dumpMusic">Треки</button>
-        <button class="ad-btn" id="ad-dumpEvents">События</button>
+        <button class="mgmt-btn" id="mgmt-dumpPrompts">Промты</button>
+        <button class="mgmt-btn" id="mgmt-dumpMusic">Треки</button>
+        <button class="mgmt-btn" id="mgmt-dumpEvents">События</button>
       </div>
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">чистка статистики</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">чистка статистики</div>
       <div style="font-size:14px;margin-bottom:14px">Удаляет строки из таблицы событий. Отменить нельзя — сначала скачайте выгрузку выше.</div>
       <div style="display:flex;gap:9px;flex-wrap:wrap">
-        <button class="ad-btn" id="ad-wipeOld">Старше 90 дней</button>
-        <button class="ad-btn" id="ad-wipeMine"${mine?'':' disabled title="в этом браузере хаб ещё не открывали"'}>Свои события</button>
-        <button class="ad-btn ad-bad" id="ad-wipeAll">Удалить всё</button>
+        <button class="mgmt-btn" id="mgmt-wipeOld">Старше 90 дней</button>
+        <button class="mgmt-btn" id="mgmt-wipeMine"${mine?'':' disabled title="в этом браузере хаб ещё не открывали"'}>Свои события</button>
+        <button class="mgmt-btn mgmt-bad" id="mgmt-wipeAll">Удалить всё</button>
       </div>
-      <div class="ad-note ad-info"><span>i</span><span>«Свои» — события этого браузера${mine?' ('+mine.slice(0,6)+'…)':''}: то, что вы наделали при проверке. Список «кто сейчас в хабе» живёт в другой таблице и чистится сам.</span></div>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>«Свои» — события этого браузера${mine?' ('+mine.slice(0,6)+'…)':''}: то, что вы наделали при проверке. Список «кто сейчас в хабе» живёт в другой таблице и чистится сам.</span></div>
     </div>
 
-    <div class="ad-card">
-      <div class="ad-lab">если понадобится закрыть удаление</div>
+    <div class="mgmt-card">
+      <div class="mgmt-lab">если понадобится закрыть удаление</div>
       <div style="font-size:14px;margin-bottom:12px">Кнопки работают, потому что политика разрешает удаление всем, кто открыл сайт. Вернуть запрет — выполнить в SQL Editor:</div>
       <div style="font-family:var(--mono);font-size:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:12px;white-space:pre-wrap">drop policy "hub_events delete" on public.hub_events;</div>
     </div>`;
 
-  $('#ad-dumpPrompts').onclick = () => dump(MAIN, 'prompts?select=*', 'prompts');
-  $('#ad-dumpMusic').onclick   = () => dump(MUSIC, 'music?select=*', 'music');
-  $('#ad-dumpEvents').onclick  = () => dump(MAIN, 'hub_events?select=*&order=at.desc&limit=20000', 'hub_events');
+  $('#mgmt-dumpPrompts').onclick = () => dump(MAIN, 'prompts?select=*', 'prompts');
+  $('#mgmt-dumpMusic').onclick   = () => dump(MUSIC, 'music?select=*', 'music');
+  $('#mgmt-dumpEvents').onclick  = () => dump(MAIN, 'hub_events?select=*&order=at.desc&limit=20000', 'hub_events');
 
-  $('#ad-wipeOld').onclick = () => {
+  $('#mgmt-wipeOld').onclick = () => {
     const edge = new Date(Date.now() - 90*864e5).toISOString();
     wipe(`hub_events?at=lt.${edge}`, 'Удалить события старше 90 дней?');
   };
-  $('#ad-wipeMine').onclick = () => {
+  $('#mgmt-wipeMine').onclick = () => {
     if(!mine) return;
     wipe(`hub_events?visitor=eq.${mine}`, 'Удалить все события этого браузера?');
   };
-  $('#ad-wipeAll').onclick = async () => {
+  $('#mgmt-wipeAll').onclick = async () => {
     const word = prompt('Удалить всю статистику без возврата.\nВведите УДАЛИТЬ, чтобы подтвердить:');
     if((word||'').trim().toUpperCase() !== 'УДАЛИТЬ'){ toast('Отменено'); return; }
     wipe('hub_events?id=gt.0', null);
@@ -4369,20 +4369,20 @@ async function dump(db, path, name){
 }
 
 /* ── связка ──────────────────────────────────────────────────────── */
-ROOT.querySelectorAll('.ad-tabs button').forEach(b => b.onclick = () => {
-  ROOT.querySelectorAll('.ad-tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+ROOT.querySelectorAll('.mgmt-tabs button').forEach(b => b.onclick = () => {
+  ROOT.querySelectorAll('.mgmt-tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
   ['stats','cfg','ops'].forEach(k => {
-    const el = ROOT.querySelector('#ad-tab-'+k);
+    const el = ROOT.querySelector('#mgmt-tab-'+k);
     if(el) el.style.display = b.dataset.tab === k ? '' : 'none';
   });
 });
-$('#ad-reload').onclick = () => { toast('Обновляю…'); loadAll(); };
+$('#mgmt-reload').onclick = () => { toast('Обновляю…'); loadAll(); };
 /* список «кто сейчас» быстро устаёт, поэтому подтягиваем его сам раз в минуту */
 setInterval(async () => {
   if(failed || document.hidden) return;
   try{
     presence = await get(MAIN, 'hub_presence?select=*&order=last_seen.desc');
-    if($('#ad-tab-stats').style.display !== 'none') renderStats();
+    if($('#mgmt-tab-stats').style.display !== 'none') renderStats();
   }catch(e){}
 }, 60000);
 
@@ -4703,7 +4703,7 @@ let LINKS = [
      панель не может остаться скрытой из-за неожиданного CSS. */
   const byId = id => document.getElementById(id);
   function openPanel(){
-    const screen=byId('screenAdmin'), gate=byId('adGate'), panel=byId('adPanel');
+    const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
     if(screen) screen.classList.add('authed');
     if(gate){ gate.style.setProperty('display','none','important'); gate.hidden=true; }
     if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
@@ -4717,7 +4717,7 @@ let LINKS = [
      просто возвращаем видимость и запоминаем, сколько раз пришлось. */
   let guardFixes = 0, guardStop = null;
   function guardPanel(){
-    const panel=byId('adPanel'), gate=byId('adGate');
+    const panel=byId('mgPanel'), gate=byId('mgGate');
     if(!panel) return;
     clearInterval(guardStop);
     const check = ()=>{
@@ -4736,13 +4736,13 @@ let LINKS = [
     check();
   }
   function closePanel(){
-    const screen=byId('screenAdmin'), gate=byId('adGate'), panel=byId('adPanel');
+    const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
     if(screen) screen.classList.remove('authed');
     if(gate){ gate.style.removeProperty('display'); gate.hidden=false; }
     if(panel){ panel.style.setProperty('display','none','important'); panel.hidden=true; }
   }
   function initAdmin(){
-    const form=byId('adGateForm'), inp=byId('adPass'), err=byId('adErr');
+    const form=byId('mgGateForm'), inp=byId('mgPass'), err=byId('mgErr');
     if(!form || !inp || !err) return;
     async function tryLogin(){
       const pass=(inp.value||'').trim();          // пробел из автозаполнения — частая причина отказа
@@ -4757,19 +4757,19 @@ let LINKS = [
       openPanel();
     }
     form.addEventListener('submit', e=>{ e.preventDefault(); tryLogin(); });
-    const go=byId('adGo');
+    const go=byId('mgGo');
     if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
     inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
     /* браузер часто подставляет сюда сохранённый пароль от домена —
        кнопка «показать» позволяет увидеть, что в поле на самом деле */
-    const eye=byId('adEye');
+    const eye=byId('mgEye');
     if(eye) eye.onclick=()=>{
       const hidden = inp.type==='password';
       inp.type = hidden ? 'text' : 'password';
       eye.textContent = hidden ? 'скрыть' : 'показать';
       inp.focus();
     };
-    const lock=byId('adLock');
+    const lock=byId('mgLock');
     if(lock) lock.onclick=()=>{
       try{ sessionStorage.removeItem(SESSION) }catch(e){}
       closePanel(); inp.value=''; err.textContent='';
@@ -4783,7 +4783,7 @@ let LINKS = [
     hideAll(); target.classList.add('on');
     document.title='Админ-панель — Deck Hub';
     window.scrollTo({top:0});
-    if(authed()) openPanel(); else { const p=byId('adPass'); if(p) setTimeout(()=>p.focus(),50); }
+    if(authed()) openPanel(); else { const p=byId('mgPass'); if(p) setTimeout(()=>p.focus(),50); }
   }
 
   window.addEventListener('hashchange',()=>{
@@ -5077,7 +5077,7 @@ let LINKS = [
       rows.push(s.id + ': display=' + st.display + ' высота=' + s.offsetHeight +
                 ' класс on=' + s.classList.contains('on') + ' текста=' + (s.innerText || '').trim().length);
     });
-    var g = document.getElementById('adGate'), p = document.getElementById('adPanel');
+    var g = document.getElementById('mgGate'), p = document.getElementById('mgPanel');
     if(g) rows.push('форма входа: display=' + getComputedStyle(g).display + ' высота=' + g.offsetHeight);
     if(p) rows.push('панель: display=' + getComputedStyle(p).display + ' высота=' + p.offsetHeight +
                     ' символов внутри=' + (p.textContent || '').trim().length +

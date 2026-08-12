@@ -1522,7 +1522,9 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       </div></details>
       <details class="ref"><summary>Разговорные генерации</summary><div class="body">
         <div class="defrow"><div class="dt">Простые · Low</div><div class="dd">Есть понятный референс, распространённый сценарий, один объект или персонаж без доп. действий (фон может быть живой), нет сюжетного развития — достаточно адаптировать существующую идею. Сюда же Medium-случай, если есть готовый отработанный промпт.</div></div>
-        <div class="defrow"><div class="dt">Обычные · Medium</div><div class="dd">Есть дополнительное действие (нарезать овощи, упаковать чемодан, езда на велосипеде); есть моушн в генерации — рассказчик говорит, затем камера уводит на другой объект; два человека говорят в одном кадре одной генерацией.</div></div>
+        <div class="defrow"><div class="dt">Обычные · Medium</div><div class="dd">Есть дополнительное действие (нарезать овощи, упаковать чемодан, езда на велосипеде); есть моушн в генерации — рассказчик говорит, затем камера уводит на другой объект; два человека говорят в одном кадре одной генерацией. Сюда же аватар, созданный через новую нативную фотографию, которую перегенерировали под окружение или профессию, и аватар из новой нативной нестандартной фотографии.</div></div>
+        <div class="defrow"><div class="dt">Нестандартная фотография</div><div class="dd">Человек или селфи с конкретной локацией, профессией и подобным по ТЗ.</div></div>
+        <div class="defrow"><div class="dt">Стандартная фотография</div><div class="dd">Примитивное селфи: без конкретной локации по ТЗ, без конкретной профессии. Аватары из таких фотографий считаются простыми.</div></div>
         <div class="defrow"><div class="dt">Сложные · High</div><div class="dd">Два человека в одном кадре двумя генерациями (диалог); один человек делает несколько разных действий — например, снимает деньги в банкомате, потом идёт по улице и платит на кассе.</div></div>
       </div></details>
       <details class="ref"><summary>Правила, которые калькулятор не считает автоматически</summary><div class="body">
@@ -3486,6 +3488,16 @@ const QUESTIONS = [
     ]
   },
   {
+    id:'photo', title:'Откуда аватар',
+    hint:'Нестандартная фотография — человек или селфи с конкретной локацией, профессией и подобным по ТЗ. Стандартная — примитивное селфи без всего этого.',
+    opts:[
+      { v:'none',     lbl:'Готовый или прикреплённый аватар',        sub:'Своё фото не заводили', tier:null },
+      { v:'standard', lbl:'Новая стандартная фотография',            sub:'Примитивное селфи без локации и профессии — такие аватары простые', tier:null },
+      { v:'nonstd',   lbl:'Новая нативная нестандартная фотография', sub:'Локация или профессия заданы ТЗ', tier:'medium' },
+      { v:'regen',    lbl:'Новое нативное фото + перегенерация',     sub:'Фото вписывали в окружение или профессию для генерации видео', tier:'medium' },
+    ]
+  },
+  {
     id:'prompt', title:'Промт',
     hint:'Готовый отработанный промт понижает оценку до простых, даже если признаки обычных есть.',
     opts:[
@@ -3495,7 +3507,7 @@ const QUESTIONS = [
   },
 ];
 
-const state = { people:'one', action:'none', motion:'no', source:'gen', prompt:'new', creo:6 };
+const state = { people:'one', action:'none', motion:'no', source:'gen', photo:'none', prompt:'new', creo:6 };
 const PRESETS = [3, 6, 8];
 const ROOT = document.getElementById('tab-talk');
 const visible = () => ROOT.style.display !== 'none';
@@ -3693,7 +3705,7 @@ document.addEventListener('keydown', e => {
 });
 
 $('#tReset').onclick = () => {
-  Object.assign(state, { people:'one', action:'none', motion:'no', source:'gen', prompt:'new', creo:6 });
+  Object.assign(state, { people:'one', action:'none', motion:'no', source:'gen', photo:'none', prompt:'new', creo:6 });
   render(); toast('Сброшено');
 };
 

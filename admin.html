@@ -87,7 +87,18 @@ html,body{margin:0}
 #screenAdmin .mgmt-bar .mgmt-t{grid-column:1/-1;height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden}
 #screenAdmin .mgmt-bar .mgmt-t i{display:block;height:100%;border-radius:3px;background:var(--accent)}
 #screenAdmin .mgmt-spark{display:flex;align-items:flex-end;gap:3px;height:82px}
-#screenAdmin .mgmt-spark div{flex:1;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:3px 3px 0 0;position:relative;min-height:3px}
+#screenAdmin .mgmt-spark div{
+  flex:1;background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:3px 3px 0 0;position:relative;min-height:3px;
+  display:flex;align-items:flex-start;justify-content:center;
+}
+/* нулевой день — черта на базовой линии, а не столбик: иначе пустой график
+   выглядит как ряд подчёркиваний и кажется сломанным */
+#screenAdmin .mgmt-spark div.mgmt-zero{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;min-height:1px;align-self:flex-end}
+#screenAdmin .mgmt-spark div b{
+  position:absolute;top:-15px;left:0;right:0;text-align:center;
+  font-family:var(--mono);font-size:9.5px;font-weight:400;color:var(--muted);
+}
 #screenAdmin .mgmt-spark div i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:2px 2px 0 0}
 #screenAdmin .mgmt-spark-x{display:flex;gap:3px;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--faint)}
 #screenAdmin .mgmt-spark-x span{flex:1;text-align:center;overflow:hidden}
@@ -407,6 +418,9 @@ function renderStats(){
   const idx = Object.fromEntries(days.map(([k],i)=>[k,i]));
   opens.forEach(e => { const k = dayKey(new Date(e.at)); if(k in idx) days[idx[k]][1]++; });
   const maxDay = Math.max(1, ...days.map(d=>d[1]));
+  const liveDays = days.filter(d => d[1] > 0).length;          // дней, в которые вообще заходили
+  const weekSum = days.slice(-7).reduce((s,d) => s + d[1], 0);
+  const prevSum = days.slice(0,7).reduce((s,d) => s + d[1], 0);
 
   /* внешние ссылки */
   const byLink = {};
@@ -477,13 +491,16 @@ function renderStats(){
         <div class="mgmt-d">по ширине экрана</div></div>
     </div>
 
-    <div class="mgmt-card">
+    ${liveDays < 3 ? '' : `<div class="mgmt-card">
       <div class="mgmt-lab">открытия по дням, две недели</div>
       <div class="mgmt-spark">${days.map(([k,v]) =>
-        `<div title="${k}: ${v}"><i style="height:${Math.round(v/maxDay*100)}%"></i></div>`).join('')}</div>
+        `<div class="${v ? '' : 'mgmt-zero'}" title="${k}: ${v}">${v ? '<b>'+v+'</b>' : ''}<i style="height:${Math.round(v/maxDay*100)}%"></i></div>`).join('')}</div>
       <div class="mgmt-spark-x">${days.map(([k],i) =>
         `<span>${i%2===0 ? k.slice(8)+'.'+k.slice(5,7) : ''}</span>`).join('')}</div>
-    </div>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>За последнюю неделю ${weekSum}, за предыдущую ${prevSum}.
+        ${prevSum ? (weekSum > prevSum ? 'Стали заходить чаще.' : weekSum < prevSum ? 'Стали заходить реже.' : 'Ровно столько же.')
+                  : 'Сравнивать пока не с чем — статистика молодая.'}</span></div>
+    </div>`}
 
     <div class="mgmt-card">
       <div class="mgmt-lab">какие сервисы открывают</div>

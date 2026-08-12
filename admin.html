@@ -255,168 +255,8 @@ html,body{margin:0}
   </div>
 </section>
 
-<script>
-(function(){
-/* =====================================================================
-   ВХОД В АДМИН-ПАНЕЛЬ
-   Пароль сверяется по хешу SHA-256, поэтому сам пароль в коде не лежит.
-   Но проверка идёт в браузере, а значит это защита от любопытных глаз,
-   а не настоящая: кто откроет исходник, обойдёт её. Настоящая — это
-   Supabase Auth плюс политики базы.
-
-   Текущий пароль: sixseven
-   Чтобы сменить, посчитайте хеш своего пароля в консоли браузера:
-     crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
-       .then(b => console.log([...new Uint8Array(b)]
-         .map(x => x.toString(16).padStart(2,'0')).join('')))
-   и подставьте результат в ADMIN_HASH.
-   ===================================================================== */
-const ADMIN_HASH = 'ed227bb0d191d168545bec592e8b9c1199ef4ffa122a7395ededa0cf888dc09f';
-const SESSION = 'deckhub.admin';
-
-/* SHA-256 на чистом JS. Нужен потому, что crypto.subtle доступен только
-   на https и на localhost: при открытии файла напрямую его нет вообще.
-   Значение хеша совпадает с crypto.subtle, поэтому ADMIN_HASH не меняется. */
-function sha256js(msg){
-  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
-  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-  const bytes=[...new TextEncoder().encode(msg)];
-  const bitLen=bytes.length*8;
-  bytes.push(0x80);
-  while(bytes.length%64!==56) bytes.push(0);
-  const hi=Math.floor(bitLen/0x100000000), lo=bitLen>>>0;
-  [24,16,8,0].forEach(s=>bytes.push((hi>>>s)&0xff));
-  [24,16,8,0].forEach(s=>bytes.push((lo>>>s)&0xff));
-
-  const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
-  for(let i=0;i<bytes.length;i+=64){
-    const w=new Array(64);
-    for(let t=0;t<16;t++)
-      w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
-    for(let t=16;t<64;t++){
-      const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
-      const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
-      w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
-    }
-    let [a,b,c,d,e,f,g,h]=H;
-    for(let t=0;t<64;t++){
-      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
-      const ch=(e&f)^(~e&g);
-      const t1=(h+S1+ch+K[t]+w[t])|0;
-      const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
-      const mj=(a&b)^(a&c)^(b&c);
-      const t2=(S0+mj)|0;
-      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
-    }
-    H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+h)|0];
-  }
-  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
-}
-
-async function sha256(text){
-  try{
-    if(crypto && crypto.subtle && crypto.subtle.digest){
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-      return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
-    }
-  }catch(e){}
-  return sha256js(text);           // https недоступен — считаем сами
-}
-const authed = () => { try{ return sessionStorage.getItem(SESSION)==='1' }catch(e){ return false } };
-/* Узлы берём через getElementById: в одном из браузеров querySelector
-   по этим же селекторам возвращал null. И видимость ставим прямым
-   стилем — он сильнее любого правила из таблицы стилей, поэтому
-   панель не может остаться скрытой из-за неожиданного CSS. */
-const byId = id => document.getElementById(id);
-function openPanel(){
-  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
-  if(screen) screen.classList.add('authed');
-  if(gate){ gate.style.setProperty('display','none','important'); gate.hidden=true; }
-  if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
-  window.scrollTo({top:0});
-  window.dispatchEvent(new CustomEvent('admin:open'));
-  guardPanel();
-}
-
-/* Страж. Панель показывается, а через мгновение исчезает — значит её
-   кто-то прячет уже после нас. Кто именно, снаружи не видно, поэтому
-   просто возвращаем видимость и запоминаем, сколько раз пришлось. */
-let guardFixes = 0, guardStop = null;
-function guardPanel(){
-  const panel=byId('mgPanel'), gate=byId('mgGate');
-  if(!panel) return;
-  clearInterval(guardStop);
-  const check = ()=>{
-    if(!authed()) return;
-    if(getComputedStyle(panel).display === 'none'){
-      guardFixes++;
-      panel.style.setProperty('display','block','important');
-      panel.hidden = false;
-      if(gate){ gate.style.setProperty('display','none','important'); gate.hidden = true; }
-      const badge = document.querySelector('.build-badge');
-      if(badge) badge.textContent = badge.textContent.replace(/ · вернул.*/,'') + ' · вернул панель ' + guardFixes + ' р.';
-    }
-  };
-  let ticks = 0;
-  guardStop = setInterval(()=>{ check(); if(++ticks > 40) clearInterval(guardStop); }, 150);
-  check();
-}
-function closePanel(){
-  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
-  if(screen) screen.classList.remove('authed');
-  if(gate){ gate.style.removeProperty('display'); gate.hidden=false; }
-  if(panel){ panel.style.setProperty('display','none','important'); panel.hidden=true; }
-}
-function initAdmin(){
-  const form=byId('mgGateForm'), inp=byId('mgPass'), err=byId('mgErr');
-  if(!form || !inp || !err) return;
-  async function tryLogin(){
-    const pass=(inp.value||'').trim();          // пробел из автозаполнения — частая причина отказа
-    if(!pass){ err.textContent='Введите пароль'; return; }
-    err.textContent='Проверяю…';
-    let ok=false;
-    try{ ok = (await sha256(pass)) === ADMIN_HASH; }
-    catch(e){ err.textContent='Не удалось проверить пароль: '+e.message; return; }
-    if(!ok){ err.textContent='Пароль не подошёл'; inp.value=''; inp.focus(); return; }
-    err.textContent='';
-    try{ sessionStorage.setItem(SESSION,'1') }catch(e){}
-    openPanel();
-  }
-  form.addEventListener('submit', e=>{ e.preventDefault(); tryLogin(); });
-  const go=byId('mgGo');
-  if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
-  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
-  /* браузер часто подставляет сюда сохранённый пароль от домена —
-     кнопка «показать» позволяет увидеть, что в поле на самом деле */
-  const eye=byId('mgEye');
-  if(eye) eye.onclick=()=>{
-    const hidden = inp.type==='password';
-    inp.type = hidden ? 'text' : 'password';
-    eye.textContent = hidden ? 'скрыть' : 'показать';
-    inp.focus();
-  };
-  const lock=byId('mgLock');
-  if(lock) lock.onclick=()=>{
-    try{ sessionStorage.removeItem(SESSION) }catch(e){}
-    closePanel(); inp.value=''; err.textContent='';
-  };
-  ['hubBackAdmin','hubBackAdmin2'].forEach(id=>{ const b=byId(id); if(b) b.onclick=()=>{ location.href='index.html' }; });
-}
-
-
-
-initAdmin();
-if(authed()) openPanel(); else { const p=byId('mgPass'); if(p) setTimeout(()=>p.focus(),50); }
-})();
-</script>
-
+<!-- скрипт панели идёт первым: он подписывается на событие входа,
+     которое отправляет скрипт формы ниже -->
 <script>
 /* Админ-панель хаба. Открывается по ссылке #/admin и паролю.
    Данные загружаются только после входа. */
@@ -468,6 +308,10 @@ const DEEDS = {
   'talk|copy'          : 'Скопировали вывод опросника',
   'music|download'     : 'Скачали трек',
   'music|upload'       : 'Открыли загрузку треков',
+  'prompt-deck|delete' : 'Удалили промт',
+  'prompt-deck|edit'   : 'Изменили промт',
+  'music|delete'       : 'Удалили трек',
+  'music|edit'         : 'Изменили трек',
 };
 const deedName = e => {
   if(e.service.startsWith('link:')) return 'Перешли в ' + linkName(e.service.slice(5));
@@ -577,6 +421,13 @@ function renderStats(){
   const actRows = Object.entries(byAct).sort((a,b)=>b[1]-a[1]);
   const topDeed = actRows[0];
 
+  /* удаления и правки — отдельно: это то, что нельзя пропустить */
+  const changes = acts.filter(e => e.detail === 'delete' || e.detail === 'edit');
+  const nameOf = v => {
+    const p = presence.find(x => x.visitor === v);
+    return p && p.name ? esc(p.name) : String(v).slice(0,6);
+  };
+
   const bars = rows => {
     const max = Math.max(1, ...rows.map(r=>r[1]));
     return `<div class="mgmt-bars">${rows.map(([k,v]) => `
@@ -653,6 +504,21 @@ function renderStats(){
         : '<div class="mgmt-empty">Кнопки внутри сервисов пока не нажимали.</div>'}
     </div>
 
+    ${changes.length ? `<div class="mgmt-card">
+      <div class="mgmt-lab">удаления и правки — ${changes.length} за ${DAYS} дней</div>
+      <table>
+        <thead><tr><th class="mgmt-mono">когда</th><th>что</th><th>название</th><th class="mgmt-mono">кто</th></tr></thead>
+        <tbody>${changes.slice(0,20).map(e => `
+          <tr>
+            <td class="mgmt-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+            <td${e.detail === 'delete' ? ' style="color:var(--bad)"' : ''}>${esc(deedName(e))}</td>
+            <td>${e.note ? esc(e.note) : '<span style="color:var(--faint)">название не записалось</span>'}</td>
+            <td class="mgmt-mono">${nameOf(e.visitor)}</td>
+          </tr>`).join('')}</tbody>
+      </table>
+      <div class="mgmt-note mgmt-warn"><span>!</span><span>Удаления необратимы: политики базы открыты, и промт или трек может удалить любой, кто открыл сервис. Скачивайте выгрузки на вкладке «Обслуживание».</span></div>
+    </div>` : ''}
+
     <div class="mgmt-card">
       <div class="mgmt-lab">последние события</div>
       <table>
@@ -660,7 +526,7 @@ function renderStats(){
         <tbody>${events.slice(0,25).map(e => `
           <tr>
             <td class="mgmt-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
-            <td>${e.kind === 'open' ? 'открыл' : esc(deedName(e))}</td>
+            <td>${e.kind === 'open' ? 'открыл' : esc(deedName(e))}${e.note ? ' <span style="color:var(--faint)">· '+esc(e.note)+'</span>' : ''}</td>
             <td>${esc(e.kind === 'open' ? (NAMES[e.service]||e.service)
                   : (e.service.startsWith('link:') ? 'внешний сервис' : (NAMES[e.service]||e.service)))}</td>
             <td class="mgmt-mono">${String(e.visitor).slice(0,6)}${e.device==='mobile'?' · моб':''}</td>
@@ -896,6 +762,168 @@ setInterval(async () => {
 
   /* грузим по событию входа, а не при открытии страницы */
   window.addEventListener('admin:open', () => loadAll());
+})();
+</script>
+
+<script>
+(function(){
+/* =====================================================================
+   ВХОД В АДМИН-ПАНЕЛЬ
+   Пароль сверяется по хешу SHA-256, поэтому сам пароль в коде не лежит.
+   Но проверка идёт в браузере, а значит это защита от любопытных глаз,
+   а не настоящая: кто откроет исходник, обойдёт её. Настоящая — это
+   Supabase Auth плюс политики базы.
+
+   Текущий пароль: sixseven
+   Чтобы сменить, посчитайте хеш своего пароля в консоли браузера:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
+       .then(b => console.log([...new Uint8Array(b)]
+         .map(x => x.toString(16).padStart(2,'0')).join('')))
+   и подставьте результат в ADMIN_HASH.
+   ===================================================================== */
+const ADMIN_HASH = 'ed227bb0d191d168545bec592e8b9c1199ef4ffa122a7395ededa0cf888dc09f';
+const SESSION = 'deckhub.admin';
+
+/* SHA-256 на чистом JS. Нужен потому, что crypto.subtle доступен только
+   на https и на localhost: при открытии файла напрямую его нет вообще.
+   Значение хеша совпадает с crypto.subtle, поэтому ADMIN_HASH не меняется. */
+function sha256js(msg){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes=[...new TextEncoder().encode(msg)];
+  const bitLen=bytes.length*8;
+  bytes.push(0x80);
+  while(bytes.length%64!==56) bytes.push(0);
+  const hi=Math.floor(bitLen/0x100000000), lo=bitLen>>>0;
+  [24,16,8,0].forEach(s=>bytes.push((hi>>>s)&0xff));
+  [24,16,8,0].forEach(s=>bytes.push((lo>>>s)&0xff));
+
+  const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let i=0;i<bytes.length;i+=64){
+    const w=new Array(64);
+    for(let t=0;t<16;t++)
+      w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
+    for(let t=16;t<64;t++){
+      const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
+      const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
+      w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
+    }
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let t=0;t<64;t++){
+      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
+      const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K[t]+w[t])|0;
+      const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
+      const mj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+mj)|0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+h)|0];
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+async function sha256(text){
+  try{
+    if(crypto && crypto.subtle && crypto.subtle.digest){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  return sha256js(text);           // https недоступен — считаем сами
+}
+const authed = () => { try{ return sessionStorage.getItem(SESSION)==='1' }catch(e){ return false } };
+/* Узлы берём через getElementById: в одном из браузеров querySelector
+   по этим же селекторам возвращал null. И видимость ставим прямым
+   стилем — он сильнее любого правила из таблицы стилей, поэтому
+   панель не может остаться скрытой из-за неожиданного CSS. */
+const byId = id => document.getElementById(id);
+function openPanel(){
+  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
+  if(screen) screen.classList.add('authed');
+  if(gate){ gate.style.setProperty('display','none','important'); gate.hidden=true; }
+  if(panel){ panel.style.setProperty('display','block','important'); panel.hidden=false; }
+  window.scrollTo({top:0});
+  window.dispatchEvent(new CustomEvent('admin:open'));
+  guardPanel();
+}
+
+/* Страж. Панель показывается, а через мгновение исчезает — значит её
+   кто-то прячет уже после нас. Кто именно, снаружи не видно, поэтому
+   просто возвращаем видимость и запоминаем, сколько раз пришлось. */
+let guardFixes = 0, guardStop = null;
+function guardPanel(){
+  const panel=byId('mgPanel'), gate=byId('mgGate');
+  if(!panel) return;
+  clearInterval(guardStop);
+  const check = ()=>{
+    if(!authed()) return;
+    if(getComputedStyle(panel).display === 'none'){
+      guardFixes++;
+      panel.style.setProperty('display','block','important');
+      panel.hidden = false;
+      if(gate){ gate.style.setProperty('display','none','important'); gate.hidden = true; }
+      const badge = document.querySelector('.build-badge');
+      if(badge) badge.textContent = badge.textContent.replace(/ · вернул.*/,'') + ' · вернул панель ' + guardFixes + ' р.';
+    }
+  };
+  let ticks = 0;
+  guardStop = setInterval(()=>{ check(); if(++ticks > 40) clearInterval(guardStop); }, 150);
+  check();
+}
+function closePanel(){
+  const screen=byId('screenAdmin'), gate=byId('mgGate'), panel=byId('mgPanel');
+  if(screen) screen.classList.remove('authed');
+  if(gate){ gate.style.removeProperty('display'); gate.hidden=false; }
+  if(panel){ panel.style.setProperty('display','none','important'); panel.hidden=true; }
+}
+function initAdmin(){
+  const form=byId('mgGateForm'), inp=byId('mgPass'), err=byId('mgErr');
+  if(!form || !inp || !err) return;
+  async function tryLogin(){
+    const pass=(inp.value||'').trim();          // пробел из автозаполнения — частая причина отказа
+    if(!pass){ err.textContent='Введите пароль'; return; }
+    err.textContent='Проверяю…';
+    let ok=false;
+    try{ ok = (await sha256(pass)) === ADMIN_HASH; }
+    catch(e){ err.textContent='Не удалось проверить пароль: '+e.message; return; }
+    if(!ok){ err.textContent='Пароль не подошёл'; inp.value=''; inp.focus(); return; }
+    err.textContent='';
+    try{ sessionStorage.setItem(SESSION,'1') }catch(e){}
+    openPanel();
+  }
+  form.addEventListener('submit', e=>{ e.preventDefault(); tryLogin(); });
+  const go=byId('mgGo');
+  if(go) go.onclick=e=>{ e.preventDefault(); tryLogin(); };
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryLogin(); } });
+  /* браузер часто подставляет сюда сохранённый пароль от домена —
+     кнопка «показать» позволяет увидеть, что в поле на самом деле */
+  const eye=byId('mgEye');
+  if(eye) eye.onclick=()=>{
+    const hidden = inp.type==='password';
+    inp.type = hidden ? 'text' : 'password';
+    eye.textContent = hidden ? 'скрыть' : 'показать';
+    inp.focus();
+  };
+  const lock=byId('mgLock');
+  if(lock) lock.onclick=()=>{
+    try{ sessionStorage.removeItem(SESSION) }catch(e){}
+    closePanel(); inp.value=''; err.textContent='';
+  };
+  ['hubBackAdmin','hubBackAdmin2'].forEach(id=>{ const b=byId(id); if(b) b.onclick=()=>{ location.href='index.html' }; });
+}
+
+
+
+initAdmin();
+if(authed()) openPanel(); else { const p=byId('mgPass'); if(p) setTimeout(()=>p.focus(),50); }
 })();
 </script>
 </body>

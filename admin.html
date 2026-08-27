@@ -399,6 +399,14 @@ function renderStats(){
     return;
   }
 
+  /* Имя дизайнера по идентификатору браузера — из таблицы присутствия.
+     Кто ни разу не представлялся на главной, остаётся под коротким кодом. */
+  const nameOf = v => {
+    const p = presence.find(x => x.visitor === v);
+    return p && p.name ? esc(p.name) : String(v).slice(0,6);
+  };
+  const named = new Set(presence.filter(p => p.name).map(p => p.visitor));
+
   const opens = events.filter(e => e.kind === 'open');
   const acts  = events.filter(e => e.kind === 'action');
   const d7 = Date.now() - 7*864e5;
@@ -437,10 +445,6 @@ function renderStats(){
 
   /* удаления и правки — отдельно: это то, что нельзя пропустить */
   const changes = acts.filter(e => e.detail === 'delete' || e.detail === 'edit');
-  const nameOf = v => {
-    const p = presence.find(x => x.visitor === v);
-    return p && p.name ? esc(p.name) : String(v).slice(0,6);
-  };
 
   const bars = rows => {
     const max = Math.max(1, ...rows.map(r=>r[1]));
@@ -539,17 +543,19 @@ function renderStats(){
     <div class="mgmt-card">
       <div class="mgmt-lab">последние события</div>
       <table>
-        <thead><tr><th class="mgmt-mono">когда</th><th>что</th><th>где</th><th class="mgmt-mono">браузер</th></tr></thead>
+        <thead><tr><th class="mgmt-mono">когда</th><th>что</th><th>где</th><th class="mgmt-mono">кто</th></tr></thead>
         <tbody>${events.slice(0,25).map(e => `
           <tr>
             <td class="mgmt-mono">${new Date(e.at).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
             <td>${e.kind === 'open' ? 'открыл' : esc(deedName(e))}${e.note ? ' <span style="color:var(--faint)">· '+esc(e.note)+'</span>' : ''}</td>
             <td>${esc(e.kind === 'open' ? (NAMES[e.service]||e.service)
                   : (e.service.startsWith('link:') ? 'внешний сервис' : (NAMES[e.service]||e.service)))}</td>
-            <td class="mgmt-mono">${String(e.visitor).slice(0,6)}${e.device==='mobile'?' · моб':''}</td>
+            <td class="mgmt-mono">${nameOf(e.visitor)}${e.device==='mobile'?' · моб':''}</td>
           </tr>`).join('')}</tbody>
       </table>
     </div>
+
+    ${events.some(e => !named.has(e.visitor)) ? `<div class="mgmt-note mgmt-info"><span>i</span><span>Часть событий подписана коротким кодом браузера — эти люди ещё не выбрали себя на главной хаба. Как только представятся, их прошлые события тоже подпишутся именем.</span></div>` : ''}
 
     <div class="mgmt-note mgmt-info"><span>i</span><span>Считаются браузеры, а не люди: другой браузер или очистка данных дают новый идентификатор. Один человек с телефона и ноутбука — это два браузера.</span></div>`;
 }

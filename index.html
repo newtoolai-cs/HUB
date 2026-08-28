@@ -795,6 +795,12 @@ body.booting{overflow:hidden}
 #screenMusic .decay-txt b{color:var(--accent);font-weight:600}
 #screenMusic .decay.flat{padding:11px 0 12px}
 #screenMusic .empty{border:1px dashed var(--border);border-radius:var(--r-lg);padding:56px 24px;text-align:center}
+#screenMusic .genre-head{display:flex;align-items:center;gap:9px;padding:16px 2px 4px;
+  font:11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+#screenMusic .genre-head:first-child{padding-top:0}
+#screenMusic .genre-head i{font-style:normal;font-size:10px;color:var(--faint);
+  background:var(--surface-2);border-radius:9px;padding:3px 7px}
+#screenMusic .genre-head::after{content:"";flex:1;height:1px;background:var(--border)}
 #screenMusic .empty h3{margin:0 0 6px;font-size:16px;font-weight:600}
 #screenMusic .empty p{margin:0 0 18px;color:var(--dim);font-size:14px}
 #screenMusic /* загрузка */
@@ -1662,6 +1668,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
           </div>
           <span class="hint">От даты добавления считается секция. Файл можно заменить, отсчёт не сбросится.</span>
         </div>
+        <label class="check"><input type="checkbox" id="fUniversal"> Универсальная: вне трендов, не устаревает</label>
         <label class="check"><input type="checkbox" id="fForceOld"> Сразу в «Старую», не ждать переездов</label>
       </div>
     </div>
@@ -2690,6 +2697,7 @@ function monthExpiry(added){
   return m;
 }
 function bucketOf(t, now){
+  if (t.universal) return 'universal';   /* время на неё не влияет */
   if (t.force_old) return 'old';
   const a = new Date(t.added_at);
   if (now < weekExpiry(a))  return 'week';
@@ -2697,7 +2705,7 @@ function bucketOf(t, now){
   return 'old';
 }
 function lifeOf(t, now){
-  if (t.force_old) return null;
+  if (t.universal || t.force_old) return null;
   const a = new Date(t.added_at), w = weekExpiry(a), m = monthExpiry(a);
   if (now < w) return { from:a, to:w, next:'«За месяц»' };
   if (now < m) return { from:w, to:m, next:'«Старую»'   };
@@ -2973,10 +2981,14 @@ async function runQueue(){
 
 /* ════════════════════════════  СОСТОЯНИЕ  ═══════════════════════════ */
 const SECTIONS = [
-  { id:'week',  label:'Актуальная за неделю' },
-  { id:'month', label:'Актуальная за месяц'  },
-  { id:'old',   label:'Старая'               },
+  { id:'week',      label:'Актуальная за неделю' },
+  { id:'month',     label:'Актуальная за месяц'  },
+  { id:'old',       label:'Старая'               },
+  { id:'universal', label:'Универсальная'        },
 ];
+/* Подсказки жанров для универсальной секции. Список открытый:
+   вписать можно что угодно, эти просто предлагаются. */
+const GENRES = ['Интимная', 'Фонк (динамичный)', 'Фонк (плавный)', 'Эпичная', 'Спокойная', 'Корпоративная'];
 let tracks = [], section = 'week', query = '', fMood = '', fAuthor = '', sort = 'new';
 let editingId = null, playingId = null;
 
@@ -3041,6 +3053,8 @@ function renderSections(){
   } else if (section === 'month') {
     const d = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
     box.innerHTML = `↳ Ближайший переезд в «Старую»: ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})} · через <b>${left(d - Date.now())}</b>`;
+  } else if (section === 'universal') {
+    box.innerHTML = '↳ Вне трендов: эти треки не переезжают и подходят под любую задачу. Разбиты по жанрам.';
   } else {
     box.innerHTML = '↳ Архив. Дальше треки никуда не переезжают.';
   }
@@ -3055,7 +3069,9 @@ function renderFilters(){
   };
   fill($('#fMood'), moods, fMood, 'Все настроения');
   fill($('#fAuthor'), auth, fAuthor, 'Все авторы');
-  $('#moodList').innerHTML = moods.map(m => `<option value="${esc(m)}">`).join('');
+  /* к найденным в базе добавляем предложенные жанры, без повторов */
+  const suggest = [...new Set([...moods, ...GENRES])];
+  $('#moodList').innerHTML = suggest.map(m => `<option value="${esc(m)}">`).join('');
 }
 
 function renderList(){
@@ -3075,7 +3091,9 @@ function renderList(){
     return;
   }
 
-  list.innerHTML = a.map(t => {
+  /* В универсальной секции треки не стареют, поэтому сортировка по дате
+     мало что даёт — раскладываем по жанрам с заголовками. */
+  const card = t => {
     const b = bucketOf(t, now), life = lifeOf(t, now);
     let decay;
     if (life) {
@@ -3084,7 +3102,9 @@ function renderList(){
         <div class="decay-bar"><div class="decay-fill" style="width:${pct.toFixed(1)}%"></div></div>
         <span class="decay-txt">в ${life.next} через <b>${left(life.to - now)}</b></span></div>`;
     } else {
-      decay = `<div class="decay flat"><span class="decay-txt">в архиве${t.force_old ? ' · вручную' : ''} · добавлен ${shortDate(t.added_at)}</span></div>`;
+      decay = t.universal
+        ? `<div class="decay flat"><span class="decay-txt">универсальная${t.mood ? ' · ' + esc(t.mood) : ''} · не устаревает</span></div>`
+        : `<div class="decay flat"><span class="decay-txt">в архиве${t.force_old ? ' · вручную' : ''} · добавлен ${shortDate(t.added_at)}</span></div>`;
     }
     const dl = Number(t.downloads) || 0;
     const meta = [
@@ -3118,7 +3138,26 @@ function renderList(){
       </div>
       ${decay}
     </article>`;
-  }).join('');
+  };
+
+  if (section === 'universal') {
+    const groups = new Map();
+    a.forEach(t => {
+      const g = (t.mood || '').trim() || 'Без жанра';
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(t);
+    });
+    const order = [...groups.keys()].sort((x, y) => {
+      if (x === 'Без жанра') return 1;
+      if (y === 'Без жанра') return -1;
+      return x.localeCompare(y, 'ru');
+    });
+    list.innerHTML = order.map(g => `
+      <div class="genre-head"><span>${esc(g)}</span><i>${groups.get(g).length}</i></div>
+      ${groups.get(g).map(card).join('')}`).join('');
+  } else {
+    list.innerHTML = a.map(card).join('');
+  }
 
   list.querySelectorAll('.card').forEach(card => {
     const t = tracks.find(x => x.id === card.dataset.id);
@@ -3272,6 +3311,7 @@ function openForm(t){
   $('#fCode').value   = t.author_code || musicAuthor();
   $('#fDate').value   = toLocalInput(t.added_at || new Date());
   $('#fForceOld').checked = !!t.force_old;
+  $('#fUniversal').checked = !!t.universal;
   $('#fFileInfo').textContent = t.file_name
     ? t.file_name + (t.size ? ' · ' + mb(t.size) : '')
     : (t.url ? 'внешняя ссылка' : 'файла нет');
@@ -3289,6 +3329,7 @@ $('#saveBtn').onclick = async () => {
     author_code: $('#fCode').value.trim(),
     added_at: new Date($('#fDate').value || Date.now()).toISOString(),
     force_old: $('#fForceOld').checked,
+    universal: $('#fUniversal').checked,
   };
   try {
     const upd = await db.update(editingId, patch);

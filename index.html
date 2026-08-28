@@ -795,6 +795,19 @@ body.booting{overflow:hidden}
 #screenMusic .decay-txt b{color:var(--accent);font-weight:600}
 #screenMusic .decay.flat{padding:11px 0 12px}
 #screenMusic .empty{border:1px dashed var(--border);border-radius:var(--r-lg);padding:56px 24px;text-align:center}
+#screenMusic .dest-files{font:11.5px/1.5 var(--mono);color:var(--dim);margin-bottom:16px;
+  word-break:break-word;padding:10px 12px;background:var(--surface-2);border-radius:var(--r)}
+#screenMusic .dest-pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){#screenMusic .dest-pick{grid-template-columns:1fr}}
+#screenMusic .dest-pick button{display:flex;flex-direction:column;gap:4px;align-items:flex-start;
+  text-align:left;padding:14px 15px;border:1px solid var(--border);border-radius:var(--r);
+  background:var(--surface-2);transition:var(--t)}
+#screenMusic .dest-pick button:hover{border-color:var(--border-strong)}
+#screenMusic .dest-pick button[aria-pressed="true"]{border-color:var(--warm);
+  background:var(--warm-soft);box-shadow:inset 0 0 0 1px var(--warm)}
+#screenMusic .dest-pick b{font-size:14px;font-weight:600}
+#screenMusic .dest-pick span{font:11px/1.4 var(--mono);color:var(--dim)}
+#screenMusic .dest-hint{font-size:12.5px;line-height:1.5;color:var(--dim);margin-top:14px}
 #screenMusic .genre-head{display:flex;align-items:center;gap:9px;padding:16px 2px 4px;
   font:11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 #screenMusic .genre-head:first-child{padding-top:0}
@@ -1676,6 +1689,36 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <button class="btn danger" id="delBtn" style="margin-right:auto">Удалить</button>
       <button class="btn" data-close>Отмена</button>
       <button class="btn primary" id="saveBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="destScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="destTitle">
+    <div class="m-head">
+      <h2 id="destTitle">Куда загрузить</h2>
+      <button class="icon-btn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="dest-files" id="destList"></div>
+      <div class="dest-pick">
+        <button type="button" data-dest="fresh" aria-pressed="true">
+          <b>Актуальная</b><span>по дате добавления</span>
+        </button>
+        <button type="button" data-dest="universal" aria-pressed="false">
+          <b>Универсальная</b><span>вне трендов, по жанрам</span>
+        </button>
+      </div>
+      <div class="field" id="destGenreWrap" style="display:none;margin-top:14px">
+        <label for="destGenre">Жанр</label>
+        <input id="destGenre" list="destGenreList" placeholder="Интимная, Фонк (плавный)…">
+        <datalist id="destGenreList"></datalist>
+      </div>
+      <div class="dest-hint" id="destHint"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn" data-close>Отмена</button>
+      <button class="btn primary" id="destGo">Загрузить</button>
     </div>
   </div>
 </div>
@@ -2932,7 +2975,43 @@ function enqueue(files){
   if (!REMOTE) { toast('Загрузка работает только при подключённом Supabase'); return; }
   const ok = [...files].filter(f => f.type.startsWith('audio/') || AUDIO_RE.test(f.name));
   if (!ok.length) { toast('Это не аудиофайлы'); return; }
-  ok.forEach(f => queue.push({ file:f, name:f.name, state:'wait', pct:0 }));
+  askDest(ok);              /* сначала спрашиваем, куда — потом грузим */
+}
+
+/* Куда грузить: в актуальную (стареет по датам) или в универсальную
+   (вне трендов, с жанром). Выбор действует на всю пачку файлов. */
+function askDest(files){
+  const one = files.length === 1;
+  $('#destTitle').textContent = one
+    ? 'Куда загрузить трек'
+    : `Куда загрузить ${files.length} ${plural(files.length,'трек','трека','треков')}`;
+  $('#destList').textContent = files.slice(0,4).map(f => f.name).join(', ')
+    + (files.length > 4 ? ` и ещё ${files.length - 4}` : '');
+  const moods = [...new Set(tracks.map(t => t.mood).filter(Boolean))];
+  $('#destGenreList').innerHTML = [...new Set([...moods, ...GENRES])]
+    .map(m => `<option value="${esc(m)}">`).join('');
+  $('#destGenre').value = '';
+  pickDest('fresh');
+  $('#destScrim').classList.add('on');
+  pendingFiles = files;
+}
+let pendingFiles = [], destKind = 'fresh';
+function pickDest(kind){
+  destKind = kind;
+  $$('#destScrim [data-dest]').forEach(b => b.setAttribute('aria-pressed', b.dataset.dest === kind));
+  $('#destGenreWrap').style.display = kind === 'universal' ? '' : 'none';
+  $('#destHint').textContent = kind === 'universal'
+    ? 'Не переезжает по неделям и месяцам. Жанр можно указать сейчас или позже в карточке.'
+    : 'Попадёт в «Актуальную за неделю» и дальше переедет сама.';
+}
+function startUpload(){
+  const universal = destKind === 'universal';
+  const mood = $('#destGenre').value.trim();
+  pendingFiles.forEach(f => queue.push({
+    file:f, name:f.name, state:'wait', pct:0, dest:{ universal, mood }
+  }));
+  pendingFiles = [];
+  closeAll();
   renderQueue();
   runQueue();
 }
@@ -2947,10 +3026,12 @@ async function runQueue(){
       q.state = 'run'; renderQueue();
       try {
         const meta = parseName(q.name);
+        const dest = q.dest || { universal:false, mood:'' };
         const rec = await db.add({
-          title: meta.title, mood: '', author_code: meta.author_code || musicAuthor(),
+          title: meta.title, mood: dest.mood || '', author_code: meta.author_code || musicAuthor(),
           file_name: q.name, size: q.file.size, storage_path: '',
-          added_at: new Date().toISOString(), force_old: false, downloads: 0
+          added_at: new Date().toISOString(), force_old: false,
+          universal: dest.universal, downloads: 0
         });
         const path = storagePath(rec.id, q.name);
         await putObject(path, q.file, p => { q.pct = p; renderQueue(); });
@@ -3422,6 +3503,12 @@ function openStats(){
 
 /* ══════════════════════════════  СВЯЗКА  ════════════════════════════ */
 $('#upBtn').onclick    = () => { $('#upFile').value = ''; $('#upFile').click(); };
+$('#destScrim').addEventListener('click', e => {
+  const b = e.target.closest('[data-dest]');
+  if (b) pickDest(b.dataset.dest);
+});
+$('#destGo').onclick = startUpload;
+$('#destGenre').addEventListener('keydown', e => { if (e.key === 'Enter') startUpload(); });
 $('#upFile').onchange  = e => enqueue(e.target.files);
 $('#mStatsBtn').onclick = openStats;
 $('#resetBtn').onclick = resetFilters;

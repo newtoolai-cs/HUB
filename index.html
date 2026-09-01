@@ -114,6 +114,20 @@ body.booting{overflow:hidden}
 })();
 </script>
 <div class="build-badge">сборка 12.08 · 15:00</div>
+<div class="gate" id="siteGate">
+  <div class="gate-card">
+    <div class="gate-mark">◤</div>
+    <h1>Deck Hub</h1>
+    <p>Внутренние инструменты команды дизайна. Введите общий пароль — он запомнится, и спрашивать больше не будем.</p>
+    <div class="gate-field">
+      <input type="password" id="gatePass" placeholder="Пароль команды" autocomplete="off" autofocus>
+      <button type="button" class="gate-eye" id="gateEye">показать</button>
+    </div>
+    <button type="button" class="gate-go" id="gateGo">Войти</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1025,6 +1039,111 @@ body.booting{overflow:hidden}
 html:not(:has(.screen.on)) #screenHub{display:block}
 
 /* метка сборки в углу: по ней сразу видно, какая версия задеплоена */
+.gate{display:none}          /* по умолчанию скрыта: упал скрипт — сайт остаётся открытым */
+.gate.on{
+  position:fixed;inset:0;z-index:9998;display:grid;place-items:center;padding:24px;
+  background:#E7EBEF;color:#161B23;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+}
+:root[data-theme="dark"] .gate.on{background:#0A0B0E;color:#EEF0F4}
+.gate-card{width:100%;max-width:340px;text-align:center}
+.gate-mark{font-size:19px;line-height:1;color:#2F6BFF;margin-bottom:16px}
+:root[data-theme="dark"] .gate-mark{color:#5C8DFF;text-shadow:0 0 18px rgba(92,141,255,.5)}
+.gate-card h1{font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:700;
+  letter-spacing:-.03em;margin:0 0 10px}
+.gate-card p{font-size:13.5px;line-height:1.55;color:#5F6A79;margin:0 0 20px}
+:root[data-theme="dark"] .gate-card p{color:#98A1AF}
+.gate-field{position:relative;margin-bottom:10px}
+.gate-field input{
+  width:100%;height:44px;padding:0 74px 0 14px;border-radius:11px;
+  border:1px solid #D6DCE3;background:#fff;color:inherit;font-size:14.5px;outline:none;
+  transition:border .14s,box-shadow .14s;
+}
+:root[data-theme="dark"] .gate-field input{background:#13161D;border-color:#252B36}
+.gate-field input:focus{border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.14)}
+.gate-eye{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;
+  font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:#8A94A3;padding:4px 6px;
+}
+.gate-eye:hover{color:#2F6BFF}
+.gate-go{
+  width:100%;height:44px;border:0;border-radius:11px;cursor:pointer;background:#2F6BFF;color:#fff;
+  font-family:'Space Grotesk',system-ui,sans-serif;font-size:14.5px;font-weight:600;transition:filter .14s;
+}
+.gate-go:hover{filter:brightness(1.07)}
+.gate-err{min-height:20px;margin-top:12px;font-size:13px;color:#D63C4E}
+body.gated{overflow:hidden}
+#screenVault{
+  --v-bg:#E7EBEF; --v-card:#FFFFFF; --v-soft:#F4F6F9; --v-line:#D6DCE3;
+  --v-ink:#161B23; --v-mid:#5F6A79; --v-faint:#8A94A3; --v-accent:#2F6BFF; --v-bad:#D63C4E;
+  background:var(--v-bg);color:var(--v-ink);min-height:100vh;
+  font-family:'Inter',system-ui,sans-serif;
+}
+:root[data-theme="dark"] #screenVault{
+  --v-bg:#0F1319; --v-card:#171C24; --v-soft:#1E242E; --v-line:#2A323E;
+  --v-ink:#E8ECF2; --v-mid:#98A3B2; --v-faint:#6C7787; --v-accent:#5C8CFF; --v-bad:#E8596A;
+}
+#screenVault .vault{max-width:820px;margin:0 auto;padding:26px 20px 70px}
+#screenVault .vault-top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+#screenVault .v-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em}
+#screenVault .v-back,#screenVault .v-btn{
+  background:var(--v-card);border:1px solid var(--v-line);color:var(--v-mid);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;padding:7px 11px;border-radius:8px;transition:all .14s;
+}
+#screenVault .v-back:hover,#screenVault .v-btn:hover{color:var(--v-ink);border-color:var(--v-faint)}
+#screenVault .v-btn{margin-left:auto}
+
+#screenVault .v-key{display:grid;place-items:center;padding:40px 0}
+#screenVault .v-key-card{max-width:360px;text-align:center;background:var(--v-card);
+  border:1px solid var(--v-line);border-radius:16px;padding:26px 24px}
+#screenVault .v-key-mark{font-size:22px;margin-bottom:12px}
+#screenVault .v-key-card h2{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;
+  letter-spacing:-.02em;margin:0 0 8px}
+#screenVault .v-key-card p{font-size:13px;line-height:1.55;color:var(--v-mid);margin:0 0 18px}
+#screenVault input{
+  width:100%;height:42px;padding:0 13px;border-radius:10px;border:1px solid var(--v-line);
+  background:var(--v-soft);color:inherit;font-size:14px;outline:none;transition:border .14s,box-shadow .14s;
+}
+#screenVault input:focus{border-color:var(--v-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--v-accent) 14%,transparent)}
+#screenVault .v-go{
+  width:100%;height:42px;margin-top:10px;border:0;border-radius:10px;cursor:pointer;
+  background:var(--v-accent);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;
+  transition:filter .14s;
+}
+#screenVault .v-go:hover{filter:brightness(1.07)}
+#screenVault .v-err{min-height:18px;margin-top:10px;font-size:12.5px;color:var(--v-bad)}
+
+#screenVault .v-list{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+#screenVault .v-row{
+  display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:center;
+  background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;padding:13px 15px;
+}
+@media(max-width:640px){#screenVault .v-row{grid-template-columns:1fr;gap:7px}}
+#screenVault .v-svc{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px}
+#screenVault .v-pair{display:flex;flex-direction:column;gap:5px;min-width:0}
+#screenVault .v-line{display:flex;align-items:center;gap:8px;min-width:0}
+#screenVault .v-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--v-faint);width:42px;flex:none}
+#screenVault .v-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--v-mid);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+#screenVault .v-acts{display:flex;gap:6px;flex-wrap:wrap}
+#screenVault .v-mini{
+  background:var(--v-soft);border:1px solid var(--v-line);color:var(--v-mid);cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 9px;border-radius:7px;transition:all .13s;
+}
+#screenVault .v-mini:hover{color:var(--v-ink);border-color:var(--v-faint)}
+#screenVault .v-mini.del:hover{color:var(--v-bad);border-color:var(--v-bad)}
+
+#screenVault .v-add{background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;padding:16px}
+#screenVault .v-add-t{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--v-faint);margin-bottom:12px}
+#screenVault .v-add-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:9px}
+@media(max-width:760px){#screenVault .v-add-row{grid-template-columns:1fr}}
+#screenVault .v-add-btn{width:auto;margin-top:0;padding:0 18px}
+#screenVault .v-hint{font-size:12px;color:var(--v-faint);margin-top:11px;line-height:1.5}
+#screenVault .v-empty{text-align:center;color:var(--v-faint);font-size:13px;padding:30px 0}
 .build-badge{
   position:fixed;right:8px;bottom:6px;z-index:200;pointer-events:none;
   font:9.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;
@@ -1068,7 +1187,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
   grid-template-areas:
     "head  head  hero hero"
     "calc  calc  hero hero"
-    "music music music music"
+    "music music vault vault"
     "ext   ext   ext  ext";
 }
 @media(max-width:1080px){
@@ -1079,6 +1198,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       "hero hero"
       "calc calc"
       "music music"
+      "vault vault"
       "ext  ext";
     padding:26px 18px 56px;
   }
@@ -1086,7 +1206,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 @media(max-width:620px){
   #screenHub .bento{
     grid-template-columns:minmax(0,1fr);
-    grid-template-areas:"head" "hero" "calc" "music" "ext";
+    grid-template-areas:"head" "hero" "calc" "music" "vault" "ext";
     padding:20px 14px 44px;--r:16px;
   }
 }
@@ -1174,6 +1294,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 /* плитка калькулятора */
 #screenHub .t-calc{grid-area:calc;padding:0;flex-direction:row;align-items:stretch}
 #screenHub .t-calc.t-music{grid-area:music}
+#screenHub .t-calc.t-vault{grid-area:vault}
 #screenHub .calc-stage{
   position:relative;flex:0 0 132px;overflow:hidden;
   background:linear-gradient(160deg,var(--h-soft),var(--h-tile));border-right:1px solid var(--h-line-soft);
@@ -1235,30 +1356,6 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 #screenHub .t-link:hover .go{filter:brightness(1.06)}
 #screenHub .t-link .go svg{transition:transform .15s}
 #screenHub .t-link:hover .go svg{transform:translate(1px,-1px)}
-#screenHub .t-link .mails{display:flex;flex-direction:column;gap:6px}
-#screenHub .t-link .mails{margin-top:10px}
-#screenHub .t-link .mail{
-  display:flex;align-items:center;gap:8px;padding:7px 9px;
-  background:var(--h-soft);border:1px solid var(--h-line);border-radius:8px;
-}
-#screenHub .t-link .mail-adr{
-  flex:1;min-width:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;
-  color:var(--h-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-#screenHub .t-link .mail-more{display:none}
-#screenHub .t-link .mails.open .mail-more{display:flex}
-#screenHub .t-link .mail-toggle{
-  align-self:flex-start;background:none;border:0;cursor:pointer;padding:2px 0;
-  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--h-faint);text-decoration:underline;text-underline-offset:2px;transition:color .14s;
-}
-#screenHub .t-link .mail-toggle:hover{color:var(--c)}
-#screenHub .t-link .mail-copy{
-  flex:0 0 auto;background:none;border:0;cursor:pointer;padding:2px 4px;
-  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--h-faint);text-decoration:underline;text-underline-offset:2px;transition:color .14s;
-}
-#screenHub .t-link .mail-copy:hover{color:var(--c)}
 #screenHub .t-link .dm{
   font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:var(--h-faint);
   margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -1268,6 +1365,18 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 #screenHub .prev .eq{transform-box:fill-box;transform-origin:center;transition:transform .45s cubic-bezier(.32,0,.24,1)}
 #screenHub .t-music:hover .prev .eq:nth-child(odd){transform:scaleY(1.22)}
 #screenHub .t-music:hover .prev .eq:nth-child(even){transform:scaleY(.76)}
+/* на наведении точки верхней строки растягиваются — пароль «показан» */
+#screenHub .prev .vsel{fill:var(--c);opacity:.10}
+#screenHub .prev .vname{fill:var(--h-mid)}
+#screenHub .prev .vname.dim{fill:var(--h-prev)}
+#screenHub .prev .vdot{fill:var(--h-prev);transition:opacity .28s ease}
+#screenHub .prev .vdot.hot{fill:var(--c);opacity:.55}
+#screenHub .prev .vchars{
+  fill:var(--c);opacity:0;transition:opacity .28s ease;
+  font-family:var(--mono);font-size:9px;letter-spacing:.5px;
+}
+#screenHub .t-vault:hover .prev .vdot.hot{opacity:0}
+#screenHub .t-vault:hover .prev .vchars{opacity:1}
 #screenHub .prev .ln{fill:var(--h-prev);transition:transform .5s cubic-bezier(.32,0,.24,1)}
 #screenHub .prev .ln.hot{fill:var(--c)}
 #screenHub .prev .caret{fill:var(--c);opacity:0;transition:opacity .2s}
@@ -1395,6 +1504,7 @@ html:not(:has(.screen.on)) #screenHub{display:block}
       <article class="tile act t-hero" id="heroTile"></article>
       <article class="tile act t-calc" id="calcTile"></article>
       <article class="tile act t-calc t-music" id="musicTile"></article>
+      <article class="tile act t-calc t-vault" id="vaultTile"></article>
 
       <div class="ext-block">
         <div class="lab">внешние сервисы</div>
@@ -1758,6 +1868,42 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 </div>
 
 <div class="toast" id="mToast"></div>
+</section>
+
+<!-- ============ экран: доступы к сервисам ============ -->
+<section class="screen" id="screenVault">
+  <div class="vault">
+    <div class="vault-top">
+      <button class="v-back" id="hubBackVault">← Все сервисы</button>
+      <span class="v-title">Доступы к сервисам</span>
+      <button class="v-btn" id="vLock" style="display:none">Забыть ключ</button>
+    </div>
+
+    <div class="v-key" id="vKeyBox">
+      <div class="v-key-card">
+        <div class="v-key-mark">🔒</div>
+        <h2>Ключ хранилища</h2>
+        <p>Пароли зашифрованы. Ключ спрашиваем один раз на устройство и больше не тревожим. В коде сайта его нет — он только у вас в голове и в этом браузере.</p>
+        <input type="password" id="vKey" placeholder="Ключ хранилища" autocomplete="off">
+        <button type="button" class="v-go" id="vKeyGo">Открыть</button>
+        <div class="v-err" id="vKeyErr"></div>
+      </div>
+    </div>
+
+    <div class="v-body" id="vBody" style="display:none">
+      <div class="v-list" id="vList"></div>
+      <div class="v-add">
+        <div class="v-add-t">Добавить доступ</div>
+        <div class="v-add-row">
+          <input class="v-in" id="vService" placeholder="Сервис — Kling, TopView…">
+          <input class="v-in" id="vLogin" placeholder="Почта или логин">
+          <input class="v-in" id="vSecret" type="password" placeholder="Пароль">
+          <button class="v-go v-add-btn" id="vAdd">Добавить</button>
+        </div>
+        <div class="v-hint">Пароль шифруется в браузере: в базу уходит только нечитаемая строка.</div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <div class="toast" id="toast"></div>
@@ -3885,6 +4031,11 @@ let SERVICES = [
     desc:'Определяет сложность задачи и считает поинты. Звёздочки поднимают тир выше.'
   },
   {
+    id:'vault', name:'Доступы к сервисам', kicker:'Пароли', status:'ready', screen:'vault',
+    color:'#7A5AF8', preview:'keys', cta:'Открыть хранилище',
+    desc:'Логины и пароли внешних сервисов. Пароли зашифрованы, ключ спрашивается один раз на устройство.'
+  },
+  {
     id:'music', name:'Актуальная музыка', kicker:'Музыка', status:'ready', screen:'music',
     color:'#E8A33C', preview:'wave', cta:'Открыть библиотеку',
     desc:'Библиотека треков команды: свежие сверху, старые уезжают в архив сами. Прослушивание и скачивание в один клик.'
@@ -3894,35 +4045,30 @@ let SERVICES = [
 
 /* =====================================================================
    ВНЕШНИЕ СЕРВИСЫ — открываются в новой вкладке.
-   login — почта, под которой заходим. Можно строкой или списком, если
-   аккаунтов несколько: ['первая@…','вторая@…']. Показывается на плитке
-   отдельной строкой с кнопкой копирования. ПАРОЛИ СЮДА НЕ ВПИСЫВАЕМ: репозиторий публичный, и всё,
-   что попало в код, остаётся в истории коммитов навсегда. Пароли —
-   в менеджере паролей команды.
+   Логины и пароли живут не здесь, а во вкладке «Доступы»: там они
+   зашифрованы. В этот массив их вписывать не нужно — репозиторий
+   публичный, и всё, что попало в код, остаётся в истории навсегда.
    ===================================================================== */
 let LINKS = [
   {id:'kling', name:'Kling',   kicker:'Видео',        color:'#2F6BFF',
-   login:['creo.team@evadav.com','designer@evadav.com','dizejner@evadav.com',
-          'dezigner@evadav.com','designer1@evadav.com','designer2@evadav.com'],
    desc:'Генерация видео из текста и картинок. Открывается в командном воркспейсе.',
    url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
-  {id:'openart', name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8', login:'creo.team@evadav.com',
+  {id:'openart', name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8',
    desc:'Картинки, стили и апскейл — для кадров и превью.',
    url:'https://openart.ai/home'},
-  {id:'vozo', name:'Vozo',    kicker:'Липсинк',       color:'#E0870B', login:'creo.team@evadav.com',
+  {id:'vozo', name:'Vozo',    kicker:'Липсинк',       color:'#E0870B',
    desc:'Сервис для липсинка: подгоняет движение губ под новую озвучку.',
    url:'https://app.vozo.ai/'},
-  {id:'vmake', name:'Vmake',   kicker:'Очистка',       color:'#E8596A', login:'creo.team@evadav.com',
+  {id:'vmake', name:'Vmake',   kicker:'Очистка',       color:'#E8596A',
    desc:'Удаление субтитров и водяных знаков с видео.',
    url:'https://vmake.ai/workspace'},
-  {id:'transcribe', name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6', login:'creo.team@evadav.com',
+  {id:'transcribe', name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6',
    desc:'Достаёт текст из озвучки — готовый скрипт из готового ролика.',
    url:'https://login.go-transcribe.com/'},
-  {id:'heygen', name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4', login:'creo.team@evadav.com',
+  {id:'heygen', name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4',
    desc:'Говорящие аватары для креативов — из текста или своей озвучки.',
    url:'https://app.heygen.com/projects/avatar-videos'},
   {id:'topview', name:'TopView', kicker:'Аватары',      color:'#2FA37A',
-   login:['creo.team@evadav.com','designer@evadav.com'],
    desc:'UGC-аватары для перформанс-креативов. Открывается на нашей доске.',
    url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'}
 ];
@@ -3940,7 +4086,7 @@ let LINKS = [
     beta :{l:'бета',    c:'#2F6BFF'},
     soon :{l:'скоро',c:'#8A94A3'}
   };
-  const SCREENS={deck:'#screenDeck',calc:'#screenCalc',music:'#screenMusic'};
+  const SCREENS={deck:'#screenDeck',calc:'#screenCalc',music:'#screenMusic',vault:'#screenVault'};
   const box=(vb,inner)=>'<svg class="prev" viewBox="'+vb+'" aria-hidden="true">'+inner+'</svg>';
 
   /* ---- миниатюры: рисуем сам инструмент ---- */
@@ -3969,6 +4115,26 @@ let LINKS = [
          + ' fill="url(#mwg)" style="transition-delay:'+(i*40)+'ms"/>';
       });
       return box('0 0 132 88',s);
+    },
+    keys(){
+      /* список доступов: метка сервиса, логин, скрытый пароль.
+         На наведении точки верхней строки гаснут, а на их месте
+         проявляется строка символов — «пароль показан». Именно
+         перекрёстное затухание: растянутые точки наезжали друг на друга. */
+      const X0 = 78;
+      let s = '';
+      [['var(--c)', true], ['#2F6BFF', false], ['#E8A33C', false]].forEach(([col, top], i) => {
+        const y = 20 + i * 24;
+        if (top) s += '<rect class="vsel" x="10" y="'+(y-6)+'" width="112" height="22" rx="7"/>';
+        s += '<rect class="vtag" x="16" y="'+y+'" width="10" height="10" rx="3" style="fill:'+col+'"/>';
+        s += '<rect class="'+(top ? 'vname' : 'vname dim')+'" x="32" y="'+(y+2.5)+
+             '" width="'+(top ? 34 : 30)+'" height="5" rx="2.5"/>';
+        for(let k = 0; k < 5; k++)
+          s += '<circle class="vdot'+(top ? ' hot' : '')+'" cx="'+(X0 + 2 + k*8)+'" cy="'+(y+5)+
+               '" r="2.6" style="transition-delay:'+(k*30)+'ms"/>';
+        if (top) s += '<text class="vchars" x="'+X0+'" y="'+(y+9)+'">Xk7#2q</text>';
+      });
+      return box('0 0 132 88', s);
     },
     tiers(){
       const cols=['#7C8AA0','#4E86C6','#2FA37A','#E0A93B','#E5713B','#D63C4E'];
@@ -4070,22 +4236,6 @@ let LINKS = [
           '<span class="badge" style="--s:var(--h-faint);margin-left:auto"><i></i>внешний</span></div>'+
         '<h3>'+esc(l.name)+'</h3>'+
         '<p>'+esc(l.desc)+'</p>'+
-        (function(){
-          const list = Array.isArray(l.login) ? l.login : (l.login ? [l.login] : []);
-          if(!list.length) return '';
-          /* больше двух аккаунтов — прячем остальные, иначе плитка вытягивается */
-          const row = (adr, hidden) =>
-            '<div class="mail'+(hidden ? ' mail-more' : '')+'" data-mail="'+esc(adr)+'">'+
-              '<span class="mail-adr">'+esc(adr)+'</span>'+
-              '<button type="button" class="mail-copy" title="Скопировать почту">копировать</button>'+
-            '</div>';
-          const head = list.slice(0,2).map(a => row(a, false)).join('');
-          const rest = list.slice(2).map(a => row(a, true)).join('');
-          return '<div class="mails">' + head + rest +
-            (rest ? '<button type="button" class="mail-toggle">ещё '+(list.length-2)+
-                    ' '+(list.length-2===1?'аккаунт':(list.length-2<5?'аккаунта':'аккаунтов'))+'</button>' : '')
-            + '</div>';
-        })()+
         '<div class="foot">'+
           '<span class="go">Открыть'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M9 7h8v8"/></svg>'+
@@ -4106,6 +4256,7 @@ let LINKS = [
   function enter(id, clickSelector){
     const s=SERVICES.find(x=>x.id===id);
     if(!s||!s.screen) return;
+    if(s.screen==='vault'){ enterVault(); return; }
     const target=q(SCREENS[s.screen]);
     if(!target) return;
     location.hash='#/'+id;
@@ -4131,6 +4282,7 @@ let LINKS = [
   window.addEventListener('hashchange',()=>{
     const id=location.hash.replace('#/','');
     if(id==='admin'){ goAdmin(); return; }
+    if(id==='vault'){ enterVault(); return; }
     const s=SERVICES.find(x=>x.id===id);
     s&&s.screen ? enter(id) : showHub();
   });
@@ -4349,37 +4501,6 @@ let LINKS = [
 
   /* копирование почты не должно уводить в сервис: плитка — это ссылка */
   document.addEventListener('click', e=>{
-    const toggle = e.target.closest('#extGrid .mail-toggle');
-    if(toggle){
-      e.preventDefault(); e.stopPropagation();
-      const box = toggle.closest('.mails');
-      const open = box.classList.toggle('open');
-      const n = box.querySelectorAll('.mail-more').length;
-      toggle.textContent = open ? 'свернуть' : 'ещё ' + n + ' ' + (n===1?'аккаунт':(n<5?'аккаунта':'аккаунтов'));
-      return;
-    }
-    const mailBtn = e.target.closest('#extGrid .mail-copy');
-    if(mailBtn){
-      e.preventDefault(); e.stopPropagation();
-      const box = mailBtn.closest('[data-mail]');
-      const adr = box ? box.dataset.mail : '';
-      const done = ()=>{
-        mailBtn.textContent = 'скопировано';
-        setTimeout(()=>{ mailBtn.textContent = 'копировать' }, 1500);
-      };
-      if(navigator.clipboard && navigator.clipboard.writeText)
-        navigator.clipboard.writeText(adr).then(done).catch(()=>done());
-      else {
-        const ta=document.createElement('textarea');
-        ta.value=adr; ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.select();
-        try{ document.execCommand('copy'); done() }catch(err){}
-        ta.remove();
-      }
-      const l = LINKS.find(x => Array.isArray(x.login) ? x.login.includes(adr) : x.login === adr);
-      track('action','link:'+(l?l.id:'other'),'login');
-      return;
-    }
     const a = e.target.closest('#extGrid a');
     if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+((l&&l.id)||hostOf(a.href)),'open'); return; }
     for(const [sel, service, detail] of ACTIONS){
@@ -4396,6 +4517,7 @@ let LINKS = [
     if(deck) buildHero(deck);
     if(calc) buildCalc(calc,'#calcTile');
     if(music) buildCalc(music,'#musicTile');
+  if(vault) buildCalc(vault,'#vaultTile');
     buildLinks();
     const live=SERVICES.filter(s=>s.screen).length;
     q('#headNote').textContent = live===SERVICES.length
@@ -4425,13 +4547,293 @@ let LINKS = [
     }catch(e){ /* база недоступна — работаем на встроенных массивах */ }
   }
 
+  /* =====================================================================
+     ОБЩИЙ ВХОД В ХАБ
+     Один пароль на команду, запоминается в браузере навсегда. Это ширма
+     от посторонних глаз, а не защита: хеш лежит в коде, и данные всё
+     равно читаются публичным ключом базы. Настоящая защита — Supabase Auth.
+
+     Текущий пароль: creoteam
+     Сменить: посчитать хеш в консоли браузера
+       crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
+         .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+     и подставить в GATE_HASH.
+
+     Если скрипт упадёт, ширма просто не покажется: запирать команду
+     из-за ошибки в коде хуже, чем не показать пароль.
+     ===================================================================== */
+  const GATE_HASH = '02d40edecb0ed2d1991cdce29e341ba1ccde0ea5aa61e031a28e6fefe2dc767f';
+  const GATE_KEY  = 'deckhub.gate';
+
+  function sha256js(msg){
+    const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+      0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+      0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+      0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+      0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+      0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    const bytes=[...new TextEncoder().encode(msg)];
+    const bitLen=bytes.length*8;
+    bytes.push(0x80);
+    while(bytes.length%64!==56) bytes.push(0);
+    const hi=Math.floor(bitLen/0x100000000), lo=bitLen>>>0;
+    [24,16,8,0].forEach(s=>bytes.push((hi>>>s)&0xff));
+    [24,16,8,0].forEach(s=>bytes.push((lo>>>s)&0xff));
+    const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+    for(let i=0;i<bytes.length;i+=64){
+      const w=new Array(64);
+      for(let t=0;t<16;t++) w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
+      for(let t=16;t<64;t++){
+        const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
+        const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
+        w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
+      }
+      let [a,b,c,d,e,f,g,hh]=H;
+      for(let t=0;t<64;t++){
+        const S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g);
+        const t1=(hh+S1+ch+K[t]+w[t])|0;
+        const S0=rotr(a,2)^rotr(a,13)^rotr(a,22), mj=(a&b)^(a&c)^(b&c);
+        const t2=(S0+mj)|0;
+        hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+      }
+      H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+hh)|0];
+    }
+    return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+  }
+  async function sha256(text){
+    try{
+      if(crypto && crypto.subtle && crypto.subtle.digest){
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+        return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+      }
+    }catch(e){}
+    return sha256js(text);      // без https Web Crypto недоступен — считаем сами
+  }
+  const gateOk = () => { try{ return store.get(GATE_KEY) === '1' }catch(e){ return false } };
+
+  function openHub(){
+    const g = document.getElementById('siteGate');
+    if(g){ g.classList.remove('on'); g.style.setProperty('display','none','important'); }
+    document.body.classList.remove('gated');
+    const boot=location.hash.replace('#/','');
+    const bs=SERVICES.find(x=>x.id===boot);
+    if(boot==='admin') goAdmin();
+    else if(boot==='vault') enterVault();
+    else if(bs&&bs.screen) enter(boot);
+    else { track('open','hub'); ping(); }
+    loadConfig();
+  }
+  function showGate(){
+    const g = document.getElementById('siteGate');
+    if(!g) { openHub(); return; }              /* нет разметки — не запираем */
+    g.classList.add('on');
+    document.body.classList.add('gated');
+    const inp = document.getElementById('gatePass'), err = document.getElementById('gateErr');
+    const go  = document.getElementById('gateGo'), eye = document.getElementById('gateEye');
+    async function tryEnter(){
+      const pass = (inp.value||'').trim();
+      if(!pass){ err.textContent = 'Введите пароль'; return; }
+      err.textContent = 'Проверяю…';
+      let ok = false;
+      try{ ok = (await sha256(pass)) === GATE_HASH; }
+      catch(e){ err.textContent = 'Не удалось проверить пароль: ' + e.message; return; }
+      if(!ok){ err.textContent = 'Пароль не подошёл'; inp.value = ''; inp.focus(); return; }
+      err.textContent = '';
+      store.set(GATE_KEY, '1');
+      openHub();
+    }
+    if(go) go.onclick = tryEnter;
+    if(inp) inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryEnter(); } });
+    if(eye) eye.onclick = ()=>{
+      const hidden = inp.type === 'password';
+      inp.type = hidden ? 'text' : 'password';
+      eye.textContent = hidden ? 'скрыть' : 'показать';
+      inp.focus();
+    };
+    setTimeout(()=>inp && inp.focus(), 60);
+  }
+
+  /* =====================================================================
+     ХРАНИЛИЩЕ ДОСТУПОВ
+     Логины лежат открыто, пароли — зашифрованы в браузере (AES-GCM,
+     ключ выводится из парольной фразы через PBKDF2, 200 000 итераций).
+     В базу и в код уходит только шифротекст: ни ключа, ни его хеша
+     нигде нет, поэтому подобрать его по файлу невозможно — только
+     перебором по самому шифротексту, что при длинной фразе безнадёжно.
+     Ключ должен отличаться от пароля входа: тот короткий и его хеш в коде.
+     ===================================================================== */
+  const VAULT_KEY_LS = 'deckhub.vaultkey';
+  let vaultKey = null, vaultRows = [];
+
+  const b64 = {
+    to: buf => btoa(String.fromCharCode(...new Uint8Array(buf))),
+    from: s => Uint8Array.from(atob(s), c => c.charCodeAt(0))
+  };
+  async function deriveKey(pass, salt){
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name:'PBKDF2', salt, iterations:200000, hash:'SHA-256' },
+      base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+  }
+  async function encryptSecret(pass, text){
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv   = crypto.getRandomValues(new Uint8Array(12));
+    const key  = await deriveKey(pass, salt);
+    const data = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(text));
+    return [b64.to(salt), b64.to(iv), b64.to(data)].join('.');
+  }
+  async function decryptSecret(pass, packed){
+    const [s, i, d] = String(packed||'').split('.');
+    if(!s || !i || !d) throw new Error('строка повреждена');
+    const key = await deriveKey(pass, b64.from(s));
+    const out = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64.from(i) }, key, b64.from(d));
+    return new TextDecoder().decode(out);
+  }
+
+  const vaultApi = {
+    list: () => fetch(DB.url+'/rest/v1/hub_vault?select=*&order=sort.asc', {headers:HEAD}).then(r=>r.json()),
+    add:  row => fetch(DB.url+'/rest/v1/hub_vault', {method:'POST',
+            headers:Object.assign({Prefer:'return=representation'}, HEAD), body:JSON.stringify(row)}).then(r=>r.json()),
+    del:  id => fetch(DB.url+'/rest/v1/hub_vault?id=eq.'+encodeURIComponent(id),
+            {method:'DELETE', headers:Object.assign({Prefer:'return=minimal'}, HEAD)})
+  };
+
+  async function openVaultWith(pass){
+    vaultRows = await vaultApi.list();
+    /* ключ проверяем на первой записи с паролем: не подошёл — расшифровка упадёт */
+    const probe = vaultRows.find(r => r.secret);
+    if(probe) await decryptSecret(pass, probe.secret);
+    vaultKey = pass;
+    try{ localStorage.setItem(VAULT_KEY_LS, pass) }catch(e){}
+    byIdV('vKeyBox').style.display = 'none';
+    byIdV('vBody').style.display = '';
+    byIdV('vLock').style.display = '';
+    renderVault();
+  }
+  const byIdV = id => document.getElementById(id);
+
+  function renderVault(){
+    const box = byIdV('vList');
+    if(!vaultRows.length){
+      box.innerHTML = '<div class="v-empty">Пока пусто. Добавьте первый доступ формой ниже.</div>';
+      return;
+    }
+    box.innerHTML = vaultRows.map(r => `
+      <div class="v-row" data-id="${esc(r.id)}">
+        <div class="v-svc">${esc(r.service)}</div>
+        <div class="v-pair">
+          <div class="v-line"><span class="v-lbl">почта</span><span class="v-val">${esc(r.login)}</span></div>
+          <div class="v-line"><span class="v-lbl">пароль</span><span class="v-val" data-secret>••••••••</span></div>
+        </div>
+        <div class="v-acts">
+          <button class="v-mini" data-act="login">почта</button>
+          <button class="v-mini" data-act="show">показать</button>
+          <button class="v-mini" data-act="copy">пароль</button>
+          <button class="v-mini del" data-act="del">удалить</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function vaultAction(btn){
+    const row = btn.closest('.v-row');
+    const rec = vaultRows.find(r => r.id === row.dataset.id);
+    if(!rec) return;
+    const act = btn.dataset.act;
+    const flash = (b, t) => { const o=b.textContent; b.textContent=t; setTimeout(()=>b.textContent=o,1400); };
+    try{
+      if(act === 'login'){ await navigator.clipboard.writeText(rec.login); flash(btn,'скопировано'); }
+      if(act === 'show'){
+        const cell = row.querySelector('[data-secret]');
+        if(btn.textContent === 'скрыть'){ cell.textContent='••••••••'; btn.textContent='показать'; return; }
+        cell.textContent = rec.secret ? await decryptSecret(vaultKey, rec.secret) : 'пароль не задан';
+        btn.textContent = 'скрыть';
+      }
+      if(act === 'copy'){
+        if(!rec.secret){ flash(btn,'нет пароля'); return; }
+        await navigator.clipboard.writeText(await decryptSecret(vaultKey, rec.secret));
+        flash(btn,'скопировано');
+      }
+      if(act === 'del'){
+        if(!confirm(`Удалить доступ к «${rec.service}» (${rec.login})?`)) return;
+        await vaultApi.del(rec.id);
+        vaultRows = vaultRows.filter(r => r.id !== rec.id);
+        renderVault();
+      }
+    }catch(e){ alert('Не получилось: ' + e.message); }
+  }
+
+  function initVault(){
+    const go = byIdV('vKeyGo'), inp = byIdV('vKey'), err = byIdV('vKeyErr');
+    if(!go) return;
+    async function tryKey(){
+      const pass = (inp.value||'').trim();
+      if(pass.length < 6){ err.textContent = 'Ключ короче шести символов не защитит'; return; }
+      err.textContent = 'Открываю…';
+      try{ await openVaultWith(pass); err.textContent = ''; }
+      catch(e){
+        /* при неверном ключе браузер бросает OperationError без текста,
+           а битая строка даёт ошибку разбора base64 — различаем */
+        const wrongKey = e.name === 'OperationError' || /decrypt|operation/i.test(e.message||'');
+        const broken   = /base|decode|atob|повреждена/i.test(e.message||'');
+        err.textContent = wrongKey ? 'Ключ не подошёл'
+          : broken ? 'Запись в базе повреждена — расшифровать нечем'
+          : 'Не удалось: ' + (e.message || e.name);
+      }
+    }
+    go.onclick = tryKey;
+    inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryKey(); } });
+    byIdV('vLock').onclick = ()=>{
+      try{ localStorage.removeItem(VAULT_KEY_LS) }catch(e){}
+      vaultKey = null;
+      byIdV('vBody').style.display='none'; byIdV('vLock').style.display='none';
+      byIdV('vKeyBox').style.display=''; inp.value='';
+    };
+    byIdV('vList').addEventListener('click', e=>{
+      const b = e.target.closest('[data-act]'); if(b) vaultAction(b);
+    });
+    byIdV('vAdd').onclick = async ()=>{
+      const service = byIdV('vService').value.trim(), login = byIdV('vLogin').value.trim();
+      const secret = byIdV('vSecret').value;
+      if(!service || !login){ alert('Нужны сервис и логин'); return; }
+      try{
+        const row = {
+          id: service.toLowerCase().replace(/[^a-zа-я0-9]+/gi,'-') + '-' + Date.now().toString(36),
+          service, login, sort: (vaultRows.length + 1) * 10,
+          secret: secret ? await encryptSecret(vaultKey, secret) : null
+        };
+        const [saved] = await vaultApi.add(row);
+        vaultRows.push(saved || row);
+        byIdV('vService').value=''; byIdV('vLogin').value=''; byIdV('vSecret').value='';
+        renderVault();
+      }catch(e){ alert('Не сохранилось: ' + e.message); }
+    };
+  }
+
+  async function enterVault(){
+    const target = byIdV('screenVault'); if(!target) return;
+    location.hash = '#/vault';
+    hideAll(); target.classList.add('on');
+    document.title = 'Доступы — Deck Hub';
+    window.scrollTo({top:0});
+    track('open','vault');
+    let saved = null;
+    try{ saved = localStorage.getItem(VAULT_KEY_LS) }catch(e){}
+    if(saved){ try{ await openVaultWith(saved); return; }catch(e){} }
+    setTimeout(()=>{ const i = byIdV('vKey'); if(i) i.focus(); }, 60);
+  }
+
   /* ---- старт ---- */
   const deck=SERVICES.find(s=>s.screen==='deck');
   const calc=SERVICES.find(s=>s.screen==='calc');
   const music=SERVICES.find(s=>s.screen==='music');
+  const vault=SERVICES.find(s=>s.screen==='vault');
   if(deck) buildHero(deck);
   if(calc) buildCalc(calc,'#calcTile');
   if(music) buildCalc(music,'#musicTile');
+  if(vault) buildCalc(vault,'#vaultTile');
   buildSoon();
   buildLinks();
   renderWho();
@@ -4439,13 +4841,9 @@ let LINKS = [
   q('#headNote').textContent = live===SERVICES.length
     ? word(SERVICES.length)+' · всё доступно'
     : word(SERVICES.length)+' · '+live+' доступно';
-  ['#hubBack','#hubBackCalc','#hubBackMusic'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
-  const boot=location.hash.replace('#/','');
-  const bs=SERVICES.find(x=>x.id===boot);
-  if(boot==='admin') goAdmin();
-  else if(bs&&bs.screen) enter(boot);
-  else { track('open','hub'); ping(); }
-  loadConfig();
+  ['#hubBack','#hubBackCalc','#hubBackMusic','#hubBackVault'].forEach(sel=>{const b=q(sel); if(b) b.onclick=showHub});
+  initVault();
+  if(gateOk()) openHub(); else showGate();
 })();
 </script>
 

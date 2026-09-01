@@ -1152,6 +1152,25 @@ body.gated{overflow:hidden}
 #screenVault .v-err{min-height:18px;margin-top:10px;font-size:12.5px;color:var(--v-bad)}
 
 #screenVault .v-list{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+#screenVault .v-search{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+#screenVault .v-search input{flex:1;height:40px}
+#screenVault .v-count{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--v-faint);white-space:nowrap}
+#screenVault .v-group{margin-bottom:18px}
+#screenVault .v-ghead{display:flex;align-items:center;gap:9px;padding:0 2px 9px}
+#screenVault .v-gdot{width:9px;height:9px;border-radius:3px;flex:none}
+#screenVault .v-gname{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px}
+#screenVault .v-gnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--v-faint);
+  background:var(--v-soft);border-radius:9px;padding:2px 7px}
+#screenVault .v-ghead::after{content:"";flex:1;height:1px;background:var(--v-line)}
+#screenVault .v-group .v-row{grid-template-columns:34px 1fr auto;margin-bottom:8px}
+#screenVault .v-group .v-row:last-child{margin-bottom:0}
+#screenVault .v-idx{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--v-faint)}
+#screenVault .v-none{color:var(--v-faint)}
+@media(max-width:640px){
+  #screenVault .v-group .v-row{grid-template-columns:1fr}
+  #screenVault .v-idx{display:none}
+}
 #screenVault .v-row{
   display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:center;
   background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;padding:13px 15px;
@@ -1916,6 +1935,10 @@ body.gated{overflow:hidden}
     </div>
 
     <div class="v-body" id="vBody" style="display:none">
+      <div class="v-search">
+        <input id="vSearch" type="search" placeholder="Найти сервис или почту" autocomplete="off">
+        <span class="v-count" id="vCount"></span>
+      </div>
       <div class="v-list" id="vList"></div>
       <div class="v-hint">Список только для чтения. Добавить или изменить доступ можно в админ-панели — она под отдельным паролем.</div>
     </div>
@@ -4714,25 +4737,73 @@ let LINKS = [
     renderVault();
   }
 
+  /* Порядок сервисов повторяет плитки на главной, чтобы искать глазами
+     в привычной последовательности; чего нет среди плиток — по алфавиту. */
+  function serviceRank(name){
+    const i = LINKS.findIndex(l => l.name.toLowerCase() === String(name||'').toLowerCase());
+    return i < 0 ? 999 : i;
+  }
+  let vaultQuery = '';
+
   function renderVault(){
     const box = byIdV('vList');
+    const q = vaultQuery.trim().toLowerCase();
+    const rows = vaultRows.filter(r => !q ||
+      (r.service + ' ' + r.login).toLowerCase().includes(q));
+
+    const cnt = byIdV('vCount');
+    if(cnt) cnt.textContent = vaultRows.length
+      ? (q ? rows.length + ' из ' + vaultRows.length : vaultRows.length + ' ' +
+          (vaultRows.length % 10 === 1 && vaultRows.length % 100 !== 11 ? 'аккаунт'
+            : (vaultRows.length % 10 > 1 && vaultRows.length % 10 < 5 && (vaultRows.length % 100 < 10 || vaultRows.length % 100 > 20) ? 'аккаунта' : 'аккаунтов')))
+      : '';
+
     if(!vaultRows.length){
-      box.innerHTML = '<div class="v-empty">Пока пусто. Добавьте первый доступ формой ниже.</div>';
+      box.innerHTML = '<div class="v-empty">Пока пусто. Доступы заводятся в админ-панели.</div>';
       return;
     }
-    box.innerHTML = vaultRows.map(r => `
-      <div class="v-row" data-id="${esc(r.id)}">
-        <div class="v-svc">${esc(r.service)}</div>
-        <div class="v-pair">
-          <div class="v-line"><span class="v-lbl">логин</span><span class="v-val">${esc(r.login)}</span></div>
-          <div class="v-line"><span class="v-lbl">пароль</span><span class="v-val" data-secret>••••••••</span></div>
+    if(!rows.length){
+      box.innerHTML = '<div class="v-empty">Ничего не нашлось. Попробуйте другое слово.</div>';
+      return;
+    }
+
+    const groups = new Map();
+    rows.forEach(r => {
+      const g = (r.service || '').trim() || 'Без сервиса';
+      if(!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(r);
+    });
+    const order = [...groups.keys()].sort((a, b) => {
+      const ra = serviceRank(a), rb = serviceRank(b);
+      return ra !== rb ? ra - rb : a.localeCompare(b, 'ru');
+    });
+
+    box.innerHTML = order.map(g => {
+      const list = groups.get(g);
+      const col = (LINKS.find(l => l.name.toLowerCase() === g.toLowerCase()) || {}).color || 'var(--v-accent)';
+      return `
+      <div class="v-group">
+        <div class="v-ghead">
+          <span class="v-gdot" style="background:${col}"></span>
+          <span class="v-gname">${esc(g)}</span>
+          <span class="v-gnum">${list.length}</span>
         </div>
-        <div class="v-acts">
-          <button class="v-mini" data-act="login">логин</button>
-          <button class="v-mini" data-act="show">показать</button>
-          <button class="v-mini" data-act="copy">пароль</button>
-        </div>
-      </div>`).join('');
+        ${list.map((r, n) => `
+          <div class="v-row" data-id="${esc(r.id)}">
+            <div class="v-idx">${list.length > 1 ? '#' + (n + 1) : ''}</div>
+            <div class="v-pair">
+              <div class="v-line"><span class="v-lbl">логин</span><span class="v-val">${esc(r.login)}</span></div>
+              <div class="v-line"><span class="v-lbl">пароль</span><span class="v-val" data-secret>${
+                r.secret ? '••••••••' : '<span class="v-none">не задан</span>'}</span></div>
+            </div>
+            <div class="v-acts">
+              <button class="v-mini" data-act="login">логин</button>
+              ${r.secret ? '<button class="v-mini" data-act="show">показать</button>' +
+                           '<button class="v-mini" data-act="copy">пароль</button>' : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+    }).join('');
   }
 
   async function vaultAction(btn){
@@ -4766,6 +4837,8 @@ let LINKS = [
     };
     const lock = byIdV('vLock');
     if(lock) lock.style.display = 'none';
+    const s = byIdV('vSearch');
+    if(s) s.addEventListener('input', e => { vaultQuery = e.target.value; renderVault(); });
     byIdV('vList').addEventListener('click', e => {
       const b = e.target.closest('[data-act]'); if(b) vaultAction(b);
     });

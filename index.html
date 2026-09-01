@@ -1235,6 +1235,30 @@ html:not(:has(.screen.on)) #screenHub{display:block}
 #screenHub .t-link:hover .go{filter:brightness(1.06)}
 #screenHub .t-link .go svg{transition:transform .15s}
 #screenHub .t-link:hover .go svg{transform:translate(1px,-1px)}
+#screenHub .t-link .mails{display:flex;flex-direction:column;gap:6px}
+#screenHub .t-link .mails{margin-top:10px}
+#screenHub .t-link .mail{
+  display:flex;align-items:center;gap:8px;padding:7px 9px;
+  background:var(--h-soft);border:1px solid var(--h-line);border-radius:8px;
+}
+#screenHub .t-link .mail-adr{
+  flex:1;min-width:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;
+  color:var(--h-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#screenHub .t-link .mail-more{display:none}
+#screenHub .t-link .mails.open .mail-more{display:flex}
+#screenHub .t-link .mail-toggle{
+  align-self:flex-start;background:none;border:0;cursor:pointer;padding:2px 0;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--h-faint);text-decoration:underline;text-underline-offset:2px;transition:color .14s;
+}
+#screenHub .t-link .mail-toggle:hover{color:var(--c)}
+#screenHub .t-link .mail-copy{
+  flex:0 0 auto;background:none;border:0;cursor:pointer;padding:2px 4px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--h-faint);text-decoration:underline;text-underline-offset:2px;transition:color .14s;
+}
+#screenHub .t-link .mail-copy:hover{color:var(--c)}
 #screenHub .t-link .dm{
   font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:var(--h-faint);
   margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -3870,27 +3894,35 @@ let SERVICES = [
 
 /* =====================================================================
    ВНЕШНИЕ СЕРВИСЫ — открываются в новой вкладке.
+   login — почта, под которой заходим. Можно строкой или списком, если
+   аккаунтов несколько: ['первая@…','вторая@…']. Показывается на плитке
+   отдельной строкой с кнопкой копирования. ПАРОЛИ СЮДА НЕ ВПИСЫВАЕМ: репозиторий публичный, и всё,
+   что попало в код, остаётся в истории коммитов навсегда. Пароли —
+   в менеджере паролей команды.
    ===================================================================== */
 let LINKS = [
   {id:'kling', name:'Kling',   kicker:'Видео',        color:'#2F6BFF',
+   login:['creo.team@evadav.com','designer@evadav.com','dizejner@evadav.com',
+          'dezigner@evadav.com','designer1@evadav.com','designer2@evadav.com'],
    desc:'Генерация видео из текста и картинок. Открывается в командном воркспейсе.',
    url:'https://kling.ai/app/video/new?ac=1&teamId=2315925653520244'},
-  {id:'openart', name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8',
+  {id:'openart', name:'OpenArt', kicker:'Изображения',  color:'#7A5AF8', login:'creo.team@evadav.com',
    desc:'Картинки, стили и апскейл — для кадров и превью.',
    url:'https://openart.ai/home'},
-  {id:'vozo', name:'Vozo',    kicker:'Липсинк',       color:'#E0870B',
+  {id:'vozo', name:'Vozo',    kicker:'Липсинк',       color:'#E0870B', login:'creo.team@evadav.com',
    desc:'Сервис для липсинка: подгоняет движение губ под новую озвучку.',
    url:'https://app.vozo.ai/'},
-  {id:'vmake', name:'Vmake',   kicker:'Очистка',       color:'#E8596A',
+  {id:'vmake', name:'Vmake',   kicker:'Очистка',       color:'#E8596A', login:'creo.team@evadav.com',
    desc:'Удаление субтитров и водяных знаков с видео.',
    url:'https://vmake.ai/workspace'},
-  {id:'transcribe', name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6',
+  {id:'transcribe', name:'Transcribe', kicker:'Расшифровка', color:'#4E86C6', login:'creo.team@evadav.com',
    desc:'Достаёт текст из озвучки — готовый скрипт из готового ролика.',
    url:'https://login.go-transcribe.com/'},
-  {id:'heygen', name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4',
+  {id:'heygen', name:'HeyGen',  kicker:'Аватары',       color:'#14A5C4', login:'creo.team@evadav.com',
    desc:'Говорящие аватары для креативов — из текста или своей озвучки.',
    url:'https://app.heygen.com/projects/avatar-videos'},
   {id:'topview', name:'TopView', kicker:'Аватары',      color:'#2FA37A',
+   login:['creo.team@evadav.com','designer@evadav.com'],
    desc:'UGC-аватары для перформанс-креативов. Открывается на нашей доске.',
    url:'https://www.topview.ai/board/ccbd7f75ec5442febff1eaa972ed5680?tool-type=ai-avatar'}
 ];
@@ -4038,6 +4070,22 @@ let LINKS = [
           '<span class="badge" style="--s:var(--h-faint);margin-left:auto"><i></i>внешний</span></div>'+
         '<h3>'+esc(l.name)+'</h3>'+
         '<p>'+esc(l.desc)+'</p>'+
+        (function(){
+          const list = Array.isArray(l.login) ? l.login : (l.login ? [l.login] : []);
+          if(!list.length) return '';
+          /* больше двух аккаунтов — прячем остальные, иначе плитка вытягивается */
+          const row = (adr, hidden) =>
+            '<div class="mail'+(hidden ? ' mail-more' : '')+'" data-mail="'+esc(adr)+'">'+
+              '<span class="mail-adr">'+esc(adr)+'</span>'+
+              '<button type="button" class="mail-copy" title="Скопировать почту">копировать</button>'+
+            '</div>';
+          const head = list.slice(0,2).map(a => row(a, false)).join('');
+          const rest = list.slice(2).map(a => row(a, true)).join('');
+          return '<div class="mails">' + head + rest +
+            (rest ? '<button type="button" class="mail-toggle">ещё '+(list.length-2)+
+                    ' '+(list.length-2===1?'аккаунт':(list.length-2<5?'аккаунта':'аккаунтов'))+'</button>' : '')
+            + '</div>';
+        })()+
         '<div class="foot">'+
           '<span class="go">Открыть'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M9 7h8v8"/></svg>'+
@@ -4299,7 +4347,39 @@ let LINKS = [
     };
   }
 
+  /* копирование почты не должно уводить в сервис: плитка — это ссылка */
   document.addEventListener('click', e=>{
+    const toggle = e.target.closest('#extGrid .mail-toggle');
+    if(toggle){
+      e.preventDefault(); e.stopPropagation();
+      const box = toggle.closest('.mails');
+      const open = box.classList.toggle('open');
+      const n = box.querySelectorAll('.mail-more').length;
+      toggle.textContent = open ? 'свернуть' : 'ещё ' + n + ' ' + (n===1?'аккаунт':(n<5?'аккаунта':'аккаунтов'));
+      return;
+    }
+    const mailBtn = e.target.closest('#extGrid .mail-copy');
+    if(mailBtn){
+      e.preventDefault(); e.stopPropagation();
+      const box = mailBtn.closest('[data-mail]');
+      const adr = box ? box.dataset.mail : '';
+      const done = ()=>{
+        mailBtn.textContent = 'скопировано';
+        setTimeout(()=>{ mailBtn.textContent = 'копировать' }, 1500);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText)
+        navigator.clipboard.writeText(adr).then(done).catch(()=>done());
+      else {
+        const ta=document.createElement('textarea');
+        ta.value=adr; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); done() }catch(err){}
+        ta.remove();
+      }
+      const l = LINKS.find(x => Array.isArray(x.login) ? x.login.includes(adr) : x.login === adr);
+      track('action','link:'+(l?l.id:'other'),'login');
+      return;
+    }
     const a = e.target.closest('#extGrid a');
     if(a){ const l = LINKS.find(x=>a.href===x.url); track('action','link:'+((l&&l.id)||hostOf(a.href)),'open'); return; }
     for(const [sel, service, detail] of ACTIONS){

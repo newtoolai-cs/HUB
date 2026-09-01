@@ -118,16 +118,20 @@ body.booting{overflow:hidden}
   <div class="gate-card">
     <div class="gate-mark">◤</div>
     <h1>Deck Hub</h1>
-    <p>Внутренние инструменты команды дизайна. Введите общий пароль — он запомнится, и спрашивать больше не будем.</p>
+    <p>Инструменты команды дизайна. Выберите себя и введите пароль команды — на этом устройстве спросим один раз.</p>
+    <div class="gate-lab">кто вы</div>
+    <div class="gate-who" id="gateWho"></div>
+    <input type="text" id="gateCode" placeholder="или впишите код" autocomplete="off">
+    <div class="gate-lab">пароль команды</div>
     <div class="gate-field">
-      <input type="password" id="gatePass" placeholder="Пароль команды" autocomplete="off" autofocus>
+      <input type="password" id="gatePass" placeholder="••••••••" autocomplete="current-password">
       <button type="button" class="gate-eye" id="gateEye">показать</button>
     </div>
     <button type="button" class="gate-go" id="gateGo">Войти</button>
     <div class="gate-err" id="gateErr"></div>
+    <div class="gate-note" id="gateNote"></div>
   </div>
 </div>
-
 
 <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Загрузка">
   <div class="boot-in">
@@ -1039,40 +1043,73 @@ body.booting{overflow:hidden}
 html:not(:has(.screen.on)) #screenHub{display:block}
 
 /* метка сборки в углу: по ней сразу видно, какая версия задеплоена */
-.gate{display:none}          /* по умолчанию скрыта: упал скрипт — сайт остаётся открытым */
+.gate{display:none}          /* по умолчанию скрыт: упал скрипт — сайт остаётся открытым */
 .gate.on{
   position:fixed;inset:0;z-index:9998;display:grid;place-items:center;padding:24px;
-  background:#E7EBEF;color:#161B23;
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:#E7EBEF;color:#161B23;font-family:'Inter',system-ui,-apple-system,sans-serif;
 }
 :root[data-theme="dark"] .gate.on{background:#0A0B0E;color:#EEF0F4}
-.gate-card{width:100%;max-width:340px;text-align:center}
-.gate-mark{font-size:19px;line-height:1;color:#2F6BFF;margin-bottom:16px}
-:root[data-theme="dark"] .gate-mark{color:#5C8DFF;text-shadow:0 0 18px rgba(92,141,255,.5)}
-.gate-card h1{font-family:'Space Grotesk',system-ui,sans-serif;font-size:24px;font-weight:700;
-  letter-spacing:-.03em;margin:0 0 10px}
-.gate-card p{font-size:13.5px;line-height:1.55;color:#5F6A79;margin:0 0 20px}
-:root[data-theme="dark"] .gate-card p{color:#98A1AF}
-.gate-field{position:relative;margin-bottom:10px}
-.gate-field input{
-  width:100%;height:44px;padding:0 74px 0 14px;border-radius:11px;
-  border:1px solid #D6DCE3;background:#fff;color:inherit;font-size:14.5px;outline:none;
-  transition:border .14s,box-shadow .14s;
+.gate-card{
+  width:100%;max-width:352px;text-align:center;background:#fff;
+  border:1px solid #DFE3EA;border-radius:18px;padding:28px 26px 24px;
+  box-shadow:0 1px 2px rgba(20,27,35,.05), 0 18px 44px rgba(20,27,35,.10);
 }
-:root[data-theme="dark"] .gate-field input{background:#13161D;border-color:#252B36}
-.gate-field input:focus{border-color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.14)}
+:root[data-theme="dark"] .gate-card{
+  background:#13161D;border-color:#242B36;
+  box-shadow:0 1px 2px rgba(0,0,0,.5), 0 22px 50px rgba(0,0,0,.55);
+}
+.gate-mark{font-size:18px;line-height:1;color:#2F6BFF;margin-bottom:14px}
+:root[data-theme="dark"] .gate-mark{color:#5C8DFF;text-shadow:0 0 18px rgba(92,141,255,.5)}
+.gate-card h1{font-family:'Space Grotesk',system-ui,sans-serif;font-size:23px;font-weight:700;
+  letter-spacing:-.03em;margin:0 0 9px}
+.gate-card p{font-size:13px;line-height:1.55;color:#5F6A79;margin:0 0 22px}
+:root[data-theme="dark"] .gate-card p{color:#98A1AF}
+
+.gate-lab{
+  font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:#8A94A3;text-align:left;margin:0 2px 8px;
+}
+.gate-who{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.gate-who button{
+  background:#F4F6F9;border:1px solid #DFE3EA;color:#161B23;cursor:pointer;border-radius:9px;
+  font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;padding:7px 11px;transition:all .14s;
+}
+:root[data-theme="dark"] .gate-who button{background:#1A1F28;border-color:#252B36;color:#EEF0F4}
+.gate-who button:hover{border-color:#2F6BFF;color:#2F6BFF}
+.gate-who button[aria-pressed="true"]{background:#2F6BFF;border-color:#2F6BFF;color:#fff}
+
+.gate-card input{
+  width:100%;height:44px;border-radius:11px;border:1px solid #DFE3EA;background:#F4F6F9;color:inherit;
+  font-size:14px;outline:none;padding:0 14px;text-align:center;margin-bottom:18px;
+  transition:border-color .14s,box-shadow .14s,background .14s;
+}
+:root[data-theme="dark"] .gate-card input{background:#1A1F28;border-color:#252B36}
+.gate-card input::placeholder{color:#A7B0BC}
+:root[data-theme="dark"] .gate-card input::placeholder{color:#5A6472}
+.gate-card input:focus{border-color:#2F6BFF;background:#fff;box-shadow:0 0 0 3px rgba(47,107,255,.14)}
+:root[data-theme="dark"] .gate-card input:focus{background:#13161D}
+/* свой фокус вместо бирюзовой рамки, приезжающей из стилей музыки */
+.gate .gate-card input:focus-visible,
+.gate .gate-card button:focus-visible{outline:none}
+#gateCode{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px}
+
+.gate-field{position:relative;margin-bottom:0}
+.gate-field input{padding:0 76px;margin-bottom:0;letter-spacing:.1em}
 .gate-eye{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;
+  position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;
   font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.08em;
-  text-transform:uppercase;color:#8A94A3;padding:4px 6px;
+  text-transform:uppercase;color:#8A94A3;padding:5px 6px;border-radius:6px;transition:color .14s;
 }
 .gate-eye:hover{color:#2F6BFF}
 .gate-go{
-  width:100%;height:44px;border:0;border-radius:11px;cursor:pointer;background:#2F6BFF;color:#fff;
-  font-family:'Space Grotesk',system-ui,sans-serif;font-size:14.5px;font-weight:600;transition:filter .14s;
+  width:100%;height:44px;margin-top:16px;border:0;border-radius:11px;cursor:pointer;
+  background:#2F6BFF;color:#fff;font-family:'Space Grotesk',system-ui,sans-serif;
+  font-size:14.5px;font-weight:600;transition:filter .14s,transform .08s;
 }
 .gate-go:hover{filter:brightness(1.07)}
-.gate-err{min-height:20px;margin-top:12px;font-size:13px;color:#D63C4E}
+.gate-go:active{transform:translateY(1px)}
+.gate-err{min-height:20px;margin-top:11px;font-size:13px;color:#D63C4E}
+.gate-note{font-size:12px;line-height:1.5;color:#8A94A3;margin-top:6px}
 body.gated{overflow:hidden}
 #screenVault{
   --v-bg:#E7EBEF; --v-card:#FFFFFF; --v-soft:#F4F6F9; --v-line:#D6DCE3;
@@ -1247,18 +1284,6 @@ body.gated{overflow:hidden}
   display:flex;flex-wrap:wrap;align-items:center;gap:7px;
   margin:16px 0 14px;padding-top:14px;border-top:1px solid var(--h-line-soft);
 }
-#screenHub .who-ask{flex:1 1 100%;font-size:12.5px;line-height:1.5;color:var(--h-mid)}
-#screenHub .who-list{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-#screenHub .who-pick{
-  background:var(--h-soft);border:1px solid var(--h-line);color:var(--h-ink);
-  font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:8px;transition:all .14s;
-}
-#screenHub .who-pick:hover{border-color:var(--h-accent);color:var(--h-accent)}
-#screenHub .who-input{
-  background:var(--h-soft);border:1px solid var(--h-line);color:var(--h-ink);
-  font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:8px;width:150px;outline:none;
-}
-#screenHub .who-input:focus{border-color:var(--h-accent)}
 #screenHub .who-me{font-family:var(--mono);font-size:11px;color:var(--h-mid)}
 #screenHub .who-me b{color:var(--h-ink);font-weight:600}
 /* статус */
@@ -4390,30 +4415,16 @@ let LINKS = [
     store.set('pd-author', String(n||'').trim());
     renderWho(); ping();
   }
-  async function renderWho(){
+  /* Кто вошёл — известно из формы входа, поэтому спрашивать больше нечего:
+     просто показываем в мастхеде. */
+  function renderWho(){
     const box = q('#whoBox'); if(!box) return;
-    const me = personName();
-    if(me){
-      box.innerHTML = '<span class="who-me">Вы — <b></b></span>';
-      box.querySelector('b').textContent = me;
-      return;
-    }
-    box.innerHTML = '<span class="who-ask">Представьтесь: имя подставится в ваши промты и будет видно в статистике хаба.</span>'
-      + '<span class="who-list">загружаю список…</span>';
-    const list = await designers();
-    const wrap = box.querySelector('.who-list');
-    wrap.innerHTML = '';
-    list.forEach(n=>{
-      const b=document.createElement('button');
-      b.type='button'; b.className='who-pick'; b.textContent=n;
-      b.onclick=()=>setName(n);
-      wrap.appendChild(b);
-    });
-    const inp=document.createElement('input');
-    inp.className='who-input'; inp.placeholder=list.length?'или впишите себя':'впишите имя';
-    inp.onkeydown=e=>{ if(e.key==='Enter' && inp.value.trim()) setName(inp.value) };
-    wrap.appendChild(inp);
+    const me = myCode() || personName();
+    if(!me){ box.innerHTML = ''; return; }
+    box.innerHTML = '<span class="who-me">Вы — <b></b></span>';
+    box.querySelector('b').textContent = me;
   }
+
   let curScreen = 'hub';
 
   function ping(){
@@ -4548,134 +4559,18 @@ let LINKS = [
   }
 
   /* =====================================================================
-     ОБЩИЙ ВХОД В ХАБ
-     Один пароль на команду, запоминается в браузере навсегда. Это ширма
-     от посторонних глаз, а не защита: хеш лежит в коде, и данные всё
-     равно читаются публичным ключом базы. Настоящая защита — Supabase Auth.
-
-     Текущий пароль: creoteam
-     Сменить: посчитать хеш в консоли браузера
-       crypto.subtle.digest('SHA-256', new TextEncoder().encode('новый'))
-         .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
-     и подставить в GATE_HASH.
-
-     Если скрипт упадёт, ширма просто не покажется: запирать команду
-     из-за ошибки в коде хуже, чем не показать пароль.
+     ШИФРОВАНИЕ ДОСТУПОВ
+     Пароли внешних сервисов лежат в базе только в зашифрованном виде:
+     AES-GCM, ключ выводится из пароля команды через PBKDF2 (200 000
+     итераций). Пароль в базу и в код не попадает никогда.
      ===================================================================== */
-  const GATE_HASH = '02d40edecb0ed2d1991cdce29e341ba1ccde0ea5aa61e031a28e6fefe2dc767f';
-  const GATE_KEY  = 'deckhub.gate';
-
-  function sha256js(msg){
-    const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-      0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-      0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-      0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-      0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-      0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
-    let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-    const bytes=[...new TextEncoder().encode(msg)];
-    const bitLen=bytes.length*8;
-    bytes.push(0x80);
-    while(bytes.length%64!==56) bytes.push(0);
-    const hi=Math.floor(bitLen/0x100000000), lo=bitLen>>>0;
-    [24,16,8,0].forEach(s=>bytes.push((hi>>>s)&0xff));
-    [24,16,8,0].forEach(s=>bytes.push((lo>>>s)&0xff));
-    const rotr=(x,n)=>(x>>>n)|(x<<(32-n));
-    for(let i=0;i<bytes.length;i+=64){
-      const w=new Array(64);
-      for(let t=0;t<16;t++) w[t]=(bytes[i+t*4]<<24)|(bytes[i+t*4+1]<<16)|(bytes[i+t*4+2]<<8)|bytes[i+t*4+3];
-      for(let t=16;t<64;t++){
-        const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
-        const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
-        w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
-      }
-      let [a,b,c,d,e,f,g,hh]=H;
-      for(let t=0;t<64;t++){
-        const S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g);
-        const t1=(hh+S1+ch+K[t]+w[t])|0;
-        const S0=rotr(a,2)^rotr(a,13)^rotr(a,22), mj=(a&b)^(a&c)^(b&c);
-        const t2=(S0+mj)|0;
-        hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
-      }
-      H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+hh)|0];
-    }
-    return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
-  }
-  async function sha256(text){
-    try{
-      if(crypto && crypto.subtle && crypto.subtle.digest){
-        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-        return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
-      }
-    }catch(e){}
-    return sha256js(text);      // без https Web Crypto недоступен — считаем сами
-  }
-  const gateOk = () => { try{ return store.get(GATE_KEY) === '1' }catch(e){ return false } };
-
-  function openHub(){
-    const g = document.getElementById('siteGate');
-    if(g){ g.classList.remove('on'); g.style.setProperty('display','none','important'); }
-    document.body.classList.remove('gated');
-    const boot=location.hash.replace('#/','');
-    const bs=SERVICES.find(x=>x.id===boot);
-    if(boot==='admin') goAdmin();
-    else if(boot==='vault') enterVault();
-    else if(bs&&bs.screen) enter(boot);
-    else { track('open','hub'); ping(); }
-    loadConfig();
-  }
-  function showGate(){
-    const g = document.getElementById('siteGate');
-    if(!g) { openHub(); return; }              /* нет разметки — не запираем */
-    g.classList.add('on');
-    document.body.classList.add('gated');
-    const inp = document.getElementById('gatePass'), err = document.getElementById('gateErr');
-    const go  = document.getElementById('gateGo'), eye = document.getElementById('gateEye');
-    async function tryEnter(){
-      const pass = (inp.value||'').trim();
-      if(!pass){ err.textContent = 'Введите пароль'; return; }
-      err.textContent = 'Проверяю…';
-      let ok = false;
-      try{ ok = (await sha256(pass)) === GATE_HASH; }
-      catch(e){ err.textContent = 'Не удалось проверить пароль: ' + e.message; return; }
-      if(!ok){ err.textContent = 'Пароль не подошёл'; inp.value = ''; inp.focus(); return; }
-      err.textContent = '';
-      store.set(GATE_KEY, '1');
-      openHub();
-    }
-    if(go) go.onclick = tryEnter;
-    if(inp) inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryEnter(); } });
-    if(eye) eye.onclick = ()=>{
-      const hidden = inp.type === 'password';
-      inp.type = hidden ? 'text' : 'password';
-      eye.textContent = hidden ? 'скрыть' : 'показать';
-      inp.focus();
-    };
-    setTimeout(()=>inp && inp.focus(), 60);
-  }
-
-  /* =====================================================================
-     ХРАНИЛИЩЕ ДОСТУПОВ
-     Логины лежат открыто, пароли — зашифрованы в браузере (AES-GCM,
-     ключ выводится из парольной фразы через PBKDF2, 200 000 итераций).
-     В базу и в код уходит только шифротекст: ни ключа, ни его хеша
-     нигде нет, поэтому подобрать его по файлу невозможно — только
-     перебором по самому шифротексту, что при длинной фразе безнадёжно.
-     Ключ должен отличаться от пароля входа: тот короткий и его хеш в коде.
-     ===================================================================== */
-  const VAULT_KEY_LS = 'deckhub.vaultkey';
-  let vaultKey = null, vaultRows = [];
-
   const b64 = {
     to: buf => btoa(String.fromCharCode(...new Uint8Array(buf))),
     from: s => Uint8Array.from(atob(s), c => c.charCodeAt(0))
   };
   async function deriveKey(pass, salt){
     const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
-    return crypto.subtle.deriveKey(
-      { name:'PBKDF2', salt, iterations:200000, hash:'SHA-256' },
+    return crypto.subtle.deriveKey({ name:'PBKDF2', salt, iterations:200000, hash:'SHA-256' },
       base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
   }
   async function encryptSecret(pass, text){
@@ -4692,7 +4587,6 @@ let LINKS = [
     const out = await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64.from(i) }, key, b64.from(d));
     return new TextDecoder().decode(out);
   }
-
   const vaultApi = {
     list: () => fetch(DB.url+'/rest/v1/hub_vault?select=*&order=sort.asc', {headers:HEAD}).then(r=>r.json()),
     add:  row => fetch(DB.url+'/rest/v1/hub_vault', {method:'POST',
@@ -4701,19 +4595,130 @@ let LINKS = [
             {method:'DELETE', headers:Object.assign({Prefer:'return=minimal'}, HEAD)})
   };
 
+  /* =====================================================================
+     ВХОД В ХАБ
+     Пароля в коде нет — ни открытого, ни хешем. Если скрипт упадёт,
+     экран входа просто не покажется: запирать команду из-за ошибки
+     в коде хуже, чем не показать форму.
+     ===================================================================== */
+  /* Вход: код дизайнера называет человека, пароль команды служит ключом
+     шифрования хранилища. Хеша пароля в коде нет намеренно — правильность
+     подтверждается тем, что им расшифровывается проверочная запись в базе.
+     Значит подобрать пароль по файлу невозможно, только перебором по
+     шифротексту, а это при 200 000 итераций PBKDF2 безнадёжно. */
+  const LS_CODE = 'deckhub.code', LS_PASS = 'deckhub.pass';
+  const PROBE_ID = '__probe__', PROBE_VAL = 'deckhub-ok';
+
+  const myCode = () => { try{ return (store.get(LS_CODE)||'').trim() }catch(e){ return '' } };
+  const myPass = () => { try{ return store.get(LS_PASS) || '' }catch(e){ return '' } };
+  const gateOk = () => !!(myCode() && myPass());
+
+  async function doLogin(code, pass){
+    const rows = await vaultApi.list();
+    const probe = rows.find(r => r.id === PROBE_ID);
+    if(probe){
+      const val = await decryptSecret(pass, probe.secret);   /* не подошёл — исключение */
+      if(val !== PROBE_VAL) throw new Error('mismatch');
+    } else {
+      /* первый вход задаёт пароль команды: проверочной записи ещё нет */
+      await vaultApi.add({ id:PROBE_ID, service:'__probe__', login:'-', sort:-1,
+                           secret: await encryptSecret(pass, PROBE_VAL) });
+    }
+    store.set(LS_CODE, code);
+    store.set(LS_PASS, pass);
+    store.set('pd-author', code);      /* дека и музыка подставят это имя сами */
+  }
+
+  function openHub(){
+    const g = document.getElementById('siteGate');
+    if(g){ g.classList.remove('on'); g.style.setProperty('display','none','important'); }
+    document.body.classList.remove('gated');
+    const boot=location.hash.replace('#/','');
+    const bs=SERVICES.find(x=>x.id===boot);
+    if(boot==='admin') goAdmin();
+    else if(boot==='vault') enterVault();
+    else if(bs&&bs.screen) enter(boot);
+    else { track('open','hub'); ping(); }
+    loadConfig();
+    renderWho();
+  }
+
+  function showGate(){
+    const g = document.getElementById('siteGate');
+    if(!g){ openHub(); return; }                 /* нет разметки — не запираем */
+    g.classList.add('on');
+    document.body.classList.add('gated');
+    const code = document.getElementById('gateCode');
+    const pass = document.getElementById('gatePass');
+    const err  = document.getElementById('gateErr');
+    const note = document.getElementById('gateNote');
+    const who  = document.getElementById('gateWho');
+    const go   = document.getElementById('gateGo');
+    const eye  = document.getElementById('gateEye');
+
+    /* список тех, кто уже добавлял промты — чтобы не набирать имя руками */
+    designers().then(list => {
+      if(!list.length || !who) return;
+      who.innerHTML = '';
+      list.forEach(n => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = n;
+        b.onclick = () => {
+          code.value = n;
+          [...who.children].forEach(x => x.setAttribute('aria-pressed', x === b));
+          pass.focus();
+        };
+        who.appendChild(b);
+      });
+    }).catch(()=>{});
+
+    /* если проверочной записи нет, первый вход задаёт пароль команды */
+    vaultApi.list().then(rows => {
+      if(note && !rows.some(r => r.id === PROBE_ID))
+        note.textContent = 'Пароль команды ещё не задан. Тот, что введёте сейчас, станет паролем для всех — придумайте длинный.';
+    }).catch(()=>{});
+
+    async function submit(){
+      const c = (code.value||'').trim(), p = (pass.value||'').trim();
+      if(!c){ err.textContent = 'Выберите себя или впишите код'; code.focus(); return; }
+      if(p.length < 6){ err.textContent = 'Пароль короче шести символов не защитит'; pass.focus(); return; }
+      err.textContent = 'Проверяю…';
+      try{
+        await doLogin(c, p);
+        err.textContent = '';
+        openHub();
+      }catch(e){
+        const wrong = e.name === 'OperationError' || /mismatch|decrypt|operation/i.test(e.message||'');
+        err.textContent = wrong ? 'Пароль не подошёл'
+          : !window.crypto || !crypto.subtle ? 'Браузер не даёт шифрование: нужен https'
+          : 'Не удалось войти: ' + (e.message || e.name);
+        pass.value = '';
+      }
+    }
+    if(go) go.onclick = submit;
+    [code, pass].forEach(el => el && el.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){ e.preventDefault(); submit(); }
+    }));
+    if(eye) eye.onclick = ()=>{
+      const hidden = pass.type === 'password';
+      pass.type = hidden ? 'text' : 'password';
+      eye.textContent = hidden ? 'скрыть' : 'показать';
+      pass.focus();
+    };
+    setTimeout(()=>{ if(code) code.focus() }, 60);
+  }
+
+  /* ---- хранилище доступов ---- */
+  const byIdV = id => document.getElementById(id);
+  let vaultKey = null, vaultRows = [];
+
   async function openVaultWith(pass){
-    vaultRows = await vaultApi.list();
-    /* ключ проверяем на первой записи с паролем: не подошёл — расшифровка упадёт */
-    const probe = vaultRows.find(r => r.secret);
-    if(probe) await decryptSecret(pass, probe.secret);
+    vaultRows = (await vaultApi.list()).filter(r => r.id !== PROBE_ID);
     vaultKey = pass;
-    try{ localStorage.setItem(VAULT_KEY_LS, pass) }catch(e){}
     byIdV('vKeyBox').style.display = 'none';
     byIdV('vBody').style.display = '';
-    byIdV('vLock').style.display = '';
     renderVault();
   }
-  const byIdV = id => document.getElementById(id);
 
   function renderVault(){
     const box = byIdV('vList');
@@ -4725,11 +4730,11 @@ let LINKS = [
       <div class="v-row" data-id="${esc(r.id)}">
         <div class="v-svc">${esc(r.service)}</div>
         <div class="v-pair">
-          <div class="v-line"><span class="v-lbl">почта</span><span class="v-val">${esc(r.login)}</span></div>
+          <div class="v-line"><span class="v-lbl">логин</span><span class="v-val">${esc(r.login)}</span></div>
           <div class="v-line"><span class="v-lbl">пароль</span><span class="v-val" data-secret>••••••••</span></div>
         </div>
         <div class="v-acts">
-          <button class="v-mini" data-act="login">почта</button>
+          <button class="v-mini" data-act="login">логин</button>
           <button class="v-mini" data-act="show">показать</button>
           <button class="v-mini" data-act="copy">пароль</button>
           <button class="v-mini del" data-act="del">удалить</button>
@@ -4742,12 +4747,12 @@ let LINKS = [
     const rec = vaultRows.find(r => r.id === row.dataset.id);
     if(!rec) return;
     const act = btn.dataset.act;
-    const flash = (b, t) => { const o=b.textContent; b.textContent=t; setTimeout(()=>b.textContent=o,1400); };
+    const flash = (b, t) => { const o = b.textContent; b.textContent = t; setTimeout(()=>b.textContent = o, 1400); };
     try{
       if(act === 'login'){ await navigator.clipboard.writeText(rec.login); flash(btn,'скопировано'); }
       if(act === 'show'){
         const cell = row.querySelector('[data-secret]');
-        if(btn.textContent === 'скрыть'){ cell.textContent='••••••••'; btn.textContent='показать'; return; }
+        if(btn.textContent === 'скрыть'){ cell.textContent = '••••••••'; btn.textContent = 'показать'; return; }
         cell.textContent = rec.secret ? await decryptSecret(vaultKey, rec.secret) : 'пароль не задан';
         btn.textContent = 'скрыть';
       }
@@ -4762,36 +4767,19 @@ let LINKS = [
         vaultRows = vaultRows.filter(r => r.id !== rec.id);
         renderVault();
       }
-    }catch(e){ alert('Не получилось: ' + e.message); }
+    }catch(e){ alert('Не получилось: ' + (e.message || e.name)); }
   }
 
   function initVault(){
-    const go = byIdV('vKeyGo'), inp = byIdV('vKey'), err = byIdV('vKeyErr');
-    if(!go) return;
-    async function tryKey(){
-      const pass = (inp.value||'').trim();
-      if(pass.length < 6){ err.textContent = 'Ключ короче шести символов не защитит'; return; }
-      err.textContent = 'Открываю…';
-      try{ await openVaultWith(pass); err.textContent = ''; }
-      catch(e){
-        /* при неверном ключе браузер бросает OperationError без текста,
-           а битая строка даёт ошибку разбора base64 — различаем */
-        const wrongKey = e.name === 'OperationError' || /decrypt|operation/i.test(e.message||'');
-        const broken   = /base|decode|atob|повреждена/i.test(e.message||'');
-        err.textContent = wrongKey ? 'Ключ не подошёл'
-          : broken ? 'Запись в базе повреждена — расшифровать нечем'
-          : 'Не удалось: ' + (e.message || e.name);
-      }
-    }
-    go.onclick = tryKey;
-    inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); tryKey(); } });
-    byIdV('vLock').onclick = ()=>{
-      try{ localStorage.removeItem(VAULT_KEY_LS) }catch(e){}
-      vaultKey = null;
-      byIdV('vBody').style.display='none'; byIdV('vLock').style.display='none';
-      byIdV('vKeyBox').style.display=''; inp.value='';
+    if(!byIdV('vList')) return;
+    const re = byIdV('vRelogin');
+    if(re) re.onclick = ()=>{
+      try{ localStorage.removeItem(LS_PASS); localStorage.removeItem(LS_CODE); }catch(e){}
+      location.reload();
     };
-    byIdV('vList').addEventListener('click', e=>{
+    const lock = byIdV('vLock');
+    if(lock) lock.style.display = 'none';
+    byIdV('vList').addEventListener('click', e => {
       const b = e.target.closest('[data-act]'); if(b) vaultAction(b);
     });
     byIdV('vAdd').onclick = async ()=>{
@@ -4806,9 +4794,9 @@ let LINKS = [
         };
         const [saved] = await vaultApi.add(row);
         vaultRows.push(saved || row);
-        byIdV('vService').value=''; byIdV('vLogin').value=''; byIdV('vSecret').value='';
+        byIdV('vService').value = ''; byIdV('vLogin').value = ''; byIdV('vSecret').value = '';
         renderVault();
-      }catch(e){ alert('Не сохранилось: ' + e.message); }
+      }catch(e){ alert('Не сохранилось: ' + (e.message || e.name)); }
     };
   }
 
@@ -4819,10 +4807,13 @@ let LINKS = [
     document.title = 'Доступы — Deck Hub';
     window.scrollTo({top:0});
     track('open','vault');
-    let saved = null;
-    try{ saved = localStorage.getItem(VAULT_KEY_LS) }catch(e){}
-    if(saved){ try{ await openVaultWith(saved); return; }catch(e){} }
-    setTimeout(()=>{ const i = byIdV('vKey'); if(i) i.focus(); }, 60);
+    /* ключ отдельно не спрашиваем: им служит пароль, введённый при входе */
+    try{ await openVaultWith(myPass()); }
+    catch(e){
+      byIdV('vKeyBox').style.display = '';
+      byIdV('vBody').style.display = 'none';
+      byIdV('vKeyErr').textContent = 'Не удалось расшифровать: ' + (e.message || e.name);
+    }
   }
 
   /* ---- старт ---- */

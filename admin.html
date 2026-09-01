@@ -748,7 +748,9 @@ function renderVaultTab(){
       <div class="mgmt-lab">доступы — ${vaultRows.length}</div>
       ${vaultRows.length ? `<table>
         <thead><tr><th>Сервис</th><th>Логин</th><th>Пароль</th><th></th></tr></thead>
-        <tbody>${vaultRows.map(r => `
+        <tbody>${[...vaultRows].sort((a,b) =>
+            (a.service||'').localeCompare(b.service||'','ru') || (a.login||'').localeCompare(b.login||''))
+          .map(r => `
           <tr data-id="${esc(r.id)}">
             <td>${esc(r.service)}</td>
             <td class="mgmt-mono">${esc(r.login)}</td>

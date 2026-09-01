@@ -126,6 +126,12 @@ html,body{margin:0}
 #screenAdmin .mgmt-note.mgmt-info{background:var(--accent-soft);border:1px solid var(--accent-line)}
 #screenAdmin .mgmt-note.mgmt-warn{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent)}
 #screenAdmin .mgmt-note b{font-weight:600}
+#screenAdmin .mgmt-btn.mgmt-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#screenAdmin .mgmt-btn.mgmt-go:hover{filter:brightness(1.07);color:#fff}
+#screenAdmin textarea.mgmt-in{
+  width:100%;resize:vertical;font-family:var(--mono);font-size:12.5px;line-height:1.6;
+  padding:11px 12px;
+}
 #screenAdmin .mgmt-empty{color:var(--faint);font-size:13px;padding:20px 0;text-align:center}
 #screenAdmin .mgmt-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);background:var(--ink);color:var(--bg);
          padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s;z-index:50}
@@ -255,11 +261,13 @@ html,body{margin:0}
   <div class="mgmt-tabs" role="tablist">
     <button role="tab" data-tab="stats" aria-selected="true">Статистика</button>
     <button role="tab" data-tab="cfg" aria-selected="false">Сервисы</button>
+    <button role="tab" data-tab="vault" aria-selected="false">Доступы</button>
     <button role="tab" data-tab="ops" aria-selected="false">Обслуживание</button>
   </div>
 
   <div id="mgmt-tab-stats"></div>
   <div id="mgmt-tab-cfg" style="display:none"></div>
+  <div id="mgmt-tab-vault" style="display:none"></div>
   <div id="mgmt-tab-ops" style="display:none"></div>
 </div>
 <div class="mgmt-toast" id="mgmt-toast"></div>
@@ -381,7 +389,7 @@ async function loadAll(){
       get(MAIN, 'hub_presence?select=*&order=last_seen.desc').catch(()=>[]),
     ]);
   }catch(e){ failed = e.message; events=[]; services=[]; links=[]; presence=[]; }
-  renderStats(); renderCfg(); renderOps();
+  renderStats(); renderCfg(); renderVaultTab(); renderOps();
 }
 
 /* ── статистика ──────────────────────────────────────────────────── */
@@ -687,6 +695,161 @@ async function seed(){
   }catch(e){ toast('Не получилось: ' + e.message); }
 }
 
+/* ── доступы к сервисам ───────────────────────────────────────────── */
+/* Пароли шифруются в браузере тем же паролем команды, которым дизайнеры
+   входят в хаб. В код они не попадают: список вставляется здесь один раз. */
+const PROBE_ID = '__probe__', PROBE_VAL = 'deckhub-ok';
+let teamPass = null, vaultRows = [];
+
+const b64 = {
+  to: buf => btoa(String.fromCharCode(...new Uint8Array(buf))),
+  from: s => Uint8Array.from(atob(s), c => c.charCodeAt(0))
+};
+async function deriveKey(pass, salt){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name:'PBKDF2', salt, iterations:200000, hash:'SHA-256' },
+    base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+}
+async function encryptSecret(pass, text){
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const key  = await deriveKey(pass, salt);
+  const data = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(text));
+  return [b64.to(salt), b64.to(iv), b64.to(data)].join('.');
+}
+async function decryptSecret(pass, packed){
+  const [s,i,d] = String(packed||'').split('.');
+  if(!s || !i || !d) throw new Error('строка повреждена');
+  const key = await deriveKey(pass, b64.from(s));
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name:'AES-GCM', iv:b64.from(i) }, key, b64.from(d)));
+}
+
+async function vaultList(){ return get(MAIN, 'hub_vault?select=*&order=sort.asc'); }
+
+function renderVaultTab(){
+  const box = $('#mgmt-tab-vault');
+  if(!teamPass){
+    box.innerHTML = `
+      <div class="mgmt-card">
+        <div class="mgmt-lab">пароль команды</div>
+        <div style="font-size:14px;margin-bottom:14px">Это тот же пароль, которым дизайнеры входят в хаб. Им шифруются доступы, поэтому без него редактировать нельзя.</div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <input class="mgmt-in" id="mgTeamPass" type="password" placeholder="Пароль команды" style="max-width:260px">
+          <button class="mgmt-btn mgmt-go" id="mgTeamGo">Открыть</button>
+        </div>
+        <div class="mgmt-note mgmt-warn" id="mgTeamErr" style="display:none"><span>!</span><span></span></div>
+      </div>`;
+    $('#mgTeamGo').onclick = tryTeamPass;
+    $('#mgTeamPass').onkeydown = e => { if(e.key === 'Enter') tryTeamPass(); };
+    return;
+  }
+  box.innerHTML = `
+    <div class="mgmt-card">
+      <div class="mgmt-lab">доступы — ${vaultRows.length}</div>
+      ${vaultRows.length ? `<table>
+        <thead><tr><th>Сервис</th><th>Логин</th><th>Пароль</th><th></th></tr></thead>
+        <tbody>${vaultRows.map(r => `
+          <tr data-id="${esc(r.id)}">
+            <td>${esc(r.service)}</td>
+            <td class="mgmt-mono">${esc(r.login)}</td>
+            <td class="mgmt-mono" data-secret>${r.secret ? '••••••••' : '<span style="color:var(--faint)">не задан</span>'}</td>
+            <td class="mgmt-rowbtns">
+              ${r.secret ? '<button class="mgmt-ico" data-act="show" title="Показать">👁</button>' : ''}
+              <button class="mgmt-ico" data-act="del" title="Удалить">✕</button>
+            </td>
+          </tr>`).join('')}</tbody></table>`
+        : '<div class="mgmt-empty">Пока пусто.</div>'}
+    </div>
+
+    <div class="mgmt-card">
+      <div class="mgmt-lab">вставить список</div>
+      <div style="font-size:14px;margin-bottom:12px">Вставьте строки как в переписке: почта и пароль через пробел, по одной на строку. Пароль можно опустить — сохранится только логин.</div>
+      <input class="mgmt-in" id="mgVService" placeholder="Сервис — Kling, TopView…" style="max-width:280px;margin-bottom:9px">
+      <textarea class="mgmt-in" id="mgVPaste" rows="7" placeholder="creo.team@evadav.com 8WgSjzaLUHp8PY
+designer@evadav.com q6coHIMUHWSAh6"></textarea>
+      <div style="display:flex;gap:9px;margin-top:11px;align-items:center;flex-wrap:wrap">
+        <button class="mgmt-btn mgmt-go" id="mgVImport">Зашифровать и сохранить</button>
+        <span class="mgmt-mono" id="mgVCount" style="color:var(--faint)"></span>
+      </div>
+      <div class="mgmt-note mgmt-info"><span>i</span><span>Пароли шифруются здесь, в браузере. В базу уходит нечитаемая строка, в код они не попадают вообще.</span></div>
+    </div>`;
+  $('#mgVImport').onclick = importVault;
+  $('#mgmt-tab-vault').querySelectorAll('.mgmt-ico').forEach(b => b.onclick = () => vaultRowAction(b));
+}
+
+async function tryTeamPass(){
+  const pass = ($('#mgTeamPass').value||'').trim();
+  const err = $('#mgTeamErr');
+  const fail = m => { err.style.display=''; err.querySelector('span:last-child').textContent = m; };
+  if(pass.length < 6) return fail('Пароль короче шести символов не подойдёт');
+  try{
+    const rows = await vaultList();
+    const probe = rows.find(r => r.id === PROBE_ID);
+    if(probe){
+      const v = await decryptSecret(pass, probe.secret);
+      if(v !== PROBE_VAL) throw new Error('mismatch');
+    } else {
+      await post(MAIN, 'hub_vault', { id:PROBE_ID, service:'__probe__', login:'-', sort:-1,
+                                      secret: await encryptSecret(pass, PROBE_VAL) });
+    }
+    teamPass = pass;
+    vaultRows = (await vaultList()).filter(r => r.id !== PROBE_ID);
+    renderVaultTab();
+  }catch(e){
+    fail(e.name === 'OperationError' || /mismatch|decrypt/i.test(e.message||'')
+      ? 'Пароль не подошёл' : 'Не удалось: ' + (e.message || e.name));
+  }
+}
+
+async function vaultRowAction(btn){
+  const tr = btn.closest('tr'), rec = vaultRows.find(r => r.id === tr.dataset.id);
+  if(!rec) return;
+  try{
+    if(btn.dataset.act === 'show'){
+      const cell = tr.querySelector('[data-secret]');
+      if(btn.textContent === '🙈'){ cell.textContent = '••••••••'; btn.textContent = '👁'; return; }
+      cell.textContent = await decryptSecret(teamPass, rec.secret);
+      btn.textContent = '🙈';
+    }
+    if(btn.dataset.act === 'del'){
+      if(!confirm(`Удалить доступ «${rec.service}» (${rec.login})?`)) return;
+      await del(MAIN, 'hub_vault?id=eq.' + encodeURIComponent(rec.id));
+      vaultRows = vaultRows.filter(r => r.id !== rec.id);
+      renderVaultTab();
+    }
+  }catch(e){ toast('Не получилось: ' + (e.message || e.name)); }
+}
+
+async function importVault(){
+  const service = ($('#mgVService').value||'').trim();
+  const text = $('#mgVPaste').value || '';
+  if(!service){ toast('Укажите сервис'); return; }
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  if(!lines.length){ toast('Вставьте хотя бы одну строку'); return; }
+  let ok = 0, bad = 0;
+  for(const line of lines){
+    /* строка вида «почта пароль»; лишние пробелы и нумерация отбрасываются */
+    const clean = line.replace(/^\s*\d+[.)]\s*/, '');
+    const parts = clean.split(/\s+/).filter(Boolean);
+    const login = parts.shift();
+    const secret = parts.join(' ');
+    if(!login || !/@|\w/.test(login)){ bad++; continue; }
+    try{
+      const row = {
+        id: (service + '-' + login).toLowerCase().replace(/[^a-zа-я0-9]+/gi,'-').slice(0,60),
+        service, login, sort: (vaultRows.length + ok + 1) * 10,
+        secret: secret ? await encryptSecret(teamPass, secret) : null
+      };
+      const [saved] = await post(MAIN, 'hub_vault', row);
+      vaultRows.push(saved || row);
+      ok++;
+    }catch(e){ bad++; }
+  }
+  $('#mgVPaste').value = '';
+  toast('Сохранено: ' + ok + (bad ? ', пропущено: ' + bad : ''));
+  renderVaultTab();
+}
+
 /* ── обслуживание ────────────────────────────────────────────────── */
 function renderOps(){
   const mine = (()=>{ try{ return localStorage.getItem('deckhub.visitor') || '' }catch(e){ return '' } })();
@@ -768,7 +931,7 @@ async function dump(db, path, name){
 /* ── связка ──────────────────────────────────────────────────────── */
 ROOT.querySelectorAll('.mgmt-tabs button').forEach(b => b.onclick = () => {
   ROOT.querySelectorAll('.mgmt-tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
-  ['stats','cfg','ops'].forEach(k => {
+  ['stats','cfg','vault','ops'].forEach(k => {
     const el = ROOT.querySelector('#mgmt-tab-'+k);
     if(el) el.style.display = b.dataset.tab === k ? '' : 'none';
   });

@@ -1917,16 +1917,7 @@ body.gated{overflow:hidden}
 
     <div class="v-body" id="vBody" style="display:none">
       <div class="v-list" id="vList"></div>
-      <div class="v-add">
-        <div class="v-add-t">Добавить доступ</div>
-        <div class="v-add-row">
-          <input class="v-in" id="vService" placeholder="Сервис — Kling, TopView…">
-          <input class="v-in" id="vLogin" placeholder="Почта или логин">
-          <input class="v-in" id="vSecret" type="password" placeholder="Пароль">
-          <button class="v-go v-add-btn" id="vAdd">Добавить</button>
-        </div>
-        <div class="v-hint">Пароль шифруется в браузере: в базу уходит только нечитаемая строка.</div>
-      </div>
+      <div class="v-hint">Список только для чтения. Добавить или изменить доступ можно в админ-панели — она под отдельным паролем.</div>
     </div>
   </div>
 </section>
@@ -4737,7 +4728,6 @@ let LINKS = [
           <button class="v-mini" data-act="login">логин</button>
           <button class="v-mini" data-act="show">показать</button>
           <button class="v-mini" data-act="copy">пароль</button>
-          <button class="v-mini del" data-act="del">удалить</button>
         </div>
       </div>`).join('');
   }
@@ -4761,12 +4751,6 @@ let LINKS = [
         await navigator.clipboard.writeText(await decryptSecret(vaultKey, rec.secret));
         flash(btn,'скопировано');
       }
-      if(act === 'del'){
-        if(!confirm(`Удалить доступ к «${rec.service}» (${rec.login})?`)) return;
-        await vaultApi.del(rec.id);
-        vaultRows = vaultRows.filter(r => r.id !== rec.id);
-        renderVault();
-      }
     }catch(e){ alert('Не получилось: ' + (e.message || e.name)); }
   }
 
@@ -4782,23 +4766,8 @@ let LINKS = [
     byIdV('vList').addEventListener('click', e => {
       const b = e.target.closest('[data-act]'); if(b) vaultAction(b);
     });
-    byIdV('vAdd').onclick = async ()=>{
-      const service = byIdV('vService').value.trim(), login = byIdV('vLogin').value.trim();
-      const secret = byIdV('vSecret').value;
-      if(!service || !login){ alert('Нужны сервис и логин'); return; }
-      try{
-        const row = {
-          id: service.toLowerCase().replace(/[^a-zа-я0-9]+/gi,'-') + '-' + Date.now().toString(36),
-          service, login, sort: (vaultRows.length + 1) * 10,
-          secret: secret ? await encryptSecret(vaultKey, secret) : null
-        };
-        const [saved] = await vaultApi.add(row);
-        vaultRows.push(saved || row);
-        byIdV('vService').value = ''; byIdV('vLogin').value = ''; byIdV('vSecret').value = '';
-        renderVault();
-      }catch(e){ alert('Не сохранилось: ' + (e.message || e.name)); }
-    };
   }
+
 
   async function enterVault(){
     const target = byIdV('screenVault'); if(!target) return;

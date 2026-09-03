@@ -1217,7 +1217,6 @@ body.gated{overflow:hidden}
   background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;padding:13px 15px;
 }
 @media(max-width:640px){#screenVault .v-row{grid-template-columns:1fr;gap:7px}}
-#screenVault .v-svc{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px}
 #screenVault .v-pair{display:flex;flex-direction:column;gap:5px;min-width:0}
 #screenVault .v-line{display:flex;align-items:center;gap:8px;min-width:0}
 #screenVault .v-lbl{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;
@@ -1233,12 +1232,7 @@ body.gated{overflow:hidden}
 #screenVault .v-mini:hover{color:var(--v-ink);border-color:var(--v-faint)}
 #screenVault .v-mini.del:hover{color:var(--v-bad);border-color:var(--v-bad)}
 
-#screenVault .v-add{background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;padding:16px}
-#screenVault .v-add-t{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--v-faint);margin-bottom:12px}
-#screenVault .v-add-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:9px}
-@media(max-width:760px){#screenVault .v-add-row{grid-template-columns:1fr}}
-#screenVault .v-add-btn{width:auto;margin-top:0;padding:0 18px}
+@media(max-width:760px){}
 #screenVault .v-hint{font-size:12px;color:var(--v-faint);margin-top:11px;line-height:1.5}
 #screenVault .v-empty{text-align:center;color:var(--v-faint);font-size:13px;padding:30px 0}
 .build-badge{
@@ -2645,7 +2639,6 @@ const ITEMS=[
  {id:'x_multi',t:'highest',s:null,th:'anim', l:'Сложные комплексные анимации из нескольких шагов'},
  {id:'x_two',  t:'highest',s:null,th:'shoot',l:'Обязательно задействован второй человек для съёмок',sh:true},
 ];
-const IT=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
 
 /* Диапазоны из методики: Low [2.5–3.80], Medium [3.85–5.25], High [5.3–6.7].
    Концы включительны, между диапазонами остаются разрывы (3.80–3.85 и
@@ -4701,10 +4694,6 @@ let LINKS = [
       const rows = await fetch(DB.url+'/rest/v1/prompts?select=author', {headers:HEAD}).then(r=>r.json());
       return [...new Set(rows.map(r=>(r.author||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
     }catch(e){ return [] }
-  }
-  function setName(n){
-    store.set('pd-author', String(n||'').trim());
-    renderWho(); ping();
   }
   /* Кто вошёл — известно из формы входа, поэтому спрашивать больше нечего:
      просто показываем в мастхеде. */

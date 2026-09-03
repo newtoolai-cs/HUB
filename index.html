@@ -521,6 +521,47 @@ body.booting{overflow:hidden}
 #screenCalc .tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(20,27,35,.14)}
 #screenCalc .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #screenCalc .base-strip{background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:11px;padding:12px 15px;font-size:13px;margin-bottom:18px;color:var(--ink)}
+#screenCalc .ttypes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+#screenCalc .ttypes button{
+  background:var(--panel);border:1px solid var(--line);color:var(--muted);cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;padding:8px 13px;border-radius:9px;transition:all .14s;
+}
+#screenCalc .ttypes button:hover{color:var(--ink);border-color:var(--faint)}
+#screenCalc .ttypes button[aria-pressed="true"]{
+  background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;
+}
+#screenCalc .sp-lab{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+#screenCalc .sp-list{display:flex;flex-direction:column;gap:9px}
+#screenCalc .sp-tier{
+  display:flex;flex-direction:column;gap:6px;text-align:left;cursor:pointer;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;transition:all .14s;
+}
+#screenCalc .sp-tier:hover{border-color:var(--faint)}
+#screenCalc .sp-tier[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:inset 0 0 0 1px var(--accent)}
+#screenCalc .sp-t-head{display:flex;align-items:baseline;gap:10px}
+#screenCalc .sp-t-head b{font-family:'Space Grotesk',sans-serif;font-size:15px}
+#screenCalc .sp-t-pts{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);margin-left:auto}
+#screenCalc .sp-t-d{font-size:12.5px;line-height:1.5;color:var(--muted)}
+#screenCalc .sp-hint{font-size:12px;line-height:1.5;color:var(--faint);margin-top:7px}
+#screenCalc .sp-why{
+  font-size:12.5px;line-height:1.55;color:var(--muted);background:var(--panel-2);
+  border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;margin-bottom:14px;
+}
+#screenCalc .sp-why b{color:var(--ink);font-weight:600}
+#screenCalc label.check{display:flex;align-items:flex-start;gap:9px;cursor:pointer;font-size:13.5px;line-height:1.45}
+#screenCalc label.check input{
+  appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin:1px 0 0;
+  border:1.5px solid var(--line);border-radius:5px;background:var(--panel-2);cursor:pointer;
+  position:relative;transition:all .14s;
+}
+#screenCalc label.check input:checked{background:var(--accent);border-color:var(--accent)}
+#screenCalc label.check input:checked::after{
+  content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+
 #screenCalc .base-strip b{color:var(--accent)}
 #screenCalc .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 #screenCalc .pad{padding:20px}
@@ -1662,6 +1703,29 @@ body.gated{overflow:hidden}
   </div>
 
   <div id="tab-calc">
+    <div class="ttypes" id="taskTypes" role="group" aria-label="Тип задачи">
+      <button data-tt="creation" aria-pressed="true">Creation Video</button>
+      <button data-tt="image" aria-pressed="false">Статика</button>
+      <button data-tt="trvideo" aria-pressed="false">Перевод видео</button>
+      <button data-tt="refresh" aria-pressed="false">Refreshing</button>
+      <button data-tt="adapt" aria-pressed="false">Adaptation</button>
+    </div>
+
+    <div id="simplePanel" style="display:none">
+      <div class="base-strip" id="spIntro"></div>
+      <div class="grid">
+        <div class="card pad">
+          <div class="sp-lab">сложность</div>
+          <div class="sp-list" id="spList"></div>
+          <div class="sp-extra" id="spExtra"></div>
+        </div>
+        <div class="card result">
+          <div id="spRes"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="creationPanel">
     <div class="base-strip">В каждую сложность уже заложена <b>база</b>: озвучка (с/без субтитров) + эмодзи + склейка/переходы + стрелка + музыка (выданная). Отмечай только то, что <b>сверх</b> базы.</div>
 
     <div class="grid">
@@ -1684,6 +1748,7 @@ body.gated{overflow:hidden}
         <div id="resBody" style="display:none"></div>
       </div>
     </div>
+  </div>
   </div>
 
   <div id="tab-ref" style="display:none">
@@ -1717,6 +1782,13 @@ body.gated{overflow:hidden}
         <div class="defrow"><div class="dt">Обычные</div><div class="dd">Средней сложности, по сюжету озвучки или по теме: разные работы, подписание документов, получение зарплаты, конкретные локационные перелёты.</div></div>
         <div class="defrow"><div class="dt">Сложные</div><div class="dd">Максимально необычные нативные футажи, поиск занимает много времени. Такие в целях экономии обычно генерируются через AI.</div></div>
       </div></details>
+      <details class="ref"><summary>Другие типы задач</summary><div class="body">
+        <div class="defrow"><div class="dt">Creation / Translation Image</div><div class="dd">Статика, две сложности. Lowest 0,15 / 0,9 / 1,2 — есть пример готовой статики для новых вариаций. Low 0,2 / 1,2 / 1,6 — есть только описание креатива. Перевод готовой статики идёт как Lowest.</div></div>
+        <div class="defrow"><div class="dt">Translation Video</div><div class="dd">Low 0,25 / 1,5 / 1,5 — обычный перевод озвучки и субтитров, может быть до восьми голосов и видов субтитров. Medium 0,35 / 2,1 / 2,1–2,6 — плюс плашки, записи экрана, простой UI. High 0,5 / 3 / 3–3,5 — плюс сложный комплексный UI. Свыше шести креативов каждый следующий добавляет 0,25, но только если по нему были дополнительные действия.</div></div>
+        <div class="defrow"><div class="dt">Refreshing Video</div><div class="dd">Одна сложность, Medium: 0,25 / 1,5 / 2.</div></div>
+        <div class="defrow"><div class="dt">Adaptation Video</div><div class="dd">Приравнивается к Creation Video: Lowest как Primitive (0,25 / 1,5 / 2), Medium как Medium (0,75 / 4,5 / 6).</div></div>
+      </div></details>
+
       <details class="ref"><summary>Разговорные генерации</summary><div class="body">
         <div class="defrow"><div class="dt">Простые · Low</div><div class="dd">Есть понятный референс, распространённый сценарий, один объект или персонаж без доп. действий (фон может быть живой), нет сюжетного развития — достаточно адаптировать существующую идею. Сюда же Medium-случай, если есть готовый отработанный промпт.</div></div>
         <div class="defrow"><div class="dt">Обычные · Medium</div><div class="dd">Есть дополнительное действие (нарезать овощи, упаковать чемодан, езда на велосипеде); есть моушн в генерации — рассказчик говорит, затем камера уводит на другой объект; два человека говорят в одном кадре одной генерацией. Сюда же аватар, созданный через новую нативную фотографию, которую перегенерировали под окружение или профессию, и аватар из новой нативной нестандартной фотографии.</div></div>
@@ -2627,6 +2699,208 @@ const themeBtn=document.getElementById('theme');
 themeBtn.addEventListener('click',()=>{const n=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=n;setLS('deckhub.theme',n);});
 
 /* ============ табы ============ */
+/* ═════════════════════════════════════════════════════════════════════
+   ОСТАЛЬНЫЕ ТИПЫ ЗАДАЧ
+   У них нет звёздочек и комбинирования: сложность выбирается напрямую,
+   поинты берутся из таблицы методики для 1, 6 и 8 креативов.
+   ═══════════════════════════════════════════════════════════════════ */
+const TASK_TYPES = {
+  image: {
+    name: 'Creation Image + Translation Image',
+    intro: 'Статические креативы делятся на две сложности. Для разработки используем нейросети.',
+    tiers: [
+      { key:'lowest', name:'Lowest', pts:[0.15, 0.9, 1.2],
+        d:'Есть пример готовой статики, по которой нужно сделать новые вариации.' },
+      { key:'low', name:'Low', pts:[0.2, 1.2, 1.6],
+        d:'Есть описание креатива, но примера готовой статики нет.' },
+    ],
+    notes: ['Перевод готовой статики оценивается как Lowest — 0,15 points за креатив.'],
+  },
+  trvideo: {
+    name: 'Translation Video',
+    intro: 'Сложность зависит от того, сколько креативов делается с одного переведённого аватара: чем меньше — тем дороже.',
+    avatars: true,        /* сложность считается из числа аватаров, а не выбирается */
+    tiers: [
+      { key:'low', name:'Low', pts:[0.25, 1.5, 1.5], perAvatar:3,
+        d:'Один аватар на три креатива — 2 аватара дают 6 крео. Обычный перевод озвучки и субтитров.' },
+      { key:'medium', name:'Medium', pts:[0.35, 2.1, 2.6], perAvatar:2,
+        d:'Один аватар на два креатива — 3 аватара дают 6 крео. Плюс плашки, записи экрана, простой UI.' },
+      { key:'high', name:'High', pts:[0.5, 3, 3.5], perAvatar:1,
+        d:'Один аватар на один креатив — 6 аватаров дают 6 крео. Плюс сложный комплексный UI.' },
+    ],
+    extra: { id:'trExtra', label:'Для каждого креатива свыше шести были дополнительные действия',
+             hint:'Скопировать перевод из одного креатива в другой за дополнительное действие не считается.',
+             per: 0.25 },
+    notes: ['У Medium и High верхняя граница на 8 креативов — вилка: 2,1–2,6 и 3–3,5. Здесь берётся верхнее значение, при споре уточняйте у TL.'],
+  },
+  refresh: {
+    name: 'Refreshing Video',
+    intro: 'Обновление существующего креатива. Одна сложность.',
+    tiers: [
+      { key:'medium', name:'Medium', pts:[0.25, 1.5, 2], d:'Стандартный рефреш по методике.' },
+    ],
+    notes: [],
+  },
+  adapt: {
+    name: 'Adaptation Video',
+    intro: 'Адаптация приравнивается к Creation Video соответствующей сложности.',
+    tiers: [
+      { key:'lowest', name:'Lowest', pts:[0.25, 1.5, 2], d:'Приравнивается к Creation Video, сложность Primitive.' },
+      { key:'medium', name:'Medium', pts:[0.75, 4.5, 6], d:'Приравнивается к Creation Video, сложность Medium.' },
+    ],
+    notes: [],
+  },
+};
+
+/* в этом скрипте своих esc и plural не было — объявляем локально */
+const esc = s => String(s == null ? '' : s)
+  .replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const plural = (n, a, b, c) => {
+  const x = Math.abs(n) % 100, y = x % 10;
+  return x > 10 && x < 20 ? c : y > 1 && y < 5 ? b : y === 1 ? a : c;
+};
+
+let spType = null, spTier = null, spCreo = 6, spExtraOn = false, spAvatars = 3, spManual = false;
+
+/* Сколько креативов приходится на один переведённый аватар: 1 → High,
+   2 → Medium, 3 и больше → Low. Правило из методики. */
+function tierByAvatars(T){
+  const per = spAvatars > 0 ? spCreo / spAvatars : spCreo;
+  const key = per <= 1 ? 'high' : per <= 2 ? 'medium' : 'low';
+  return { key, per: Math.round(per * 100) / 100 };
+}
+
+function spPoints(t){
+  const n = spCreo;
+  if(n === 1) return { v:t.pts[0], exact:true };
+  if(n === 6) return { v:t.pts[1], exact:true };
+  if(n === 8) return { v:t.pts[2], exact:true };
+  return { v: round2(t.pts[0] * n), exact:false };   /* в таблице такого объёма нет */
+}
+
+function renderSimple(){
+  const T = TASK_TYPES[spType];
+  if(!T) return;
+  document.getElementById('spIntro').innerHTML = '<b>' + esc(T.name) + '.</b> ' + esc(T.intro);
+
+  /* для перевода видео сложность выводим сама, если её не задали вручную */
+  let derived = null;
+  if(T.avatars){
+    derived = tierByAvatars(T);
+    if(!spManual) spTier = derived.key;
+  }
+
+  document.getElementById('spList').innerHTML = T.tiers.map(t => `
+    <button class="sp-tier" type="button" data-tier="${t.key}" aria-pressed="${spTier === t.key}">
+      <span class="sp-t-head"><b>${esc(t.name)}</b>
+        <span class="sp-t-pts">${fmt(t.pts[0])} / ${fmt(t.pts[1])} / ${fmt(t.pts[2])}</span></span>
+      <span class="sp-t-d">${esc(t.d)}</span>
+    </button>`).join('');
+
+  document.getElementById('spExtra').innerHTML = `
+    ${T.avatars ? `
+    <div class="sp-lab" style="margin-top:18px">переводим аватаров</div>
+    <div class="creo">
+      <span class="creo-lab">Столько разных переводов делаем</span>
+      <span class="creo-in">
+        <button type="button" data-avstep="-1" aria-label="Меньше">−</button>
+        <input id="spAv" type="number" inputmode="numeric" min="1" max="99" value="${spAvatars}" aria-label="Количество аватаров">
+        <button type="button" data-avstep="1" aria-label="Больше">+</button>
+      </span>
+      <span class="creo-pre">${[2,3,6].map(p =>
+        `<button type="button" data-avset="${p}" class="${p === spAvatars ? 'on' : ''}">${p}</button>`).join('')}</span>
+    </div>` : ''}
+    <div class="sp-lab" style="margin-top:18px">креативов в задаче</div>
+    <div class="creo">
+      <span class="creo-lab">В таблице методики есть 1, 6 и 8</span>
+      <span class="creo-in">
+        <button type="button" data-spstep="-1" aria-label="Меньше">−</button>
+        <input id="spCreo" type="number" inputmode="numeric" min="1" max="99" value="${spCreo}" aria-label="Количество креативов">
+        <button type="button" data-spstep="1" aria-label="Больше">+</button>
+      </span>
+      <span class="creo-pre">${[1,6,8].map(p =>
+        `<button type="button" data-spcreo="${p}" class="${p === spCreo ? 'on' : ''}">${p}</button>`).join('')}</span>
+    </div>
+    ${T.extra ? `<label class="check" style="margin-top:14px">
+      <input type="checkbox" id="spExtraBox"${spExtraOn ? ' checked' : ''}> ${esc(T.extra.label)}
+    </label><div class="sp-hint">${esc(T.extra.hint)}</div>` : ''}`;
+
+  const box = document.getElementById('spRes');
+  const t = T.tiers.find(x => x.key === spTier);
+  if(!t){
+    box.innerHTML = '<div class="res-empty">Выбери сложность — покажу поинты.</div>';
+  } else {
+    const p = spPoints(t);
+    const bonus = (T.extra && spExtraOn && spCreo > 6) ? round2((spCreo - 6) * T.extra.per) : 0;
+    const total = round2(p.v + bonus);
+    box.innerHTML = `
+      <div class="res-head"><div class="res-t">${esc(T.name)}</div>
+        <div class="tier-pill t-${t.key}">${esc(t.name)}</div></div>
+      ${derived ? `<div class="sp-why">${spCreo} ${plural(spCreo,'креатив','креатива','креативов')} на
+        ${spAvatars} ${plural(spAvatars,'аватар','аватара','аватаров')} —
+        <b>${fmt(derived.per)} ${plural(derived.per,'креатив','креатива','креативов')} с одного аватара</b>,
+        отсюда ${esc((T.tiers.find(x=>x.key===derived.key)||{}).name || derived.key)}.
+        ${spManual && spTier !== derived.key ? 'Сложность выставлена вручную — расчёт по ней.' : ''}</div>` : ''}
+      <div class="lines">
+        <div class="ln"><span class="k">${esc(t.name)} · ${spCreo} ${plural(spCreo,'креатив','креатива','креативов')}</span>
+          <span class="v tnum">${fmt(p.v)}</span></div>
+        ${bonus ? `<div class="ln"><span class="k">Сверх шести: ${spCreo - 6} × ${fmt(T.extra.per)}</span>
+          <span class="v tnum">+${fmt(bonus)}</span></div>` : ''}
+        <div class="ln total"><span class="k">Итого</span><span class="v tnum">${fmt(total)} points</span></div>
+      </div>
+      ${!p.exact ? `<div class="flag info"><span class="i">≡</span><span>В методике для ${spCreo} креативов значения нет. Посчитано как цена одного креатива × ${spCreo}; при споре уточняйте у TL.</span></div>` : ''}
+      ${T.notes.map(n => `<div class="flag warn"><span class="i">!</span><span>${esc(n)}</span></div>`).join('')}
+      <button class="ghost" id="spCopy" style="margin-top:16px">Скопировать расчёт</button>`;
+    const cp = document.getElementById('spCopy');
+    if(cp) cp.onclick = ()=>{
+      const L = [
+        'Task Assessment — ' + T.name,
+        'Сложность: ' + t.name,
+        'Креативов: ' + spCreo,
+        (bonus ? 'Сверх шести: ' + (spCreo - 6) + ' × ' + fmt(T.extra.per) + ' = +' + fmt(bonus) : null),
+        'ИТОГО: ' + fmt(total) + ' points',
+        (calcAuthor() ? 'Оценил: ' + calcAuthor() : null),
+      ].filter(Boolean).join('\n');
+      (navigator.clipboard ? navigator.clipboard.writeText(L) : Promise.reject())
+        .then(()=>toast('Расчёт скопирован')).catch(()=>toast('Не получилось скопировать'));
+    };
+  }
+}
+
+function setTaskType(kind){
+  document.querySelectorAll('#taskTypes button').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.tt === kind));
+  const creation = kind === 'creation';
+  document.getElementById('creationPanel').style.display = creation ? '' : 'none';
+  document.getElementById('simplePanel').style.display  = creation ? 'none' : '';
+  if(!creation){
+    if(spType !== kind){ spType = kind; spTier = null; spExtraOn = false; spManual = false; }
+    renderSimple();
+  }
+}
+
+document.getElementById('taskTypes').addEventListener('click', e => {
+  const b = e.target.closest('[data-tt]');
+  if(b) setTaskType(b.dataset.tt);
+});
+document.getElementById('simplePanel').addEventListener('click', e => {
+  const tier = e.target.closest('[data-tier]');
+  if(tier){ spTier = tier.dataset.tier; spManual = true; renderSimple(); return; }
+  const avset = e.target.closest('[data-avset]');
+  if(avset){ spAvatars = +avset.dataset.avset; spManual = false; renderSimple(); return; }
+  const avst = e.target.closest('[data-avstep]');
+  if(avst){ spAvatars = Math.min(99, Math.max(1, spAvatars + (+avst.dataset.avstep))); spManual = false; renderSimple(); return; }
+  const pre = e.target.closest('[data-spcreo]');
+  if(pre){ spCreo = +pre.dataset.spcreo; renderSimple(); return; }
+  const st = e.target.closest('[data-spstep]');
+  if(st){ spCreo = Math.min(99, Math.max(1, spCreo + (+st.dataset.spstep))); renderSimple(); return; }
+});
+document.getElementById('simplePanel').addEventListener('change', e => {
+  if(e.target.id === 'spCreo'){ spCreo = Math.min(99, Math.max(1, Math.round(+e.target.value) || 1)); spManual = false; renderSimple(); }
+  if(e.target.id === 'spAv'){ spAvatars = Math.min(99, Math.max(1, Math.round(+e.target.value) || 1)); spManual = false; renderSimple(); }
+  if(e.target.id === 'spExtraBox'){ spExtraOn = e.target.checked; renderSimple(); }
+});
+
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
   ['calc','ref','talk'].forEach(k=>{

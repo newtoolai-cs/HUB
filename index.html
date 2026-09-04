@@ -1644,7 +1644,7 @@ body.gated{overflow:hidden}
     <div class="toolbar">
       <div class="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="search" type="text" placeholder="поиск по названию, тексту, тегам…" autocomplete="off">
+        <input id="search" type="text" placeholder="поиск по названию, тексту, тегам, ID задачи…" autocomplete="off">
       </div>
       <select id="sortSel" class="sort-sel" aria-label="Сортировка">
         <option value="new">Сначала новые</option>
@@ -2095,8 +2095,16 @@ function filtered(){
     if(activeAuthor!=='__all' && authorKey(p)!==activeAuthor) return false;
     if(activeTags.size){ for(const t of activeTags){ if(!(p.tags||[]).includes(t)) return false; } }
     if(q){
-      const hay=(p.title+' '+p.body+' '+(p.tags||[]).join(' ')+' '+(p.category||'')+' '+(p.author||'')).toLowerCase();
-      if(!hay.includes(q)) return false;
+      /* ID задачи ищем отдельно: у него свой формат, и по нему часто
+         приходят с вопросом «а был промт под эту задачу». Ищем и по
+         полному совпадению, и по части номера. */
+      const hay=(p.title+' '+p.body+' '+(p.tags||[]).join(' ')+' '+(p.category||'')
+                 +' '+(p.author||'')+' '+(p.task_id||'')).toLowerCase();
+      const idOnly=(p.task_id||'').toLowerCase();
+      const qDigits=q.replace(/\D+/g,'');
+      const hitId = idOnly && (idOnly.includes(q) ||
+                    (qDigits && idOnly.replace(/\D+/g,'').includes(qDigits)));
+      if(!hay.includes(q) && !hitId) return false;
     }
     return true;
   });

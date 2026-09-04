@@ -27,6 +27,24 @@
    ПРЕЛОУДЕР. Стили лежат в <head>, чтобы он появился до всего
    остального и не мигнул. Тема берётся из data-theme на <html>.
    ===================================================================== */
+/* =====================================================================
+   ПОЛОСЫ ПРОКРУТКИ
+   Системные полосы выглядят чужеродно на тёмном фоне, поэтому задаём
+   свои: тонкие, без дорожки, в цвет темы. Правило глобальное — так
+   одинаково ведут себя и хаб, и все сервисы внутри.
+   ===================================================================== */
+:root{ --sb:#C3CAD4; --sb-hover:#9AA4B2; }
+:root[data-theme="dark"]{ --sb:#2A323E; --sb-hover:#3A4553; }
+*{scrollbar-width:thin;scrollbar-color:var(--sb) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{
+  background:var(--sb);border-radius:10px;
+  border:3px solid transparent;background-clip:content-box;
+}
+::-webkit-scrollbar-thumb:hover{background:var(--sb-hover);background-clip:content-box}
+::-webkit-scrollbar-corner{background:transparent}
+
 body.booting{overflow:hidden}
 .boot{
   position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
@@ -359,7 +377,11 @@ body.booting{overflow:hidden}
   }
 
   /* сайдбар и модалка */
-  .rail{border-right:1px solid var(--border-soft)}
+  .rail{
+    border-right:1px solid var(--border-soft);
+    overscroll-behavior:contain;      /* докрутил сайдбар — страница не едет */
+    scrollbar-gutter:stable;          /* полоса не сдвигает содержимое */
+  }
   .modal{border-radius:18px;padding:26px}
 
   /* пилюли фильтров в сайдбаре */
@@ -853,8 +875,7 @@ body.booting{overflow:hidden}
 #screenMusic button{cursor:pointer;background:none;border:none}
 #screenMusic :focus-visible{outline:2px solid var(--warm);outline-offset:2px;border-radius:var(--r-sm)}
 #screenMusic mark{background:var(--hot-soft);color:var(--hot);border-radius:3px;padding:0 2px}
-#screenMusic ::-webkit-scrollbar{width:10px;height:10px}
-#screenMusic ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px;border:3px solid var(--bg)}
+/* полосы прокрутки заданы глобально в <head> */
 #screenMusic .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 #screenMusic /* шапка */
 .top{border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:40}

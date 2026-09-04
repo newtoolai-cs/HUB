@@ -145,25 +145,26 @@ body.booting{overflow:hidden}
 <!-- ============ стили Prompt Deck ============ -->
 <style>
   :root{
-    --bg:#16171b;
-    --panel:#1f2127;
-    --panel-2:#282b33;
-    --raised:#2f323b;
-    --border:#34373f;
-    --border-soft:#2a2c33;
-    --txt:#e8e9ec;
-    --txt-mid:#a7abb5;
-    --txt-dim:#777c87;
-    --play:#3dd7c4;        /* playhead accent */
-    --play-dim:#1d5e57;
-    --danger:#e0697f;
-    --label-1:#e0a458; /* amber */
-    --label-2:#9b8cf0; /* violet */
-    --label-3:#e07a9b; /* rose */
-    --label-4:#6bce8f; /* green */
-    --label-5:#5fa8e0; /* blue */
-    --label-6:#d98c6a; /* clay */
-    --radius:10px;
+    /* палитра выровнена с калькулятором: одна семья цветов на весь хаб */
+    --bg:#0F1319;
+    --panel:#171C24;
+    --panel-2:#1E242E;
+    --raised:#252C37;
+    --border:#2A323E;
+    --border-soft:#222933;
+    --txt:#E8ECF2;
+    --txt-mid:#98A3B2;
+    --txt-dim:#6C7787;
+    --play:#5C8CFF;        /* акцент, как в калькуляторе */
+    --play-dim:#1A2338;
+    --danger:#E8596A;
+    --label-1:#E8A33C; /* янтарный */
+    --label-2:#7A5AF8; /* фиолетовый */
+    --label-3:#E8596A; /* розовый */
+    --label-4:#3FBE8A; /* зелёный */
+    --label-5:#5C8CFF; /* синий */
+    --label-6:#F0855A; /* терракота */
+    --radius:14px;
     --mono:'IBM Plex Mono',ui-monospace,monospace;
     --disp:'Space Grotesk',system-ui,sans-serif;
     --body:'Inter',system-ui,sans-serif;
@@ -316,6 +317,59 @@ body.booting{overflow:hidden}
     max-height:6.4em;overflow:hidden;position:relative;transition:max-height .2s;
     user-select:none;-webkit-user-select:none;-moz-user-select:none;cursor:default;
   }
+  /* ═══════════════════════════════════════════════════════════════
+     ДОВОДКА ПОД ЯЗЫК КАЛЬКУЛЯТОРА
+     Отдельным блоком, чтобы исходные правила деки остались читаемыми
+     и правку легко было откатить.
+     ═══════════════════════════════════════════════════════════════ */
+  .card{
+    border-color:var(--border);
+    box-shadow:0 1px 2px rgba(0,0,0,.18);
+    padding:16px 18px 16px 20px;
+  }
+  :root[data-theme="light"] .card{box-shadow:0 1px 2px rgba(20,27,35,.05), 0 8px 24px rgba(20,27,35,.06)}
+  .card:hover{border-color:var(--txt-dim)}
+  .edge{width:3px}
+
+  /* бейдж категории — как плашки сложности в калькуляторе */
+  .card-cat{border-radius:20px;padding:3px 9px;font-size:10px;letter-spacing:.1em}
+
+  /* теги — таблетки на подложке */
+  .ftag{
+    border:1px solid var(--border-soft);background:var(--panel-2);
+    border-radius:8px;padding:3px 9px;font-size:10.5px;letter-spacing:.04em;
+    transition:border-color .14s,color .14s;cursor:pointer;
+  }
+  .ftag:hover{border-color:var(--play);color:var(--play)}
+
+  /* кнопки: главная — синяя, остальные — обводка */
+  .add-btn{border-radius:11px;font-family:var(--disp);font-weight:600;padding:11px 17px}
+  .copy-btn{border-radius:9px;font-family:var(--disp);font-size:12.5px;height:32px;padding:0 14px}
+  .copy-btn:hover{border-color:var(--play);color:var(--play)}
+  .icon-btn{border-radius:9px}
+
+  /* поля ввода — единый вид с калькулятором */
+  input[type="text"], input[type="search"], textarea, select{
+    border-radius:11px !important;
+    transition:border-color .14s, box-shadow .14s;
+  }
+  input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:focus{
+    border-color:var(--play) !important;
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--play) 14%, transparent) !important;
+  }
+
+  /* сайдбар и модалка */
+  .rail{border-right:1px solid var(--border-soft)}
+  .modal{border-radius:18px;padding:26px}
+
+  /* пилюли фильтров в сайдбаре */
+  .filter-pill{border-radius:9px}
+  .filter-pill.on{background:var(--play);border-color:var(--play);color:var(--on-play)}
+
+  /* счётчик копирований и подписи — моно, как везде в хабе */
+  .copies-badge, .card-date, .byline, .task-chip{font-family:var(--mono);font-size:10.5px}
+  .task-chip{border-radius:8px}
+
   /* ---- варианты промта ---- */
   .var-strip{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 9px}
   .var-chip{
@@ -1535,8 +1589,8 @@ body.gated{overflow:hidden}
   --txt:#161B23;
   --txt-mid:#5F6A79;
   --txt-dim:#8A94A3;
-  --play:#0E9C8D;
-  --play-dim:#D3F1EC;
+  --play:#2F6BFF;
+  --play-dim:#E7EEFF;
   --danger:#D63C4E;
   --label-1:#C0781B;
   --label-2:#6B57DE;
@@ -1544,10 +1598,11 @@ body.gated{overflow:hidden}
   --label-4:#1B9463;
   --label-5:#2F6BFF;
   --label-6:#B4633C;
+  --radius:14px;
   --panel-hover:#F7F9FC;
   --on-play:#FFFFFF;
-  --on-play-dim:#0A5E55;
-  --mark-txt:#08403A;
+  --on-play-dim:#1B45B0;
+  --mark-txt:#12275E;
   --scrim:rgba(22,27,35,.42);
   --shadow-modal:0 24px 60px rgba(20,27,35,.18);
   --shadow-toast:0 10px 28px rgba(20,27,35,.16);

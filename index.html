@@ -316,6 +316,32 @@ body.booting{overflow:hidden}
     max-height:6.4em;overflow:hidden;position:relative;transition:max-height .2s;
     user-select:none;-webkit-user-select:none;-moz-user-select:none;cursor:default;
   }
+  /* ---- варианты промта ---- */
+  .var-strip{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 9px}
+  .var-chip{
+    background:var(--surface-2);border:1px solid var(--line);color:var(--txt-dim);cursor:pointer;
+    border-radius:7px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:4px 8px;transition:all .14s;
+  }
+  .var-chip:hover{color:var(--txt)}
+  .var-chip.on{background:var(--play);border-color:var(--play);color:#fff}
+  .lab-dim{color:var(--txt-dim);font-weight:400;font-size:11.5px;margin-left:6px}
+  .var-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+  .var-num{
+    flex:none;width:22px;height:22px;margin-top:9px;border-radius:6px;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--txt-dim);
+    font-family:var(--mono);font-size:10.5px;display:grid;place-items:center;
+  }
+  .var-in{min-height:64px;flex:1}
+  .var-del{
+    flex:none;width:28px;height:28px;margin-top:6px;border-radius:7px;cursor:pointer;
+    background:none;border:1px solid var(--line);color:var(--txt-dim);transition:all .14s;
+  }
+  .var-del:hover{color:#E8596A;border-color:#E8596A}
+  .var-add{
+    background:none;border:1px dashed var(--line);color:var(--txt-dim);cursor:pointer;
+    width:100%;padding:9px;border-radius:9px;font-size:12.5px;transition:all .14s;
+  }
+  .var-add:hover{color:var(--play);border-color:var(--play)}
   .card-body.open{max-height:2000px}
   .card-body.clamped::after{
     content:"";position:absolute;left:0;right:0;bottom:0;height:2em;
@@ -2098,8 +2124,8 @@ function filtered(){
       /* ID задачи ищем отдельно: у него свой формат, и по нему часто
          приходят с вопросом «а был промт под эту задачу». Ищем и по
          полному совпадению, и по части номера. */
-      const hay=(p.title+' '+p.body+' '+(p.tags||[]).join(' ')+' '+(p.category||'')
-                 +' '+(p.author||'')+' '+(p.task_id||'')).toLowerCase();
+      const hay=(p.title+' '+p.body+' '+(p.variants||[]).join(' ')+' '+(p.tags||[]).join(' ')
+                 +' '+(p.category||'')+' '+(p.author||'')+' '+(p.task_id||'')).toLowerCase();
       const idOnly=(p.task_id||'').toLowerCase();
       const qDigits=q.replace(/\D+/g,'');
       const hitId = idOnly && (idOnly.includes(q) ||
@@ -2214,6 +2240,10 @@ function renderDeck(){
         ${p.category?`<span class="card-cat" style="color:${col};background:color-mix(in srgb, ${col} 14%, transparent)">${esc(p.category)}</span>`:''}
         <h3>${hl(p.title)}</h3>
       </div>
+      ${(p.variants||[]).length?`<div class="var-strip">
+        <button type="button" class="var-chip on" data-var="0">Основной</button>
+        ${(p.variants||[]).map((v,i)=>`<button type="button" class="var-chip" data-var="${i+1}">Вариант ${i+2}</button>`).join('')}
+      </div>`:''}
       <div class="card-body" data-body>${hl(p.body)}</div>
       <button class="more-btn" data-more style="display:none">показать полностью</button>
       <div class="card-foot">
@@ -2246,7 +2276,25 @@ function renderDeck(){
       body.classList.toggle('clamped',!open);
       more.textContent=open?'свернуть':'показать полностью';
     };
-    card.querySelector('[data-copy]').onclick=e=>{ copyText(p.body,e.currentTarget); bumpCopies(p,card); };
+    /* копируем тот вариант, который выбран на карточке */
+    const pickedText=()=>{
+      const i=+(card.dataset.vi||0);
+      return i ? ((p.variants||[])[i-1]||p.body) : p.body;
+    };
+    card.querySelector('[data-copy]').onclick=e=>{ copyText(pickedText(),e.currentTarget); bumpCopies(p,card); };
+    const chips=[...card.querySelectorAll('[data-var]')];
+    chips.forEach(ch=>ch.onclick=()=>{
+      chips.forEach(x=>x.classList.toggle('on',x===ch));
+      card.dataset.vi=ch.dataset.var;
+      body.innerHTML=hl(pickedText());
+      body.classList.remove('open');
+      more.style.display='none';
+      requestAnimationFrame(()=>{
+        if(body.scrollHeight>body.clientHeight+4){ body.classList.add('clamped'); more.style.display=''; }
+        else body.classList.remove('clamped');
+        more.textContent='показать полностью';
+      });
+    });
     card.querySelector('[data-edit]').onclick=()=>openModal(p);
     card.querySelector('[data-del]').onclick=()=>delPrompt(p);
     card.querySelectorAll('[data-tag]').forEach(t=>{
@@ -2348,6 +2396,16 @@ function openModal(p){
       <label>Текст промта</label>
       <textarea id="f_body" placeholder="Сам промт целиком…">${p?esc(p.body):''}</textarea>
     </div>
+    <div class="field">
+      <label>Варианты <span class="lab-dim">то же, но иначе — по желанию</span></label>
+      <div id="f_vars">${((p&&p.variants)||[]).map((v,i)=>`
+        <div class="var-row">
+          <span class="var-num">${i+2}</span>
+          <textarea class="var-in" placeholder="Другая формулировка того же промта…">${esc(v)}</textarea>
+          <button type="button" class="var-del" title="Убрать вариант">✕</button>
+        </div>`).join('')}</div>
+      <button type="button" class="var-add" id="f_varAdd">+ добавить вариант</button>
+    </div>
     <div class="modal-foot">
       <button class="ghost-btn" id="f_cancel">Отмена</button>
       <button class="save-btn" id="f_save">${p?'Сохранить':'Добавить'}</button>
@@ -2363,6 +2421,26 @@ function openModal(p){
   const paintKind=()=>kpick.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===pickKind));
   kpick.querySelectorAll('button').forEach(b=>b.onclick=()=>{pickKind=b.dataset.k;paintKind()});
   paintKind();
+  /* варианты: добавление, удаление и перенумерация на месте */
+  const varsBox=scrim.querySelector('#f_vars');
+  const renumber=()=>varsBox.querySelectorAll('.var-row').forEach((r,i)=>{
+    r.querySelector('.var-num').textContent=i+2;
+  });
+  const addVar=(text='')=>{
+    const row=document.createElement('div');
+    row.className='var-row';
+    row.innerHTML='<span class="var-num"></span>'+
+      '<textarea class="var-in" placeholder="Другая формулировка того же промта…"></textarea>'+
+      '<button type="button" class="var-del" title="Убрать вариант">✕</button>';
+    row.querySelector('.var-in').value=text;
+    row.querySelector('.var-del').onclick=()=>{ row.remove(); renumber(); };
+    varsBox.appendChild(row);
+    renumber();
+    row.querySelector('.var-in').focus();
+  };
+  varsBox.querySelectorAll('.var-del').forEach(b=>b.onclick=()=>{ b.closest('.var-row').remove(); renumber(); });
+  scrim.querySelector('#f_varAdd').onclick=()=>addVar();
+
   const titleEl=scrim.querySelector('#f_title');
   const saveBtn=scrim.querySelector('#f_save');
   const check=()=>{
@@ -2379,15 +2457,17 @@ function openModal(p){
     const cat=scrim.querySelector('#f_cat').value.trim();
     const tags=scrim.querySelector('#f_tags').value.split(',').map(t=>t.trim()).filter(Boolean);
     const task_id=scrim.querySelector('#f_task').value.trim();
+    const variants=[...scrim.querySelectorAll('#f_vars .var-in')]
+      .map(t=>t.value.trim()).filter(Boolean);
     if(!title||!author||!task_id||!body||!tags.length) return;
     try{ localStorage.setItem('pd-author',author); }catch(e){}
     saveBtn.disabled=true;saveBtn.textContent='…';
     try{
       if(editId){
-        const updated=await dbUpdate(editId,{title,body,category:cat,tags,task_id,kind:pickKind,author});
+        const updated=await dbUpdate(editId,{title,body,category:cat,tags,task_id,kind:pickKind,author,variants});
         const i=prompts.findIndex(x=>x.id===editId); if(i>=0) prompts[i]=updated;
       }else{
-        const created=await dbAdd({title,body,category:cat,tags,task_id,kind:pickKind,author});
+        const created=await dbAdd({title,body,category:cat,tags,task_id,kind:pickKind,author,variants});
         prompts.unshift(created);
       }
       if(kind!==pickKind){ kind=pickKind; activeCat='__all'; activeAuthor='__all'; activeTags.clear(); }
